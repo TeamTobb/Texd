@@ -1,0 +1,16 @@
+<div id="wrapper">
+  <div id="title">
+    <h1>{{title}}</h1>
+  </div>
+  <div id="body">
+    <div id="documentName">Document name: {{documentName}}</div>
+    <div id="changeDocumentName">
+      Change document name: <input id="changeDocumentNameInput" [(ngModel)]="documentName" placeholder="name">
+      <button (click)="changeName()">save</button>
+    </div>
+    <br>
+    <div id="textAreaWrapper">
+      <textarea id="textArea" (keyup)="changeDocument()" rows="80" cols="150" [(ngModel)]="documentText"></textarea>
+    </div>
+  </div>
+</div>

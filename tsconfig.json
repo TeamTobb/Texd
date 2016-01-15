@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        "noImplicitAny": false
+    },
+    "filesGlob": [
+        "./server.ts",
+        "./app/**/*.ts",
+        "./app/**/*.tsx",
+        "!node_modules/**",
+        "!./public/**"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "files": [
+        "./server.ts",
+        "./app/controllers/documentController.ts",
+        "./app/models/documentModel.ts",
+        "./app/models/messageModel.ts",
+        "./app/routes/documentRoutes.ts",
+        "./app/routes/indexRoutes.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

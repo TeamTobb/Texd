@@ -1,0 +1,44 @@
+#wrapper {
+  display: block;
+}
+
+#title {
+  color: orange;
+  text-align: center;
+}
+
+#body {
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  font-size: 16px;
+}
+
+#documentName {
+}
+
+#changeDocumentName {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#changeDocumentNameInput {
+  margin-left: auto;
+  margin-right: auto;
+  width: 15em;
+  outline: none;
+}
+
+#textAreaWrapper {
+  display: flex;
+}
+
+#textArea {
+  outline: none;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: 3px solid #888;
+  resize: none;
+  font-size: 14px;
+}

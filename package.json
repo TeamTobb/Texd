@@ -1,0 +1,34 @@
+{
+  "name": "MEAN-Typescript-Angular2-Skeleton",
+  "version": "1.0.0",
+  "description": "A simple MEAN stack skeleton written in Typescript.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamTobb/MEAN-Typescript-Angular2-Skeleton.git"
+  },
+  "author": "Team Tobb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TeamTobb/MEAN-Typescript-Angular2-Skeleton/issues"
+  },
+  "homepage": "https://github.com/TeamTobb/MEAN-Typescript-Angular2-Skeleton#readme",
+  "dependencies": {
+    "es6-shim": "latest",
+    "reflect-metadata": "latest",
+    "rxjs": "latest",
+    "zone.js": "latest",
+    "angular2": "latest",
+    "body-parser": "latest",
+    "express": "^4.13.3",
+    "kerberos": "latest",
+    "mongodb": ">= 1.4.29",
+    "mongoose": "latest",
+    "systemjs": "0.19.6",
+    "ws": "^1.0.1",
+    "typescript" : "latest"
+  }
+}
