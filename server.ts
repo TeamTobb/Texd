@@ -17,6 +17,7 @@ var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
 
+checkArgs();
 
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
@@ -65,3 +66,46 @@ app.listen(httpPort, function(){
 });
 
 export var App = app;
+
+function checkArgs(){
+	var next;
+	process.argv.forEach((val, index, array) => {
+		if (index<2){
+			return;
+		}
+
+	    switch (next){
+		    case'--db':
+				databaseUrl=val;
+		    	console.log("setting: --db = "+val);
+			break;
+		    case'--httpPort':
+				httpPort = Number(val);
+		    	console.log("setting: --httpPort = "+val);
+		    break;
+		    case'--wsPort':
+				wsPort = Number(val);
+		    	console.log("setting: --wsPort = "+val);
+		    break;
+			case'--socketUrl':
+		    	console.log("not implementet");
+		    break;
+			case'--help':
+				console.log("example: \n--db hoxmark.xyz \n --httpPort 3000 \n -wsPort 3001 \n\n --db to change database URL, \n --httpPort to change portnumber to access the express server \n --wsPort to change the portnumber of the socket ")
+				process.exit();
+			break;
+
+	    	default:
+				if (val=="--db"){
+					next = val;
+				} else if (val == "--httpPort"){
+					next = val;
+				} else if (val == "--wsPort"){
+					next = val;
+				} else {
+					next = "";
+					console.log("Can not understand the input.");
+				}
+	  	}
+		});
+}
