@@ -78,22 +78,22 @@ function checkArgs(){
 		    case'--db':
 				databaseUrl=val;
 		    	console.log("setting: --db = "+val);
+				next = ""
 			break;
 		    case'--httpPort':
 				httpPort = Number(val);
 		    	console.log("setting: --httpPort = "+val);
+				next = ""
 		    break;
 		    case'--wsPort':
 				wsPort = Number(val);
 		    	console.log("setting: --wsPort = "+val);
+				next = ""
 		    break;
 			case'--socketUrl':
 		    	console.log("not implementet");
+				next = ""
 		    break;
-			case'--help':
-				console.log("example: \n--db hoxmark.xyz \n --httpPort 3000 \n -wsPort 3001 \n\n --db to change database URL, \n --httpPort to change portnumber to access the express server \n --wsPort to change the portnumber of the socket ")
-				process.exit();
-			break;
 
 	    	default:
 				if (val=="--db"){
@@ -102,9 +102,12 @@ function checkArgs(){
 					next = val;
 				} else if (val == "--wsPort"){
 					next = val;
+				} else if (val =="--help") {
+					next = "";
+					console.log("example: \n--db hoxmark.xyz \n--httpPort 3000 \n--wsPort 3001 \n\n--db to change database URL, \n--httpPort to change portnumber to access the express server \n--wsPort to change the portnumber of the socket ");
+					process.exit();
 				} else {
 					next = "";
-					console.log("Can not understand the input.");
 				}
 	  	}
 		});
