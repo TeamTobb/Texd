@@ -8,10 +8,9 @@ import path = require('path');
 import mongoose = require('mongoose');
 import WebSocket = require('ws');
 
-import routes = require('./app/routes/indexRoutes');
-import documentRoutes = require('./app/routes/documentRoutes');
-import documentController = require('./app/controllers/documentController');
-import models = require('./app/models/messageModel');
+import routes = require('./server/resources/index');
+import documentRoutes = require('./server/resources/document');
+import models = require('./server/dao/messageModel');
 
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
@@ -28,7 +27,7 @@ server.on('connection', ws => {
 			var userMessage: models.UserMessage = new models.UserMessage(message);
 			broadcast(JSON.stringify(userMessage));
 			if (userMessage.name == "document") {
-					documentController.updateDocumentText(userMessage.message);
+					documentRoutes.updateDocumentText(userMessage.message);
 			}
 		} catch (e) {
 			console.error(e.message);
@@ -47,7 +46,6 @@ if (mongoose.connect('mongodb://'+databaseUrl+'/dbTexd')){
 } else {
 	console.log("Not able to connect to the database: "+databaseUrl);
 }
-
 
 var app = express();
 app.use(express.static(__dirname + '/public'));

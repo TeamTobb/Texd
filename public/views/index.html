@@ -13,9 +13,9 @@
       System.config({
         transpiler: 'typescript',
         typescriptOptions: { emitDecoratorMetadata: true },
-        packages: {'app': {defaultExtension: 'ts'}}
+        packages: {'controllers': {defaultExtension: 'ts'}}
       });
-      System.import('app/boot')
+      System.import('controllers/index')
             .then(null, console.error.bind(console));
     </script>
   </head>

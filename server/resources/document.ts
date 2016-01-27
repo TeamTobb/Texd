@@ -1,11 +1,12 @@
 import express = require("express");
 import mongoose = require("mongoose");
-import documentModel = require("../models/documentModel");
-import IDocument = require('../models/documentModel');
+import documentModel = require("../dao/documentModel");
+import IDocument = require('../dao/documentModel');
 var bodyParser = require('body-parser');
 import repository = documentModel.repository;
 
-export function retrieveDocument(req: express.Request, res: express.Response) {
+
+export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     var textParam: String = "This is a really long standard text"
     var idParam: String = "2"
@@ -27,9 +28,9 @@ export function retrieveDocument(req: express.Request, res: express.Response) {
             }
         }
     });
-}
+};
 
-export function updateDocumentTitle(req: express.Request, res: express.Response) {
+export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
     var textParam: String = req.body.hei
     var idParam: String = "2"
@@ -48,7 +49,7 @@ export function updateDocumentTitle(req: express.Request, res: express.Response)
             }
         }
     });
-}
+};
 
 export function updateDocumentText(updateText: string){
     console.log("documentController.testUpdateDocument()");

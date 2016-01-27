@@ -10,14 +10,15 @@ import 'rxjs/Rx';
 })
 
 @Injectable()
-export class AppComponent{
+export class EditorController{
     public socket = new WebSocket('ws://localhost:3001');
     public title = 'MEAN skeleton with typescript';
     public documentName = "Name of document";
     public documentText = "This is a standard text";
     public senderId : string = "" + Math.random;
 
-    constructor(public http: Http) {}
+    constructor(public http: Http) {
+    }
 
     public changeName = function() {
         this.socket.send(JSON.stringify({ name: 'name', message: this.documentName, senderId: "hello" }));
