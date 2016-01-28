@@ -70,7 +70,7 @@ export class Parser {
 
         // this.writeJSONtoFile(outputJSON, "test.json");
 
-        return JSON.stringify(outputJSON, null, 2);
+        return JSON.stringify(outputJSON, null, 0);
     }
 
     public writeJSONtoFile(outputJSON : string, filename: string) {

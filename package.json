@@ -29,6 +29,9 @@
     "mongoose": "latest",
     "systemjs": "0.19.6",
     "ws": "^1.0.1",
-    "typescript" : "latest"
+    "typescript": "latest"
+  },
+  "devDependencies": {
+    "jasmine-core": "2.4.1"
   }
 }

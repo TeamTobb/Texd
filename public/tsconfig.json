@@ -19,6 +19,7 @@
         "controllers/editor.ts",
         "controllers/index.ts",
         "utils/jsonToHtml.ts",
+        "utils/parser.spec.ts",
         "utils/parser.ts"
     ]
 }
