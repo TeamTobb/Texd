@@ -64,9 +64,13 @@ export class Parser {
             }
         }
 
-        this.writeJSONtoFile(outputJSON, "test.json");
+        if (tempText != "") {
+            refStack[refStack.length-1].push({text : tempText.trim()});
+        }
 
-        return JSON.stringify(outputJSON);
+        // this.writeJSONtoFile(outputJSON, "test.json");
+
+        return JSON.stringify(outputJSON, null, 2);
     }
 
     public writeJSONtoFile(outputJSON : string, filename: string) {

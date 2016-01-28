@@ -9,8 +9,21 @@
       <button (click)="changeName()">save</button>
     </div>
     <br>
+    <div id="cointainer">
+        <div id="left">
+            <textarea id="textArea" (keyup)="changeDocument()" rows="30" cols="1" [(ngModel)]="documentText"></textarea>
+        </div>
+        <div id="center">
+            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentJSON"></textarea>
+        </div>
+        <div id="right">
+            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentHTML"></textarea>
+        </div>
+    </div>
+    <!--
     <div id="textAreaWrapper">
       <textarea id="textArea" (keyup)="changeDocument()" rows="80" cols="150" [(ngModel)]="documentText"></textarea>
     </div>
+    -->
   </div>
 </div>

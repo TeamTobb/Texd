@@ -1,5 +1,5 @@
 export class jsonToHtml {
-    public json : string = '{"content":[{"text":"test"},{"h1":[{"text":"her"},{"b":[{"h1":[{"text":"er"}]}]},{"text":"det"},{"b":[{"text":"noe"}]},{"text":"tull."},{"h1":[{"text":"Hei"},{"b":[{"text":"bloggen"}]},{"text":"!"}]}]}]}';
+    // public json : string = '{"content":[{"text":"test"},{"h1":[{"text":"her"},{"b":[{"h1":[{"text":"er"}]}]},{"text":"det"},{"b":[{"text":"noe"}]},{"text":"tull."},{"h1":[{"text":"Hei"},{"b":[{"text":"bloggen"}]},{"text":"!"}]}]}]}';
     public html : string = "";
     public stack = [];
     public hashMap: { [id: string]: boolean } = {};
@@ -27,8 +27,9 @@ export class jsonToHtml {
         }
     }
 
-    public parseJson() : string {
-        var content = JSON.parse(this.json).content;
+    public getParsedHTML(inputJSON : string) : string {
+        this.html = "";
+        var content = JSON.parse(inputJSON).content;
         this.iterate(content, '');
         return this.html;
     }

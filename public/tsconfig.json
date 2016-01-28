@@ -8,7 +8,8 @@
         "experimentalDecorators": true
     },
     "filesGlob": [
-        "controllers/*.ts"
+        "controllers/*.ts",
+        "utils/*.ts"
     ],
     "compileOnSave": true,
     "atom": {
@@ -16,6 +17,8 @@
     },
     "files": [
         "controllers/editor.ts",
-        "controllers/index.ts"
+        "controllers/index.ts",
+        "utils/jsonToHtml.ts",
+        "utils/parser.ts"
     ]
 }

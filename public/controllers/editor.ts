@@ -4,6 +4,9 @@ import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
 import {Injectable, bind} from 'angular2/core';
 import 'rxjs/Rx';
 
+import {Parser} from '../utils/parser.ts';
+import {jsonToHtml} from '../utils/jsonToHtml.ts';
+
 @Component({
   selector: 'my-app',
   templateUrl:'views/editor.html'
@@ -15,7 +18,12 @@ export class EditorController{
     public title = 'MEAN skeleton with typescript';
     public documentName = "Name of document";
     public documentText = "This is a standard text";
+    public documentJSON = "This is a standard text";
+    public documentHTML = "This is a standard text";
     public senderId : string = "" + Math.random;
+
+    public textParser : Parser = new Parser();
+    public jsonParser : jsonToHtml = new jsonToHtml();
 
     constructor(public http: Http) {
     }
@@ -34,6 +42,8 @@ export class EditorController{
 
     public changeDocument = function() {
         this.socket.send(JSON.stringify({ name: 'document', message: this.documentText, senderId: this.senderId }));
+        this.documentJSON = this.textParser.getParsedJSON(this.documentText);
+        this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
     }
 
     ngAfterViewInit() {
@@ -59,6 +69,8 @@ export class EditorController{
         this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
             this.documentText = res.text;
             this.documentName = res.title;
+            this.documentJSON = this.textParser.getParsedJSON(this.documentText);
+            this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
         });
     }
 }
