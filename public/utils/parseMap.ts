@@ -12,6 +12,7 @@ export class ParseMap{
     	"attr" : ["src"],
     	"optattr" : ["height","width"]
     }
+    consider adding allowed nested somehow
     */
 
     parseHtmlString(html : string) : any {
@@ -35,6 +36,9 @@ export class ParseMap{
 
 export interface Plugin{
     getRef: (parentRef) => any;
-    generateHtmlWithAttr: (attributeList) => any;
+    // attributelist is key -> value ( src : "hei.png")
+    // value is the first occurence of "text" in current JSON scope
+    // value is all that is recursively inside this #
+    generateHtmlWithAttr: (attributeList, value) => any;
     getClosingBracket: () => any;
 }
