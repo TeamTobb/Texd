@@ -22,6 +22,9 @@ export class Parser {
     }
 
     public parseText(hashMap : any, inputText : string ) : string {
+
+        
+
         var outputJSON : any = {};
         var list = inputText.split(" ");
 

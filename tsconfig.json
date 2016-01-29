@@ -23,6 +23,7 @@
         "./server/dao/documentModel.ts",
         "./server/dao/messageModel.ts",
         "./server/resources/document.ts",
-        "./server/resources/index.ts"
+        "./server/resources/index.ts",
+        "./server/resources/plugins.ts"
     ]
 }

@@ -1,0 +1,6 @@
+{
+	"tagname" : "ref",
+	"html" : "<a href='$value'>$value</a>",
+	"attr" : [],
+	"optattr" : []
+}

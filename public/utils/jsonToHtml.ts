@@ -15,7 +15,11 @@ export class jsonToHtml {
                 if (typeof obj[property] == "object") {
                     if(this.hashMap[property]) {
                         this.html = this.html + "<" + property + ">";
+                        // var attr = getAllAttrFromThisProperty...
+                        // this.html = generateHtmlWithAttr(attr);
+                        // in the next iterate it must avoid attributes(?)
                         this.iterate(obj[property], stack + '.' + property);
+                        // this.html = getClosingBracket();
                         this.html = this.html + "</" + property + ">";
                     } else {
                         this.iterate(obj[property], stack + '.' + property);

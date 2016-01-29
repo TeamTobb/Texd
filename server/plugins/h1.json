@@ -1,0 +1,6 @@
+{
+	"tagname" : "h1",
+	"html" : "<h1>$value</h1> ",
+	"attr" : [],
+	"optattr" : []
+}
