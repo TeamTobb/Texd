@@ -9,7 +9,9 @@
     },
     "filesGlob": [
         "controllers/*.ts",
-        "utils/*.ts"
+        "utils/*.ts",
+        "domain/*.ts",
+        "data_access/*.ts"
     ],
     "compileOnSave": true,
     "atom": {
@@ -21,6 +23,8 @@
         "utils/jsonToHtml.ts",
         "utils/parseMap.ts",
         "utils/parser.spec.ts",
-        "utils/parser.ts"
+        "utils/parser.ts",
+        "domain/document.ts",
+        "data_access/document.ts"
     ]
 }

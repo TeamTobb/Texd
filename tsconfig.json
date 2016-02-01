@@ -5,7 +5,8 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "watch": true
     },
     "filesGlob": [
         "./server.ts",

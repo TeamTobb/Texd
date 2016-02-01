@@ -64,6 +64,15 @@ app.get('/plugins', pluginsRoutes.read);
 app.get('/document', documentRoutes.read);
 app.post('/document', documentRoutes.update);
 
+// app.post('/document/:documentid', documentRoutes.update)
+// app.put('/document/:documentid', documentRoutes.update)
+
+// app.post('/document/:documentid/:chapterid', documentRoutes.update)
+// app.put('/document/:documentid/:chapterid', documentRoutes.update)
+
+// app.post('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
+// app.put('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
+
 app.listen(httpPort, function(){
     console.log("Demo Express server listening on port %d", httpPort);
 });
