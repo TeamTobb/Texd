@@ -22,6 +22,9 @@ export class Parser {
     }
 
     public parseText(hashMap : any, inputText : string ) : string {
+
+
+
         var outputJSON : any = {};
         var list = inputText.split(" ");
 
@@ -70,7 +73,7 @@ export class Parser {
 
         // this.writeJSONtoFile(outputJSON, "test.json");
 
-        return JSON.stringify(outputJSON, null, 0);
+        return JSON.stringify(outputJSON, null, 2);
     }
 
     public writeJSONtoFile(outputJSON : string, filename: string) {

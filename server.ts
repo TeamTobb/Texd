@@ -8,6 +8,9 @@ import path = require('path');
 import mongoose = require('mongoose');
 import WebSocket = require('ws');
 
+
+import pluginsRoutes = require('./server/resources/plugins');
+
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
 import models = require('./server/dao/messageModel');
@@ -57,14 +60,26 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/', routes.index);
+app.get('/plugins', pluginsRoutes.read);
 app.get('/document', documentRoutes.read);
 app.post('/document', documentRoutes.update);
+
+// app.post('/document/:documentid', documentRoutes.update)
+// app.put('/document/:documentid', documentRoutes.update)
+
+// app.post('/document/:documentid/:chapterid', documentRoutes.update)
+// app.put('/document/:documentid/:chapterid', documentRoutes.update)
+
+// app.post('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
+// app.put('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
 
 app.listen(httpPort, function(){
     console.log("Demo Express server listening on port %d", httpPort);
 });
 
 export var App = app;
+
+
 
 function checkArgs(){
 	var next;

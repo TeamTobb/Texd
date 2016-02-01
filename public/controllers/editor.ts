@@ -1,3 +1,4 @@
+import {ParseMap} from "../utils/parseMap.ts";
 import {Component, ViewChild, Input, Output, Renderer} from 'angular2/core';
 import {Http, Headers, Response, RequestOptions} from 'angular2/http';
 import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
@@ -21,11 +22,14 @@ export class EditorController{
     public documentJSON = "This is a standard text";
     public documentHTML = "This is a standard text";
     public senderId : string = "" + Math.random;
+    private parseMap = new ParseMap();
 
-    public textParser : Parser = new Parser();
-    public jsonParser : jsonToHtml = new jsonToHtml();
+
+    private textParser : Parser = new Parser();
+    private jsonParser : jsonToHtml = new jsonToHtml();
 
     constructor(public http: Http) {
+        this.getPlugins();
     }
 
     public changeName = function() {
@@ -71,6 +75,13 @@ export class EditorController{
             this.documentName = res.title;
             this.documentJSON = this.textParser.getParsedJSON(this.documentText);
             this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
+        });
+    }
+
+    getPlugins(){
+        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+            console.log(res);
+            this.parseMap.generateParseMap(res);
         });
     }
 }

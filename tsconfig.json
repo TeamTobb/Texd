@@ -5,7 +5,8 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "watch": true
     },
     "filesGlob": [
         "./server.ts",
@@ -23,6 +24,7 @@
         "./server/dao/documentModel.ts",
         "./server/dao/messageModel.ts",
         "./server/resources/document.ts",
-        "./server/resources/index.ts"
+        "./server/resources/index.ts",
+        "./server/resources/plugins.ts"
     ]
 }
