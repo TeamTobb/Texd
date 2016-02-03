@@ -2,6 +2,21 @@
   display: block;
 }
 
+textarea {
+    border: none;
+    resize: none;
+    overflow: hidden;
+    display: block;
+    /*outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;*/
+}
+
+#previewFrame {
+    height: 600px;
+}
+
 #title {
   color: orange;
   text-align: center;
@@ -53,16 +68,16 @@
 }
 #left {
     float: left;
-    width: 33%;
+    width: 15%;
     background-color: #bbb;
 }
 #center {
     float: left;
     background-color: #eee;
-    width: 33%;
+    width: 60%;
 }
 #right {
     float: left;
-    width: 33%;
-    background-color: #bbb;
+    width: 25%;
+    /*background-color: #bbb;*/
 }

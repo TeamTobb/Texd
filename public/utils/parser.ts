@@ -1,6 +1,8 @@
+import {Document, Paragraph, Chapter} from '../domain/document.ts';
+
 export class Parser {
 
-    public getParsedJSON(inputText : string) : string {
+    public getParsedJSON(inputText : Paragraph[]) : string {
         var hashMap: { [id: string]: parseMap} = {};
 
         hashMap["#b"] = <parseMap> ({
@@ -17,16 +19,33 @@ export class Parser {
                 return h1;
             }
         });
+        // need to handle this differently tho
+        hashMap["#p"] = <parseMap> ({
+            getRef: (obj) => {
+                var p = [];
+                obj.push({p : p});
+                return p;
+            }
+        });
 
         return this.parseText(hashMap, inputText);
     }
 
-    public parseText(hashMap : any, inputText : string ) : string {
+    public parseText(hashMap : any, inputText : Paragraph[] ) : string {
 
 
 
         var outputJSON : any = {};
-        var list = inputText.split(" ");
+
+        var mergedParas = "";
+
+        for (var para in inputText) {
+            mergedParas += " #p "
+            mergedParas += inputText[para].raw;
+            mergedParas += " # "
+        }
+
+        var list = mergedParas.split(" ");
 
         var refStack : any = [];
         var tempText : string = "";

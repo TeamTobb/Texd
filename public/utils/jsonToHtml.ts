@@ -7,6 +7,7 @@ export class jsonToHtml {
     constructor() {
         this.hashMap['h1'] = true;
         this.hashMap['b'] = true;
+        this.hashMap['p'] = true;
     }
 
     public iterate(obj, stack) {
@@ -23,7 +24,7 @@ export class jsonToHtml {
                         // create a new stack -> send in to next iterate (must also return the valeus)
                         this.iterate(obj[property], stack + '.' + property);
 
-                        // 
+                        //
                         // this.html = getClosingBracket();
                         this.html = this.html + "</" + property + ">";
                     } else {
