@@ -25,16 +25,14 @@ export function read(req: express.Request, res: express.Response) {
     
     repository.findOne({_idTest: 2}, (error, document) => {
         if(error){
-
             res.send(error);
         } else {
             if(!document){
-                repository.create(documentStart, (error, document) => {
+                repository.create(documentStart, (error, document2) => {
                     if(error){
                         res.send(error);
                     } else {
-                        console.log("we are creating document")
-                        res.jsonp(document);
+                        res.jsonp(document2);
                     }
                 });
             } else {
@@ -49,31 +47,14 @@ export function update(req: express.Request, res: express.Response) {
     var title = "This is document title"; 
     
     // repository.update()
-    repository.update({_idTest: 2}, {_title: req.body.documentTitle}, (error, document) => {
+    repository.update({_idTest: 2}, {title: req.body.documentTitle}, (error, document) => {
         if(error){
             res.send(error); 
         } else {
-            console.log("we have updated the document"); 
             res.jsonp(document); 
         }
     }); 
-    // var textParam: String = req.body.hei
-    // var idParam: String = "2"
-    /*repository.findOne({title: title}, (error, document) => {
-        if(error){
-            res.send(error);
-        } else {
-            if(document){
-                repository.update({title: req.body.documentTitle}, (error, document2) => {
-                    if(error){
-                        res.send(error);
-                    } else {
-                        res.jsonp(document2);
-                    }
-                });
-            }
-        }
-    });*/
+
 };
 
 export function updateDocumentText(diff: diff.Diff){
@@ -85,20 +66,15 @@ export function updateDocumentText(diff: diff.Diff){
         if(error){
             //TODO: error handling
         }else{ 
-            document["_chapters"][diff.chapter]["_paragraphs"][0] = diff.paragraph;
+            document["_chapters"][diff.chapter]["_paragraphs"][diff.index] = diff.paragraph;
             console.log(JSON.stringify(document, null, 2)); 
             var doc = document; 
-            // document.save;
             repository.findOneAndUpdate({_idTest: 2}, {_chapters: document["_chapters"]}, (error, document2) => {
                 if(error){
                     console.log("error: " + error)
-                    //error handling 
                 } else {
-                    console.log("it works) ")
-                  
                 }
             }); 
         }   
     });
-  
 }

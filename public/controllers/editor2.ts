@@ -8,6 +8,7 @@ import 'rxjs/Rx';
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Paragraph, Chapter} from '../domain/document.ts';
+import {Diff} from '../domain/diff.ts'; 
 
 @Component({
   selector: 'my-app',
@@ -18,9 +19,12 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 export class EditorController2 {
 
     public socket = new WebSocket('ws://localhost:3001');
-    public document : Document = this.getDocumentMock(1);
+    // public document : Document = getDocumentMock(); 
+    // Have to do this cause of HTML file expecting multiple chapters on load - error otherwise. 
+    // TODO: fix this
+    public document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter : number = 0;
-    public senderId : string = "" + Math.random;
+    public senderId : string = "" + Math.random();
     public modifierKeyDown : boolean = false;
     public element : ElementRef;
     public documentHTML : string = "preview";
@@ -33,19 +37,20 @@ export class EditorController2 {
 
     constructor(public http: Http, public currElement: ElementRef) {
         this.element = currElement;
+        this.getDocument();
     }
 
-    // public changeName = function() {
-    //     this.socket.send(JSON.stringify({ name: 'name', message: this.documentName, senderId: "hello" }));
-    //     var headers = new Headers();
-    //     headers.append('Content-Type', 'application/json');
-    //     this.http.post('./document',
-    //         JSON.stringify({ documentTitle: this.documentName}),
-    //         {headers: headers}).subscribe(res => {
-    //             console.log(res);
-    //         }
-    //     );
-    // }
+    public changeName = function() {
+        this.socket.send(JSON.stringify({ name: 'name', message: this.documentName, senderId: "hello" }));
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        this.http.post('./document',
+            JSON.stringify({ documentTitle: this.documentName}),
+            {headers: headers}).subscribe(res => {
+                console.log(res);
+            }
+        );
+    }
 
     public changeChapter = function(chapter_number : number) {
         this.current_chapter = chapter_number;
@@ -63,8 +68,10 @@ export class EditorController2 {
             this.modifierKeyDown = true;
         }
     }
+    
 
     public changeDocument = function($event, paragraphIndex : number) {
+        console.log("changeDocument()")
         this.auto_grow($event.target);
         // console.log($event.which);
         if ($event.which === 17) {
@@ -88,7 +95,10 @@ export class EditorController2 {
         }
         else {
             console.log("send diff");
-            // this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw = newValue;
+            var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []); 
+            var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false); 
+            
+            this.socket.send(JSON.stringify({senderId: this.senderId, newDiff: diff}));
         }
     }
 
@@ -97,55 +107,65 @@ export class EditorController2 {
         element.style.height = (element.scrollHeight)+"px";
     }
 
-    ngAfterViewInit() {
-        // this.getDocument();
-        // this.socket.onmessage = message => {
-        //     var parsed = JSON.parse(message.data);
-        //     if (this.senderId != parsed.data.senderId) {
-        //         console.log("You are not the sender");
-        //         if (parsed.data.name == "name") {
-        //             this.documentName = parsed.data.message;
-        //         }
-        //         if (parsed.data.name == "document") {
-        //             this.documentText = parsed.data.message;
-        //         }
-        //       }
-        //       else {
-        //             console.log("You are the sender");
-        //       }
-        //   }
-    }
+      ngAfterViewInit() {
+        this.socket.onmessage = message => {
+            var parsed = JSON.parse(message.data);
+            console.log("is " + this.senderId + " equal to " + parsed.senderId); 
+            if(this.senderId != parsed.senderId){
+                if(parsed.newDiff){
+                    console.log("updating paragraphs");
+                    this.document.chapters[parsed.newDiff._chapter].paragraphs[parsed.newDiff._index] = parsed.newDiff._paragraph._raw;    
+                } 
+                if(parsed.message){
+                    this.document.title = parsed.message; 
+                } 
+            }        
+        }
+      }
 
     getDocument(){
-        // this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
-        //     this.documentText = res.text;
-        //     this.documentName = res.title;
-        //     this.documentJSON = this.textParser.getParsedJSON(this.documentText);
-        //     this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
-        // });
+        // Have to manually assign all of the parameters - TODO: 
+        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
+            this.document = new Document(); 
+            this.document.title = res._title; 
+            this.document.documentname = res._documentname; 
+            this.document.id = res._idTest;
+            this.document.authors = res._authors; 
+
+            this.document.chapters = res._chapters; 
+            
+            for(var i = 0; i<this.document.chapters.length; i++){
+                this.document.chapters[i].header = res._chapters[i]._header; 
+                this.document.chapters[i].paragraphs = res._chapters[i]._paragraphs;
+                
+                for(var j = 0; j<this.document.chapters[i].paragraphs.length; j++){
+                    this.document.chapters[i].paragraphs[j].raw = res._chapters[i]._paragraphs[j]._raw;
+                    this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata; 
+                } 
+            }
+        });
     }
 
     getPlugins(){
         // this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
-        //     console.log(res);
         //     this.parseMap.generateParseMap(res);
         // });
     }
 
-    public getDocumentMock(documentId: number){
-        var paragraphs1: Paragraph[] = [];
-        paragraphs1.push(new Paragraph("Hei #b bloggen1 # #h1 overskrift her # ", []));
-        paragraphs1.push(new Paragraph("Hei #b bloggen2 # #h1 overskrift her # ", []));
-        paragraphs1.push(new Paragraph("Hei #b <br> bloggen3 # #h1 overskrift her # ", []));
-        paragraphs1.push(new Paragraph("Hei #b \n bloggen4 # #h1 overskrift her # ", []));
-        var paragraphs2: Paragraph[] = [];
-        paragraphs2.push(new Paragraph("Hei #b bloggen5 # #h1 overskrift her # ", []));
-        paragraphs2.push(new Paragraph("Hei #b bloggen6 # #h1 overskrift her # ", []));
-        paragraphs2.push(new Paragraph("Hei #b bloggen7 # #h1 overskrift her # ", []));
-        paragraphs2.push(new Paragraph("Hei #b bloggen8 # #h1 overskrift her # ", []));
-        var chapters: Chapter[] = [];
-        chapters.push(new Chapter("Kapittel 1", paragraphs1));
-        chapters.push(new Chapter("Kapittel 2", paragraphs2));
-        return new Document("Test tittel", "Test navn", ["Borgar", "Jørgen", "bjørn"], chapters);
-    }
+    // public getDocumentMock(documentId: number){
+    //     var paragraphs1: Paragraph[] = [];
+    //     paragraphs1.push(new Paragraph("Hei #b bloggen1 # #h1 overskrift her # ", []));
+    //     paragraphs1.push(new Paragraph("Hei #b bloggen2 # #h1 overskrift her # ", []));
+    //     paragraphs1.push(new Paragraph("Hei #b <br> bloggen3 # #h1 overskrift her # ", []));
+    //     paragraphs1.push(new Paragraph("Hei #b \n bloggen4 # #h1 overskrift her # ", []));
+    //     var paragraphs2: Paragraph[] = [];
+    //     paragraphs2.push(new Paragraph("Hei #b bloggen5 # #h1 overskrift her # ", []));
+    //     paragraphs2.push(new Paragraph("Hei #b bloggen6 # #h1 overskrift her # ", []));
+    //     paragraphs2.push(new Paragraph("Hei #b bloggen7 # #h1 overskrift her # ", []));
+    //     paragraphs2.push(new Paragraph("Hei #b bloggen8 # #h1 overskrift her # ", []));
+    //     var chapters: Chapter[] = [];
+    //     chapters.push(new Chapter("Kapittel 1", paragraphs1));
+    //     chapters.push(new Chapter("Kapittel 2", paragraphs2));
+    //     return new Document(2, "Test tittel", "Test navn", ["Borgar", "Jørgen", "bjørn"], chapters);
+    // }
 }

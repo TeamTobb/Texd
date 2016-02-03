@@ -59,7 +59,7 @@ export class EditorController{
         var para = new Paragraph(this.documentText, []);
         var diff: Diff = new Diff(0, para, 2, true); 
         this.socket.send(JSON.stringify({senderId: this.senderId, newDiff: diff}));
-        this.documentJSON = this.textParser.getParsedJSON(this.documentText);
+        // this.documentJSON = this.textParser.getParsedJSON(this.documentText);
         this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
     }
 
@@ -93,7 +93,7 @@ export class EditorController{
         this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
             this.documentText = res._chapters[0]._paragraphs[0]._raw; 
             this.documentName = res._title;
-            this.documentJSON = this.textParser.getParsedJSON(this.documentText);
+            // this.documentJSON = this.textParser.getParsedJSON(this.documentText);
             this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
         });
     }

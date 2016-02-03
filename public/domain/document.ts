@@ -5,12 +5,14 @@ export class Document{
     private _authors: string[];
     private _chapters: Chapter [];
     
-    constructor(_idTest, title, documentname, authors, chapters){
-        this._idTest = _idTest; 
-        this._title = title; 
-        this._documentname = documentname; 
-        this._authors = authors; 
-        this._chapters = chapters; 
+    constructor(idTest?, title?, documentname?, authors?, chapters?){
+        if(idTest && title && documentname && authors && chapters){
+            this._idTest = idTest; 
+            this._title = title; 
+            this._documentname = documentname; 
+            this._authors = authors; 
+            this._chapters = chapters;  
+        }
     }
 
     get id(): number{
