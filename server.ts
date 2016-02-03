@@ -14,6 +14,7 @@ import pluginsRoutes = require('./server/resources/plugins');
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
 import models = require('./server/dao/messageModel');
+import diff = require('./public/domain/diff');
 
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
@@ -27,18 +28,23 @@ var server = new WebSocketServer({ port: wsPort });
 server.on('connection', ws => {
 	ws.on('message', message => {
 		try {
-			var userMessage: models.UserMessage = new models.UserMessage(message);
-			broadcast(JSON.stringify(userMessage));
-			if (userMessage.name == "document") {
-					documentRoutes.updateDocumentText(userMessage.message);
-			}
-		} catch (e) {
+            var obj = JSON.parse(message); 
+            if(obj.newDiff){
+                var difftest = new diff.Diff({}, {}, 0, false, obj.newDiff); 
+                broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
+                documentRoutes.updateDocumentText(difftest); 
+            }else{
+                broadcast(message);    
+            }
+                        
+		} catch (e) { 
 			console.error(e.message);
 		}
 	});
 });
 
 function broadcast(data: string): void {
+
 	server.clients.forEach(client => {
 		client.send(data);
 	});

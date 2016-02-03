@@ -1,5 +1,5 @@
 
-import {Paragraph} from "Document"
+import {Paragraph} from './document.ts'
 
 export class Diff{
     private _chapter: number;
@@ -7,13 +7,20 @@ export class Diff{
     private _index: number;
     private _newelement: boolean;
     
-    constructor(chapter, paragraph, index, newelement){
-        this._chapter = chapter; 
-        this._paragraph = paragraph; 
-        this._index = index; 
-        this._newelement = newelement; 
+    constructor(chapter, paragraph, index, newelement, payload?){
+        if(payload){          
+            this._chapter = payload._chapter;
+            this._paragraph = payload._paragraph;
+            this._index = payload._index;
+            this._newelement = payload._newelement;
+        } else{
+            this._chapter = chapter; 
+            this._paragraph = paragraph; 
+            this._index = index; 
+            this._newelement = newelement;
+        }       
     }
-
+    
     get chapter(): number{
         return this._chapter;
     }
