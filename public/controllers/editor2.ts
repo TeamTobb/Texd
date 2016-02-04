@@ -12,47 +12,69 @@ import {DocumentService} from '../data_access/document.ts';
 
 @Component({
   selector: 'my-app',
-  templateUrl:'views/editor2.html', 
+  templateUrl:'views/editor2.html',
   providers: [DocumentService, HTTP_BINDINGS]
 })
 
 export class EditorController2 {
-    // Have to do this cause of HTML file expecting multiple chapters on load - error otherwise. 
+    // Have to do this cause of HTML file expecting multiple chapters on load - error otherwise.
     // TODO: fix this
     private document: Document;
     public current_chapter : number = 0;
     public modifierKeyDown : boolean = false;
     public element : ElementRef;
     public documentHTML : string = "preview";
-    
+
     // CTRL + P = parse
     // CTRL + N = new paragraph
 
     constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer ) {
-        this.document = this.documentService.document; 
-        this.element = currElement;  
+        this.document = this.documentService.document;
+        this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
-    }   
-    
+        this.documentService.getDocument(2, () => {
+            setTimeout( () => {
+                var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
+                for (var i in elem) {
+                    this.auto_grow(elem[i]);
+                }
+            }, 10);
+        })
+    }
+
      public createChapter() {
-         var p = new Paragraph("Text", []); 
+         var p = new Paragraph("Text", []);
         this.document.chapters.splice(this.current_chapter+1, 0, new Chapter("New Chapter", [p]));
         this.documentService.sendDiff(new Diff(this.current_chapter, p, 0, true, true));
         this.current_chapter += 1;
     }
-    
+
+    public gotoChapter($event, text) {
+        if($event.which === 13) {
+            if(this.document.chapters[text]) {
+                this.current_chapter = parseInt(text);
+            }
+        }
+    }
+
+    public changeDocumentTitle($event) {
+        // check if there actually is made a change ?
+        // this.changeName();
+        console.log("should send a message to change the name of the document");
+    }
+
     public changeChapter(chapter_number : number) {
         this.current_chapter = chapter_number;
         setTimeout( () => {
-            var elem = jQuery(_this.element.nativeElement).find('[id=para]').toArray();
+            var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
             for (var i in elem) {
                 this.auto_grow(elem[i]);
             }
         }, 10);
     }
-    
+
     public globalKeyEvent($event) {
         console.log($event.which);
         var keyMap = {};
@@ -74,7 +96,7 @@ export class EditorController2 {
             }
         }
     }
-    
+
     public parseCurrentChapter() {
         console.log("parsing");
         var rawParagraphs = this.document.chapters[this.current_chapter].paragraphs;
@@ -92,7 +114,7 @@ export class EditorController2 {
             this.modifierKeyDown = true;
         }
     }
-    
+
     public changeDocument($event, paragraphIndex : number) {
         this.auto_grow($event.target);
         if ($event.which === 17) {
@@ -103,13 +125,13 @@ export class EditorController2 {
         }
         else if ($event.which === 78 && this.modifierKeyDown) {
             this.document.chapters[this.current_chapter].paragraphs.splice(paragraphIndex+1,0, new Paragraph("",[]));
-            var diff: Diff = new Diff(this.current_chapter, new Paragraph("", []), paragraphIndex, true, false); 
-            this.documentService.sendDiff(diff); 
+            var diff: Diff = new Diff(this.current_chapter, new Paragraph("", []), paragraphIndex, true, false);
+            this.documentService.sendDiff(diff);
         }
         else {
-            var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []); 
-            var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false, false); 
-            this.documentService.sendDiff(diff); 
+            var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []);
+            var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false, false);
+            this.documentService.sendDiff(diff);
         }
     }
 
