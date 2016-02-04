@@ -4,6 +4,7 @@ import documentModel = require("../dao/documentModel");
 import IDocument = require('../dao/documentModel');
 import Document = require("../../server/domain/document");
 import Chapter = require('../../server/domain/chapter')
+import Paragraph = require('../../server/domain/paragraph')
 import Diff = require("../../server/domain/diff");
 var bodyParser = require('body-parser');
 import repository = documentModel.repository;
@@ -12,7 +13,7 @@ import repository = documentModel.repository;
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     
-    var rawStart: String = "hei #b bloggen #h1 dette er megatsort # # ";
+    var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
     var para = new Document(rawStart, []);
     
     var chapterHeaderStart: string = "Kapittel header"; 
@@ -21,7 +22,9 @@ export function read(req: express.Request, res: express.Response) {
     
     var chapter = new Chapter(chapterHeaderStart, paras);
     var chapters = []; 
-    chapters.push(chapter);  
+    chapters.push(chapter);
+    chapters.push(new Chapter("Header kap 2", paras));
+    chapters.push(new Chapter("Header kap 3", paras));  
     var documentStart = new Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
     
     repository.findOne({_idTest: 2}, (error, document) => {
@@ -66,8 +69,13 @@ export function updateDocumentText(diff: Diff){
         if(error){
             //TODO: error handling
         }else{ 
-            document["_chapters"][diff.chapter]["_paragraphs"][diff.index] = diff.paragraph;
-            console.log(JSON.stringify(document, null, 2)); 
+            if(diff.newchapter == true){
+                document["_chapters"][diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]); 
+            }
+            else{
+                document["_chapters"][diff.chapter]["_paragraphs"][diff.index] = diff.paragraph;    
+            }
+            
             var doc = document; 
             repository.findOneAndUpdate({_idTest: 2}, {_chapters: document["_chapters"]}, (error, document2) => {
                 if(error){

@@ -30,13 +30,12 @@ server.on('connection', ws => {
 		try {
             var obj = JSON.parse(message); 
             if(obj.newDiff){
-                var difftest = new Diff({}, {}, 0, false, obj.newDiff); 
+                var difftest = new Diff({}, {}, 0, false, false, obj.newDiff); 
                 broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
                 documentRoutes.updateDocumentText(difftest); 
             }else{
                 broadcast(message);    
             }
-                        
 		} catch (e) { 
 			console.error(e.message);
 		}

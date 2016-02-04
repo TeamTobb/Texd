@@ -14,7 +14,7 @@
         "./server/**/*.tsx",
         "!node_modules/**",
         "!public/**/*.ts",
-        "!public/**/*.tsx", 
+        "!public/**/*.tsx",
         "!typings/**/*.ts",
         "!typings/**/*.tsx"
     ],
@@ -26,6 +26,10 @@
         "./server.ts",
         "./server/dao/documentModel.ts",
         "./server/dao/messageModel.ts",
+        "./server/domain/chapter.ts",
+        "./server/domain/diff.ts",
+        "./server/domain/document.ts",
+        "./server/domain/paragraph.ts",
         "./server/resources/document.ts",
         "./server/resources/index.ts",
         "./server/resources/plugins.ts"
