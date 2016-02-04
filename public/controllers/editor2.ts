@@ -113,8 +113,8 @@ export class EditorController2 {
             console.log("is " + this.senderId + " equal to " + parsed.senderId); 
             if(this.senderId != parsed.senderId){
                 if(parsed.newDiff){
-                    console.log("updating paragraphs");
-                    this.document.chapters[parsed.newDiff._chapter].paragraphs[parsed.newDiff._index] = parsed.newDiff._paragraph._raw;    
+                    var diff: Diff = new Diff([], [], [], [], parsed.newDiff);
+                    this.document.chapters[diff.chapter].paragraphs[diff.index].raw = diff.paragraph.raw;     
                 } 
                 if(parsed.message){
                     this.document.title = parsed.message; 

@@ -7,10 +7,10 @@ export class Diff{
     private _index: number;
     private _newelement: boolean;
     
-    constructor(chapter, paragraph, index, newelement, payload?){
+    constructor(chapter?, paragraph?, index?, newelement?, payload?){
         if(payload){          
             this._chapter = payload._chapter;
-            this._paragraph = payload._paragraph;
+            this.paragraph = new Paragraph(payload._paragraph._raw, payload._paragraph._metadata); 
             this._index = payload._index;
             this._newelement = payload._newelement;
         } else{
