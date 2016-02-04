@@ -10,20 +10,20 @@ import {Diff} from "../domain/diff.ts";
 
 @Injectable()
 export class DocumentService{
-    private _socket; 
-    
-    private _document: Document = new Document([], [], [], [], [{}, {}, {}]); 
-    private _current_chapter: number; 
-     
-    public _senderId : string;  
-    private _textParser : Parser; 
+    private _socket;
+
+    private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
+    private _current_chapter: number;
+
+    public _senderId : string;
+    private _textParser : Parser;
     private _jsonParser : jsonToHtml;
-    
+
     constructor(private http: Http){
         this._senderId = "" + Math.random();
         this._textParser = new Parser();
         this._jsonParser = new jsonToHtml();
-        
+
         this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data);
@@ -31,7 +31,7 @@ export class DocumentService{
                 if(parsed.newDiff){
                     var diff: Diff = new Diff([], [], [], [], [], parsed.newDiff);
                     if(diff.newchapter == true){
-                        this.document.chapters.splice(diff.chapter+1, 0, new Chapter("New Chapter", [diff.paragraph])); 
+                        this.document.chapters.splice(diff.chapter+1, 0, new Chapter("New Chapter", [diff.paragraph]));
                     } else {
                        if(diff.newelement){
                             this.document.chapters[diff.chapter].paragraphs.splice(diff.index+1, 0, diff.paragraph);
@@ -39,15 +39,14 @@ export class DocumentService{
                             this.document.chapters[diff.chapter].paragraphs[diff.index] = diff.paragraph;
                         }
                     }
-                } 
+                }
                 if(parsed.message){
-                    this.document.title = parsed.message; 
-                } 
-            }        
+                    this.document.title = parsed.message;
+                }
+            }
         }
-        this.getDocument(2); 
     }
-    
+
      public changeName(){
         this._socket.send(JSON.stringify({ name: 'name', message: this._document.title, senderId: "hello" }));
         var headers = new Headers();
@@ -59,48 +58,49 @@ export class DocumentService{
             }
         );
     }
-    
+
     public sendDiff(diff: Diff){
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));
     }
     //mock implementation
-    public getDocument(documentId: number){
-        // Have to manually assign all of the parameters - TODO: 
+    public getDocument(documentId: number, callback: any){
+        // Have to manually assign all of the parameters - TODO:
         this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
-            this.document.title = res._title; 
-            this.document.documentname = res._documentname; 
+            this.document.title = res._title;
+            this.document.documentname = res._documentname;
             this.document.id = res._idTest;
             this.document.authors = res._authors;
-            this.document.chapters = res._chapters; 
-            
+            this.document.chapters = res._chapters;
+
             for(var i = 0; i<this.document.chapters.length; i++){
-                this.document.chapters[i].header = res._chapters[i]._header; 
+                this.document.chapters[i].header = res._chapters[i]._header;
                 this.document.chapters[i].paragraphs = res._chapters[i]._paragraphs;
-                
+
                 for(var j = 0; j<this.document.chapters[i].paragraphs.length; j++){
                     this.document.chapters[i].paragraphs[j].raw = res._chapters[i]._paragraphs[j]._raw;
-                    this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata; 
-                } 
-            } 
+                    this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata;
+                }
+            }
+            callback();
         });
     }
-    
+
     public getDocumentTest(){
-        return this._document; 
+        return this._document;
     }
-        
+
     get document(): Document{
-        return this._document; 
-    } 
-    
-    set document(value){
-        this._document = value; 
+        return this._document;
     }
-    
+
+    set document(value){
+        this._document = value;
+    }
+
     getParsedJSON(rawParagraphs){
         return this._textParser.getParsedJSON(rawParagraphs)
     }
     getParsedHTML(documentJSON){
-        return this._jsonParser.getParsedHTML(documentJSON); 
+        return this._jsonParser.getParsedHTML(documentJSON);
     }
 }
