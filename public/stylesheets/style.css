@@ -81,3 +81,7 @@ textarea {
     width: 25%;
     /*background-color: #bbb;*/
 }
+
+#chapterLi:hover {
+    color: blue;
+}

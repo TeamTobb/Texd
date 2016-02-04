@@ -1,6 +1,6 @@
 <div id="wrapper">
     <div id="title">
-        <h1>{{document.title}}</h1>
+        <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1>
     </div>
     <div id="body">
         Hints:
@@ -8,11 +8,15 @@
         CTRL + P = parse
         <br>
         CTRL + N = new paragraph
+        <br>
+        CTRL + C = new chapter
+        <br>
+        Goto chapter (index+enter): <input value="" type="text" #current (keydown)="gotoChapter($event, current.value)">
         <br><br>
         <div id="container">
             <div id="left">
                 <ul>
-                    <li *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)">{{chapter.header}}</li>
+                    <li id="chapterLi" *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)">{{chapter.header}}</li>
                 </ul>
             </div>
             <div id="center">

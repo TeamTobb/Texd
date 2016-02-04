@@ -5,14 +5,14 @@ export class Parser {
     public getParsedJSON(inputText : Paragraph[]) : string {
         var hashMap: { [id: string]: parseMap} = {};
 
-        hashMap["#b"] = <parseMap> ({
+        hashMap["#b "] = <parseMap> ({
             getRef: (obj) => {
                 var b = [];
                 obj.push({b : b});
                 return b;
             }
         });
-        hashMap["#h1"] = <parseMap> ({
+        hashMap["#h1 "] = <parseMap> ({
             getRef: (obj) => {
                 var h1 = [];
                 obj.push({h1 : h1});
@@ -20,7 +20,7 @@ export class Parser {
             }
         });
         // need to handle this differently tho
-        hashMap["#p"] = <parseMap> ({
+        hashMap["#p "] = <parseMap> ({
             getRef: (obj) => {
                 var p = [];
                 obj.push({p : p});
@@ -45,7 +45,10 @@ export class Parser {
             mergedParas += " # "
         }
 
-        var list = mergedParas.split(" ");
+        // var list = mergedParas.split(" ");
+        // var list = mergedParas.split(/<br \/>(?=&#?[a-zA-Z0-9]+;)/g);
+        var list = mergedParas.split(/[\n ]+/);
+        for (var i = 0; i < list.length; i++) list[i] += " ";
 
         var refStack : any = [];
         var tempText : string = "";
@@ -57,17 +60,17 @@ export class Parser {
             if (hashMap[list[elem]]) {
                 // reached a valid starting hashtag
                 if (tempText != "") {
-                    refStack[refStack.length-1].push({text : tempText.trim()});
+                    refStack[refStack.length-1].push({text : tempText});
                     tempText = "";
                 }
                 // push new tag to refStack
                 refStack.push(hashMap[list[elem]].getRef(refStack[refStack.length-1]));
                 // TODO: maybe rename getRef to createRef or something more precise
             }
-            else if (list[elem] == "#") {
+            else if (list[elem] == "# ") {
                 // reached an ending tag
                 if (tempText != "") {
-                    refStack[refStack.length-1].push({text : tempText.trim()});
+                    refStack[refStack.length-1].push({text : tempText});
                     tempText = "";
                 }
                 // can never remove the content element
@@ -82,16 +85,16 @@ export class Parser {
             else {
                 // normal text
                 // TODO: trim the tags and dont remove space on split instead
-                tempText += list[elem] + " ";
+                tempText += list[elem];
             }
         }
 
         if (tempText != "") {
-            refStack[refStack.length-1].push({text : tempText.trim()});
+            refStack[refStack.length-1].push({text : tempText});
         }
 
         // this.writeJSONtoFile(outputJSON, "test.json");
-
+        // console.log(outputJSON);
         return JSON.stringify(outputJSON, null, 2);
     }
 
