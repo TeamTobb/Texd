@@ -8,7 +8,7 @@ import 'rxjs/Rx';
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Paragraph, Chapter} from '../domain/document.ts';
-import {Diff} from '../domain/diff.ts'; 
+import {Diff} from '../domain/diff.ts';
 
 @Component({
   selector: 'my-app',

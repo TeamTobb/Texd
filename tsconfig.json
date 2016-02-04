@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
         "sourceMap": true,
@@ -13,7 +13,10 @@
         "./server/**/*.ts",
         "./server/**/*.tsx",
         "!node_modules/**",
-        "!./public/**"
+        "!public/**/*.ts",
+        "!public/**/*.tsx", 
+        "!typings/**/*.ts",
+        "!typings/**/*.tsx"
     ],
     "compileOnSave": true,
     "atom": {

@@ -1,4 +1,7 @@
-export class Document{
+import Paragraph = require('./paragraph')
+import Chapter = require('./chapter');
+
+class Document{
     private _idTest: number; 
     private _title: string;
     private _documentname: string;
@@ -56,55 +59,4 @@ export class Document{
     }
 }
 
-
-export class Chapter{
-    private _header: string;
-    private _paragraphs: Paragraph[];
-
-    constructor(header, paragraphs){
-        this._header = header; 
-        this._paragraphs = paragraphs; 
-    }
-
-    get header(): string{
-        return this._header;
-    }
-
-    set header(value){
-        this._header = value;
-    }
-
-    get paragraphs(): Paragraph[] {
-        return this._paragraphs;
-    }
-
-    set paragraphs(value){
-        this._paragraphs = value;
-    }
-}
-
-export class Paragraph{
-    private _raw: string;
-    private _metadata: any[];
-    
-    constructor(raw, metadata){
-        this._raw = raw; 
-        this._metadata = metadata; 
-    }
-
-    get raw(): string{
-        return this._raw;
-    }
-
-    set raw(value){
-        this._raw = value;
-    }
-
-    get metadata(): any[] {
-        return this._metadata;
-    }
-    
-    set metadata(value){
-        this._metadata = value; 
-    }
-}
+export = Document; 

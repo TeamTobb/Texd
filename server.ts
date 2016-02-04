@@ -14,7 +14,7 @@ import pluginsRoutes = require('./server/resources/plugins');
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
 import models = require('./server/dao/messageModel');
-import diff = require('./public/domain/diff');
+import Diff = require('./server/domain/diff');
 
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
@@ -30,7 +30,7 @@ server.on('connection', ws => {
 		try {
             var obj = JSON.parse(message); 
             if(obj.newDiff){
-                var difftest = new diff.Diff({}, {}, 0, false, obj.newDiff); 
+                var difftest = new Diff({}, {}, 0, false, obj.newDiff); 
                 broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
                 documentRoutes.updateDocumentText(difftest); 
             }else{
@@ -57,9 +57,9 @@ if (mongoose.connect('mongodb://'+databaseUrl+'/dbTexd')){
 }
 
 var app = express();
-app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/node_modules'));
-app.use(express.static(__dirname + '/typings'));
+app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, '/node_modules')));
+app.use(express.static(path.join(__dirname, '/typings')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
@@ -84,8 +84,6 @@ app.listen(httpPort, function(){
 });
 
 export var App = app;
-
-
 
 function checkArgs(){
 	var next;

@@ -2,8 +2,9 @@ import express = require("express");
 import mongoose = require("mongoose");
 import documentModel = require("../dao/documentModel");
 import IDocument = require('../dao/documentModel');
-import document = require("../../public/domain/document");
-import diff = require("../../public/domain/diff");
+import Document = require("../../server/domain/document");
+import Chapter = require('../../server/domain/chapter')
+import Diff = require("../../server/domain/diff");
 var bodyParser = require('body-parser');
 import repository = documentModel.repository;
 
@@ -12,16 +13,16 @@ export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     
     var rawStart: String = "hei #b bloggen #h1 dette er megatsort # # ";
-    var para = new document.Paragraph(rawStart, []);
+    var para = new Document(rawStart, []);
     
     var chapterHeaderStart: string = "Kapittel header"; 
     var paras = []; 
     paras.push(para); 
     
-    var chapter = new document.Chapter(chapterHeaderStart, paras);
+    var chapter = new Chapter(chapterHeaderStart, paras);
     var chapters = []; 
     chapters.push(chapter);  
-    var documentStart = new document.Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
+    var documentStart = new Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
     
     repository.findOne({_idTest: 2}, (error, document) => {
         if(error){
@@ -46,7 +47,6 @@ export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
     var title = "This is document title"; 
     
-    // repository.update()
     repository.update({_idTest: 2}, {title: req.body.documentTitle}, (error, document) => {
         if(error){
             res.send(error); 
@@ -57,7 +57,7 @@ export function update(req: express.Request, res: express.Response) {
 
 };
 
-export function updateDocumentText(diff: diff.Diff){
+export function updateDocumentText(diff: Diff){
     console.log("documentController.testUpdateDocument()");
     var title = "This is document title";
 
