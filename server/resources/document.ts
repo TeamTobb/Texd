@@ -69,10 +69,13 @@ export function updateDocumentText(diff: Diff){
         if(error){
             //TODO: error handling
         }else{ 
-            if(diff.newchapter == true){
-                document["_chapters"][diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]); 
-            }
-            else{
+            if(diff.newchapter){
+                document["_chapters"].splice(diff.chapter+1, 0, new Chapter("New Chapter", [new Paragraph("Text", [])]));
+                // [diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]); 
+            // } else if(diff.newchapter == false{
+            //     document["_chapters"][diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]);
+            // }
+            } else{
                 document["_chapters"][diff.chapter]["_paragraphs"][diff.index] = diff.paragraph;    
             }
             
