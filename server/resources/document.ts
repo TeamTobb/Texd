@@ -48,12 +48,11 @@ export function read(req: express.Request, res: express.Response) {
 
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
-    var title = "This is document title"; 
     
-    repository.update({_idTest: 2}, {title: req.body.documentTitle}, (error, document) => {
+    repository.update({_idTest: 2}, {_title: req.body.documentTitle}, (error, document) => {
         if(error){
             res.send(error); 
-        } else {
+        } else { 
             res.jsonp(document); 
         }
     }); 

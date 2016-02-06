@@ -60,9 +60,9 @@ export class EditorController2 {
     }
 
     public changeDocumentTitle($event) {
-        // check if there actually is made a change ?
-        // this.changeName();
-        console.log("should send a message to change the name of the document");
+        if(!($event.target.innerHTML == this.document.title)){
+            this.documentService.changeTitle($event.target.innerHTML); 
+        } 
     }
 
     public changeChapter(chapter_number : number) {

@@ -47,14 +47,17 @@ export class DocumentService{
         }
     }
 
-     public changeName(){
-        this._socket.send(JSON.stringify({ name: 'name', message: this._document.title, senderId: "hello" }));
+     public changeTitle(newTitle: string){
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         this.http.post('./document',
-            JSON.stringify({ documentTitle: this._document.title}),
+            JSON.stringify({ documentTitle: newTitle}),
             {headers: headers}).subscribe(res => {
-                console.log(res);
+                // Only actually change the title and send socket messages if status==OK
+                if(res.status==200){
+                    this._socket.send(JSON.stringify({ name: 'name', message: newTitle, senderId: "hello" }));
+                    this.document.title = newTitle; 
+                }
             }
         );
     }
