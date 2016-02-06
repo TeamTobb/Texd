@@ -13,9 +13,14 @@ import repository = documentModel.repository;
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     
+    
     var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
     var para = new Document(rawStart, []);
     
+    repository.find({'chapters.paragraphs._id': 'ObjectID(56b5e4ab1e214b7818907c50)'},  (error, document) => {
+       console.log("we found " + JSON.stringify(document, null, 2));  
+    });
+        
     var chapterHeaderStart: string = "Kapittel header"; 
     var paras = []; 
     paras.push(para); 
@@ -40,6 +45,7 @@ export function read(req: express.Request, res: express.Response) {
                     }
                 });
             } else {
+                console.log("WE ARE SENDING THIS BACK: " + JSON.stringify(document, null, 2)); 
                 res.jsonp(document);
             }
         }
@@ -61,30 +67,26 @@ export function update(req: express.Request, res: express.Response) {
 
 export function updateDocumentText(diff: Diff){
     console.log("documentController.testUpdateDocument()");
-    var title = "This is document title";
+    console.log("trying to update: " + JSON.stringify(diff, null, 2));   
+    var query = {$set: {}}; 
+    query.$set["_chapters.0._paragraphs." + diff.index] = diff.paragraph
 
     // TODO: This is ugly. 
-    repository.findOne({_idTest: 2}, (error, document) => {
+    repository.findOne({_id: diff.documentId}, (error, document) => {
         if(error){
             //TODO: error handling
         }else{ 
             if(diff.newchapter){
-                document["_chapters"].splice(diff.chapter+1, 0, new Chapter("New Chapter", [new Paragraph("Text", [])]));
-                // [diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]); 
-            // } else if(diff.newchapter == false{
-            //     document["_chapters"][diff.chapter+1] = new Chapter("New Chapter", [new Paragraph("Text", [])]);
-            // }
-            } else{
-                document["_chapters"][diff.chapter]["_paragraphs"][diff.index] = diff.paragraph;    
+                // document["_chapters"].splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [new Paragraph("Text", [])]));
+            } else{             
+                 repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {            
+                   console.log("here it is: " + JSON.stringify(document2, null, 2));
+                });   
             }
-            
-            var doc = document; 
-            repository.findOneAndUpdate({_idTest: 2}, {_chapters: document["_chapters"]}, (error, document2) => {
-                if(error){
-                    console.log("error: " + error)
-                } else {
-                }
-            }); 
         }   
     });
+    
+    repository.findOne({_id: diff.documentId}, (error, document)=>{
+        console.log("document is : " + JSON.stringify(document, null, 2)); 
+    })
 }

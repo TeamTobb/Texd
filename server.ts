@@ -30,7 +30,9 @@ server.on('connection', ws => {
 		try {
             var obj = JSON.parse(message); 
             if(obj.newDiff){
-                var difftest = new Diff({}, {}, 0, false, false, obj.newDiff); 
+                // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
+                var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
+                console.log("we recieved diff in serer.ts " + JSON.stringify(difftest, null, 2));  
                 broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
                 documentRoutes.updateDocumentText(difftest); 
             }else{

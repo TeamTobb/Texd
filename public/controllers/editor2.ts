@@ -125,12 +125,17 @@ export class EditorController2 {
         }
         else if ($event.which === 78 && this.modifierKeyDown) {
             this.document.chapters[this.current_chapter].paragraphs.splice(paragraphIndex+1,0, new Paragraph("",[]));
-            var diff: Diff = new Diff(this.current_chapter, new Paragraph("", []), paragraphIndex, true, false);
+            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("", []), paragraphIndex, true, false)
+            console.log("WE are sending diff: " + JSON.stringify(diff, null, 2));
+            // var diff: Diff = new Diff(this.current_chapter, new Paragraph("", []), paragraphIndex, true, false);
             this.documentService.sendDiff(diff);
         }
         else {
-            var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []);
-            var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false, false);
+            // var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []);
+            var para: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
+            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, para.id, para, paragraphIndex, false, false)
+            console.log("WE are sending diff: " + JSON.stringify(diff, null, 2)); 
+            // var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false, false);
             this.documentService.sendDiff(diff);
         }
     }

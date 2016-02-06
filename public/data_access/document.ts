@@ -29,14 +29,15 @@ export class DocumentService{
             var parsed = JSON.parse(message.data);
             if(this._senderId != parsed.senderId){
                 if(parsed.newDiff){
-                    var diff: Diff = new Diff([], [], [], [], [], parsed.newDiff);
+                    var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff); 
+                    // var diff: Diff = new Diff([], [], [], [], [], parsed.newDiff);
                     if(diff.newchapter == true){
-                        this.document.chapters.splice(diff.chapter+1, 0, new Chapter("New Chapter", [diff.paragraph]));
+                        this.document.chapters.splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [diff.paragraph]));
                     } else {
                        if(diff.newelement){
-                            this.document.chapters[diff.chapter].paragraphs.splice(diff.index+1, 0, diff.paragraph);
+                            this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index+1, 0, diff.paragraph);
                         }else {
-                            this.document.chapters[diff.chapter].paragraphs[diff.index] = diff.paragraph;
+                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
                         }
                     }
                 }
@@ -69,22 +70,27 @@ export class DocumentService{
     public getDocument(documentId: number, callback: any){
         // Have to manually assign all of the parameters - TODO:
         this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
+            this.document.id = res._id; 
             this.document.title = res._title;
             this.document.documentname = res._documentname;
-            this.document.id = res._idTest;
+            this.document.idTest = res._idTest;
             this.document.authors = res._authors;
             this.document.chapters = res._chapters;
 
             for(var i = 0; i<this.document.chapters.length; i++){
+                this.document.chapters[i].id = res._chapters[i]._id; 
                 this.document.chapters[i].header = res._chapters[i]._header;
                 this.document.chapters[i].paragraphs = res._chapters[i]._paragraphs;
 
                 for(var j = 0; j<this.document.chapters[i].paragraphs.length; j++){
+                    this.document.chapters[i].paragraphs[j].id = res._chapters[i]._paragraphs[j]._id;
                     this.document.chapters[i].paragraphs[j].raw = res._chapters[i]._paragraphs[j]._raw;
                     this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata;
                 }
             }
             callback();
+            
+            console.log("we created: " + JSON.stringify(this.document, null, 2)); 
         });
     }
 

@@ -2,21 +2,29 @@
 import {Paragraph} from './document.ts'
 
 export class Diff{
-    private _chapter: number;
+    private _documentId: string; 
+    private _chapterId: string;
+    private _chapterIndex: number;
+    private _paragraphId: string;
     private _paragraph: Paragraph;
     private _index: number;
     private _newelement: boolean;
     private _newchapter: boolean; 
     
-    constructor(chapter?, paragraph?, index?, newelement?, newchapter?, payload?){
-        if(payload){          
-            this._chapter = payload._chapter;
+    constructor(documentId?, chapterId?, chapterIndex?, paragraphId?, paragraph?, index?, newelement?, newchapter?, payload?){
+        if(payload){   
+            this._documentId = payload._documentId;       
+            this._chapterId = payload._chapterId; 
+            this._chapterIndex = payload._chapterIndex;
             this.paragraph = new Paragraph(payload._paragraph._raw, payload._paragraph._metadata); 
             this._index = payload._index;
             this._newelement = payload._newelement;
             this._newchapter = payload._newchapter; 
         } else{
-            this._chapter = chapter; 
+            this._documentId = documentId; 
+            this._chapterId = chapterId; 
+            this._chapterIndex = chapterIndex; 
+            this._paragraphId = paragraphId
             this._paragraph = paragraph; 
             this._index = index; 
             this._newelement = newelement;
@@ -24,12 +32,28 @@ export class Diff{
         }       
     }
     
-    get chapter(): number{
-        return this._chapter;
+    get documentId(): string{
+        return this._documentId; 
     }
-
-    set chapter(value){
-        this._chapter = value;
+    
+    set documentId(value){
+        this._documentId = value;
+    }
+      
+    get chapterId(): string{
+        return this._chapterId; 
+    }
+    
+    set chapterId(value){
+        this._chapterId = value; 
+    }
+    
+    get chapterIndex(): number{
+        return this._chapterIndex; 
+    }
+   
+    set chapterIndex(value){
+        this._chapterIndex = value;
     }
 
     get paragraph(): Paragraph{

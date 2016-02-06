@@ -38,7 +38,7 @@ export class EditorController{
         var para = new Paragraph("#b this is a new paragraph#", []);
         
         // console.log(documentService.getDocument(0));  
-        documentService.updateParagraph(0, new Diff(0, para, 2, true)); 
+        // documentService.updateParagraph(0, new Diff(0, para, 2, true)); 
         // console.log(documentService.getDocument(0));
     }
 
