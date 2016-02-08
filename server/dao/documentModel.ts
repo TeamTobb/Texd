@@ -11,12 +11,14 @@ var chapterSchema = new mongoose.Schema({
      _paragraphs:[paragraphSchema]
 });
 
-export var documentSchema = new mongoose.Schema({
+var documentSchema = new mongoose.Schema({
      _idTest: Number,
      _title: String,
      _documentname: String,
      _authors: [],
      _chapters:[chapterSchema]
 })
-
+export var paragraphModel = mongoose.model("paragraph", paragraphSchema);
+export var chapterModel = mongoose.model("chapter", chapterSchema);
 export var repository = mongoose.model("document", documentSchema); 
+

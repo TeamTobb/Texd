@@ -9,13 +9,12 @@ import mongoose = require('mongoose');
 import WebSocket = require('ws');
 
 
-import pluginsRoutes = require('./server/resources/plugins');
-
-import routes = require('./server/resources/index');
-import documentRoutes = require('./server/resources/document');
 import models = require('./server/dao/messageModel');
 import Diff = require('./server/domain/diff');
 
+import pluginsRoutes = require('./server/resources/plugins');
+import routes = require('./server/resources/index');
+import documentRoutes = require('./server/resources/document');
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
@@ -32,8 +31,10 @@ server.on('connection', ws => {
             if(obj.newDiff){
                 // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
                 var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);  
-                broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
-                documentRoutes.updateDocumentText(difftest); 
+                documentRoutes.updateDocumentText(difftest, (elementId) => {
+                    broadcast(JSON.stringify({senderId: obj.senderId, elementId: elementId, newDiff: difftest}));    
+                });
+                
             }else{
                 broadcast(message);    
             }
