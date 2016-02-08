@@ -73,18 +73,16 @@ export function updateDocumentText(diff: Diff){
     query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
 
     var paraQuery = {$push: {}};
-    paraQuery.$push = {chaptersIndex: {$each: [diff.paragraph], $position: diff.index+1}};
-    // paraQuery
-
-    // TODO: This is ugly.
-    repository.findOne({_id: diff.documentId}, (error, document) => {
-        if(error){
-            //TODO: error handling
-        }else{
+    paraQuery.$push[chaptersIndex] = {$each: [diff.paragraph], $position: diff.index+1};
+    
+    // repository.findOne({_id: diff.documentId}, (error, document) => {
+    //     if(error){
+    //         //TODO: error handling
+    //     }else{
             if(diff.newchapter){
                 console.log("diff.newchapter == true ");
                 repository.update(
-                    {_idTest: 2},
+                    {_id: diff.documentId},
                     { $push:
                         {_chapters:
                             {
@@ -116,6 +114,6 @@ export function updateDocumentText(diff: Diff){
                      }
                 });
             }
-        }
-    });
+    //     }
+    // });
 }
