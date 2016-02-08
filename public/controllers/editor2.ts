@@ -47,7 +47,8 @@ export class EditorController2 {
      public createChapter() {
          var p = new Paragraph("Text", []);
         this.document.chapters.splice(this.current_chapter+1, 0, new Chapter("New Chapter", [p]));
-        this.documentService.sendDiff(new Diff(this.current_chapter, p, 0, true, true));
+        var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
+        this.documentService.sendDiff(diff); 
         this.current_chapter += 1;
     }
 
@@ -126,16 +127,11 @@ export class EditorController2 {
         else if ($event.which === 78 && this.modifierKeyDown) {
             this.document.chapters[this.current_chapter].paragraphs.splice(paragraphIndex+1,0, new Paragraph("",[]));
             var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("", []), paragraphIndex, true, false)
-            console.log("WE are sending diff: " + JSON.stringify(diff, null, 2));
-            // var diff: Diff = new Diff(this.current_chapter, new Paragraph("", []), paragraphIndex, true, false);
             this.documentService.sendDiff(diff);
         }
         else {
-            // var para: Paragraph = new Paragraph(this.document.chapters[this.current_chapter].paragraphs[paragraphIndex].raw, []);
             var para: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
             var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, para.id, para, paragraphIndex, false, false)
-            console.log("WE are sending diff: " + JSON.stringify(diff, null, 2)); 
-            // var diff: Diff = new Diff(this.current_chapter, para, paragraphIndex, false, false);
             this.documentService.sendDiff(diff);
         }
     }

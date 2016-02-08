@@ -66,8 +66,7 @@ export function update(req: express.Request, res: express.Response) {
 };
 
 export function updateDocumentText(diff: Diff){
-    console.log("documentController.testUpdateDocument()");
-    console.log("trying to update: " + JSON.stringify(diff, null, 2));   
+    console.log("documentController.testUpdateDocument()"); 
     var query = {$set: {}}; 
     query.$set["_chapters.0._paragraphs." + diff.index] = diff.paragraph
 
@@ -76,17 +75,11 @@ export function updateDocumentText(diff: Diff){
         if(error){
             //TODO: error handling
         }else{ 
-            if(diff.newchapter){
-                // document["_chapters"].splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [new Paragraph("Text", [])]));
+            if(diff.newchapter==true){
             } else{             
                  repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {            
-                   console.log("here it is: " + JSON.stringify(document2, null, 2));
                 });   
             }
         }   
     });
-    
-    repository.findOne({_id: diff.documentId}, (error, document)=>{
-        console.log("document is : " + JSON.stringify(document, null, 2)); 
-    })
 }

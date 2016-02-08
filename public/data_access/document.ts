@@ -30,7 +30,6 @@ export class DocumentService{
             if(this._senderId != parsed.senderId){
                 if(parsed.newDiff){
                     var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff); 
-                    // var diff: Diff = new Diff([], [], [], [], [], parsed.newDiff);
                     if(diff.newchapter == true){
                         this.document.chapters.splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [diff.paragraph]));
                     } else {
@@ -69,7 +68,7 @@ export class DocumentService{
     //mock implementation
     public getDocument(documentId: number, callback: any){
         // Have to manually assign all of the parameters - TODO:
-        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
+        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => { 
             this.document.id = res._id; 
             this.document.title = res._title;
             this.document.documentname = res._documentname;
@@ -80,17 +79,15 @@ export class DocumentService{
             for(var i = 0; i<this.document.chapters.length; i++){
                 this.document.chapters[i].id = res._chapters[i]._id; 
                 this.document.chapters[i].header = res._chapters[i]._header;
-                this.document.chapters[i].paragraphs = res._chapters[i]._paragraphs;
-
-                for(var j = 0; j<this.document.chapters[i].paragraphs.length; j++){
+                this.document.chapters[i].paragraphs = []; 
+                var paragraphLength = res._chapters[i]._paragraphs.length;  
+                
+                for(var j = 0; j<paragraphLength; j++){
+                    this.document.chapters[i].paragraphs[j] = new Paragraph(res._chapters[i]._paragraphs[j]._raw, res._chapters[i]._paragraphs[j]._metadata);
                     this.document.chapters[i].paragraphs[j].id = res._chapters[i]._paragraphs[j]._id;
-                    this.document.chapters[i].paragraphs[j].raw = res._chapters[i]._paragraphs[j]._raw;
-                    this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata;
                 }
             }
             callback();
-            
-            console.log("we created: " + JSON.stringify(this.document, null, 2)); 
         });
     }
 

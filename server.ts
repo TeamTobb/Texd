@@ -28,7 +28,7 @@ var server = new WebSocketServer({ port: wsPort });
 server.on('connection', ws => {
 	ws.on('message', message => {
 		try {
-            var obj = JSON.parse(message); 
+            var obj = JSON.parse(message);  
             if(obj.newDiff){
                 // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
                 var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);

@@ -17,7 +17,7 @@ class Diff{
             this._documentId = payload._documentId;       
             this._chapterId = payload._chapterId; 
             this._chapterIndex = payload._chapterIndex;
-            this.paragraph = new Paragraph(payload._paragraph.raw, payload._paragraph.metadata); 
+            this._paragraph = new Paragraph(payload._paragraph._raw, payload._paragraph._metadata); 
             this._index = payload._index;
             this._newelement = payload._newelement;
             this._newchapter = payload._newchapter; 
