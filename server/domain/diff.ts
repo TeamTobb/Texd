@@ -12,8 +12,7 @@ class Diff{
     private _newchapter: boolean; 
     
     constructor(documentId?, chapterId?, chapterIndex?, paragraphId?, paragraph?, index?, newelement?, newchapter?, payload?){
-        if(payload){
-            console.log("Payload is: " + JSON.stringify(payload, null, 2));    
+        if(payload){    
             this._documentId = payload._documentId;       
             this._chapterId = payload._chapterId; 
             this._chapterIndex = payload._chapterIndex;
@@ -31,8 +30,6 @@ class Diff{
             this._newelement = newelement;
             this._newchapter = newchapter; 
         }       
-       
-       console.log("the diff created is: " + JSON.stringify(this, null, 2)); 
     }
     
     get documentId(): string{

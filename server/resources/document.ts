@@ -45,7 +45,6 @@ export function read(req: express.Request, res: express.Response) {
                     }
                 });
             } else {
-                console.log("WE ARE SENDING THIS BACK: " + JSON.stringify(document, null, 2)); 
                 res.jsonp(document);
             }
         }
@@ -67,18 +66,35 @@ export function update(req: express.Request, res: express.Response) {
 
 export function updateDocumentText(diff: Diff){
     console.log("documentController.testUpdateDocument()"); 
+     
     var query = {$set: {}}; 
     query.$set["_chapters.0._paragraphs." + diff.index] = diff.paragraph
+    
+    var paraQuery = {$push: {}};
+    paraQuery.$push = {"_chapters.0._paragraphs": {$each: [diff.paragraph], $position: diff.index+1}};    
+    // paraQuery
 
     // TODO: This is ugly. 
     repository.findOne({_id: diff.documentId}, (error, document) => {
         if(error){
             //TODO: error handling
         }else{ 
-            if(diff.newchapter==true){
-            } else{             
-                 repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {            
-                });   
+            if(diff.newchapter){
+                
+            } else if (diff.newelement){  
+                repository.update({
+                    _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
+                    if(error){
+                        console.log(error)
+                    }
+                    console.log(document2);
+                })  
+            } else{
+                 repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
+                     if(error){
+                         
+                     }          
+                }); 
             }
         }   
     });
