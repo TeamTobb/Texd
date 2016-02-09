@@ -8,6 +8,8 @@ import Paragraph = require('../../server/domain/paragraph')
 import Diff = require("../../server/domain/diff");
 var bodyParser = require('body-parser');
 import repository = documentModel.repository;
+import chapterModel = documentModel.chapterModel;
+import paragraphModel = documentModel.paragraphModel; 
 
 
 export function read(req: express.Request, res: express.Response) {
@@ -64,58 +66,51 @@ export function update(req: express.Request, res: express.Response) {
 
 };
 
-export function updateDocumentText(diff: Diff){
+export function updateDocumentText(diff: Diff, callback){ 
     console.log("documentController.testUpdateDocument()");
     var chaptersIndex = "_chapters."+diff.chapterIndex+"._paragraphs"
     var chaptersIndexWithDot = "_chapters."+diff.chapterIndex+"._paragraphs."
 
     var query = {$set: {}};
     query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
+    
+    var newParagraph = new paragraphModel({_raw: "...", _metadata: []});
 
     var paraQuery = {$push: {}};
-    paraQuery.$push = {chaptersIndex: {$each: [diff.paragraph], $position: diff.index+1}};
-    // paraQuery
-
-    // TODO: This is ugly.
-    repository.findOne({_id: diff.documentId}, (error, document) => {
-        if(error){
-            //TODO: error handling
-        }else{
-            if(diff.newchapter){
-                console.log("diff.newchapter == true ");
-                repository.update(
-                    {_idTest: 2},
-                    { $push:
-                        {_chapters:
-                            {
-                               $each: [{_header: "New Chapter "+(diff.chapterIndex+1), _paragraphs: [{_raw:"..."}]}],
-                               $position: diff.chapterIndex+1
-                            }
-                        }
-                     }, function (err, res) {
-                     if (err){
-                         console.log(err)
-                     }
-                     if (res){
-                         console.log(res);
-                     }
-                 });
-
-            } else if (diff.newelement){
-                repository.update({
-                    _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
-                    if(error){
-                        console.log(error)
+    paraQuery.$push[chaptersIndex] = {$each: [newParagraph], $position: diff.index+1};
+    if(diff.newchapter){
+        var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _paragraphs: [{_raw: "...", _metadata: []}]});
+        repository.update(
+            {_id: diff.documentId},
+            { $push:
+                {_chapters:
+                    {
+                        $each: [newChapter],
+                        $position: diff.chapterIndex+1
                     }
-                    console.log(document2);
-                })
-            } else{
-                 repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
-                     if(error){
-
-                     }
-                });
+                }
+            }, (error, document) => {
+                if (error){
+                    console.log(error);
+                } else { 
+                    callback(newChapter._id);
+                }
+            });
+    } else if (diff.newelement){
+        repository.update({
+            _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
+            if(error){
+                console.log(error)
+            }else{
+                callback(newParagraph._id)
             }
-        }
-    });
+        })
+    } else{
+            repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
+                if(error){
+                } else {
+                    callback("");
+                }
+        });
+    }
 }
