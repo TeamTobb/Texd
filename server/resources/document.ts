@@ -18,11 +18,7 @@ export function read(req: express.Request, res: express.Response) {
 
     var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
     var para = new Document(rawStart, []);
-
-    repository.find({'chapters.paragraphs._id': 'ObjectID(56b5e4ab1e214b7818907c50)'},  (error, document) => {
-       console.log("we found " + JSON.stringify(document, null, 2));
-    });
-
+    
     var chapterHeaderStart: string = "Kapittel header";
     var paras = [];
     paras.push(para);

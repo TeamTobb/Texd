@@ -17,8 +17,6 @@ import {DocumentService} from '../data_access/document.ts';
 })
 
 export class EditorController {
-    // Have to do this cause of HTML file expecting multiple chapters on load - error otherwise.
-    // TODO: fix this
     private document: Document;
     public current_chapter : number = 0;
     public modifierKeyDown : boolean = false;
@@ -89,7 +87,6 @@ export class EditorController {
         }
         keyMap[82] = () => {
             console.log("ctrl+r");
-            // this.document.chapters[this.current_chapter].header =
         }
         if($event.ctrlKey) {
             if (keyMap[$event.which]) {
