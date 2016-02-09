@@ -28,16 +28,16 @@ var server = new WebSocketServer({ port: wsPort });
 server.on('connection', ws => {
 	ws.on('message', message => {
 		try {
-            var obj = JSON.parse(message);  
+            var obj = JSON.parse(message);
             if(obj.newDiff){
                 // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
-                var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);  
+                var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
                 broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
-                documentRoutes.updateDocumentText(difftest); 
+                documentRoutes.updateDocumentText(difftest);
             }else{
-                broadcast(message);    
+                broadcast(message);
             }
-		} catch (e) { 
+		} catch (e) {
 			console.error(e.message);
 		}
 	});
@@ -65,10 +65,10 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.get('/', routes.index);
 app.get('/plugins', pluginsRoutes.read);
 app.get('/document', documentRoutes.read);
 app.post('/document', documentRoutes.update);
+app.get('/*', routes.index);
 
 // app.post('/document/:documentid', documentRoutes.update)
 // app.put('/document/:documentid', documentRoutes.update)

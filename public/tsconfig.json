@@ -18,9 +18,12 @@
         "rewriteTsconfig": true
     },
     "files": [
+        "controllers/dashboard.ts",
         "controllers/editor.ts",
-        "controllers/editor2.ts",
         "controllers/index.ts",
+        "controllers/mainview.ts",
+        "controllers/settings.ts",
+        "controllers/settingspage.ts",
         "utils/jsonToHtml.ts",
         "utils/parseMap.ts",
         "utils/parser.spec.ts",

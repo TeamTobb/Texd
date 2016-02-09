@@ -1,0 +1,8 @@
+<div>
+documents.html
+</div>
+<ul>
+<li id="chapterLi" *ngFor="#chapter of chapters; #i = index" (click)="goToDocument(i)">document: {{chapter}}</li>
+</ul>
+<router-outlet></router-outlet>
+<br> below router outlet test

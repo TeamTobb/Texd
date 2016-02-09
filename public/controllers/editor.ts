@@ -1,106 +1,143 @@
 import {ParseMap} from "../utils/parseMap.ts";
-import {Component, ViewChild, Input, Output, Renderer} from 'angular2/core';
-import {Http, Headers, Response, RequestOptions} from 'angular2/http';
-import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
-import {Injectable, bind} from 'angular2/core';
-
-
-import {DocumentService} from '../data_access/document.ts';
-import {Diff} from '../domain/diff.ts';
-import {Document, Chapter, Paragraph} from '../domain/document.ts';
+import {Component, ElementRef, Renderer} from 'angular2/core';
+import {HTTP_BINDINGS} from 'angular2/http';
+import {Injectable,} from 'angular2/core';
 import 'rxjs/Rx';
 
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
+import {Document, Paragraph, Chapter} from '../domain/document.ts';
+import {Diff} from '../domain/diff.ts';
+import {DocumentService} from '../data_access/document.ts';
 
 @Component({
   selector: 'my-app',
-  templateUrl:'views/editor.html', 
-  providers: [DocumentService]
+  templateUrl:'views/editor.html',
+  providers: [DocumentService, HTTP_BINDINGS]
 })
 
-@Injectable()
-export class EditorController{
-    public socket = new WebSocket('ws://localhost:3001');
-    public title = 'MEAN skeleton with typescript';
-    public documentName = "Name of document";
-    public documentText = "This is a standard text";
-    public documentJSON = "This is a standard text";
-    public documentHTML = "This is a standard text";
-    public senderId : string = "" + Math.random;
-    private parseMap = new ParseMap();
-    private textParser : Parser = new Parser();
-    private jsonParser : jsonToHtml = new jsonToHtml();
+export class EditorController {
+    // Have to do this cause of HTML file expecting multiple chapters on load - error otherwise.
+    // TODO: fix this
+    private document: Document;
+    public current_chapter : number = 0;
+    public modifierKeyDown : boolean = false;
+    public element : ElementRef;
+    public documentHTML : string = "preview";
 
-    constructor(public http: Http, private documentService: DocumentService) {
-        this.getPlugins();
-        
-        var para = new Paragraph("#b this is a new paragraph#", []);
-        
-        // console.log(documentService.getDocument(0));  
-        // documentService.updateParagraph(0, new Diff(0, para, 2, true)); 
-        // console.log(documentService.getDocument(0));
+    // CTRL + P = parse
+    // CTRL + N = new paragraph
+
+    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer ) {
+        this.document = this.documentService.document;
+        this.element = currElement;
+        renderer.listenGlobal('document', 'keydown', ($event) => {
+            this.globalKeyEvent($event);
+        });
+        this.documentService.getDocument(2, () => {
+            setTimeout( () => {
+                var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
+                for (var i in elem) {
+                    this.auto_grow(elem[i]);
+                }
+            }, 10);
+        })
     }
 
-    public changeName() {
-        this.socket.send(JSON.stringify({ name: 'name', message: this.documentName, senderId: "hello" }));
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document',
-            JSON.stringify({ documentTitle: this.documentName}),
-            {headers: headers}).subscribe(res => {
-                console.log(res); 
-                // this.documentName = re
-            }
-        );
+     public createChapter() {
+         var p = new Paragraph("Text", []);
+        this.document.chapters.splice(this.current_chapter+1, 0, new Chapter("New Chapter", [p]));
+        var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
+        this.documentService.sendDiff(diff);
+        this.current_chapter += 1;
     }
 
-    public changeDocument(){
-        var para = new Paragraph(this.documentText, []);
-        var diff: Diff = new Diff(0, para, 2, true); 
-        this.socket.send(JSON.stringify({senderId: this.senderId, newDiff: diff}));
-        // this.documentJSON = this.textParser.getParsedJSON(this.documentText);
-        this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
-    }
-
-    ngAfterViewInit() {
-        this.getDocument();
-        this.socket.onmessage = message => {
-            var parsed = JSON.parse(message.data);
-            if(this.senderId != parsed.senderId){
-                if(parsed.newDiff){
-                    this.documentText = parsed.newDiff._paragraph._raw;    
-                } 
-                
-                if(parsed.message){
-                    this.documentName = parsed.message; 
-                }   
+    public gotoChapter($event, text) {
+        if($event.which === 13) {
+            if(this.document.chapters[text]) {
+                this.current_chapter = parseInt(text);
             }
-             
-            
-            // console.log(JSON.stringify(parsed)); 
-
-          /*  if (parsed.data.name == "name") {
-                this.documentName = parsed.data.message;
-            }
-            if (parsed.data.name == "document") {
-                this.documentText = parsed.data.message;
-            }*/
         }
     }
 
-    getDocument(){
-        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
-            this.documentText = res._chapters[0]._paragraphs[0]._raw; 
-            this.documentName = res._title;
-            // this.documentJSON = this.textParser.getParsedJSON(this.documentText);
-            this.documentHTML = this.jsonParser.getParsedHTML(this.documentJSON);
-        });
+    public changeDocumentTitle($event) {
+        if(!($event.target.innerHTML == this.document.title)){
+            this.documentService.changeTitle($event.target.innerHTML);
+        }
     }
 
-    getPlugins(){
-        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
-            this.parseMap.generateParseMap(res);
-        });
+    public changeChapter(chapter_number : number) {
+        this.current_chapter = chapter_number;
+        setTimeout( () => {
+            var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
+            for (var i in elem) {
+                this.auto_grow(elem[i]);
+            }
+        }, 10);
+    }
+
+    public globalKeyEvent($event) {
+        console.log($event.which);
+        var keyMap = {};
+        keyMap[80] = () => {
+            console.log("ctrl+p");
+            this.parseCurrentChapter();
+        }
+        keyMap[67] = () => {
+            console.log("ctrl+c");
+            this.createChapter();
+        }
+        keyMap[82] = () => {
+            console.log("ctrl+r");
+            // this.document.chapters[this.current_chapter].header =
+        }
+        if($event.ctrlKey) {
+            if (keyMap[$event.which]) {
+                keyMap[$event.which]();
+            }
+        }
+    }
+
+    public parseCurrentChapter() {
+        console.log("parsing");
+        var rawParagraphs = this.document.chapters[this.current_chapter].paragraphs;
+        var documentJSON = this.documentService.getParsedJSON(rawParagraphs);
+        this.documentHTML = this.documentService.getParsedHTML(documentJSON);
+        // update previewFrame
+        var doc = jQuery(this.element.nativeElement).find('#previewFrame')[0].contentWindow.document;
+        doc.open();
+        doc.write(this.documentHTML);
+        doc.close();
+    }
+
+    public modifierKeyDownPress($event) {
+        if($event.which === 17) {
+            this.modifierKeyDown = true;
+        }
+    }
+
+    public changeDocument($event, paragraphIndex : number) {
+        this.auto_grow($event.target);
+        if ($event.which === 17) {
+            this.modifierKeyDown = false;
+        }
+        else if ($event.which === 80 && this.modifierKeyDown) {
+            this.parseCurrentChapter();
+        }
+        else if ($event.which === 78 && this.modifierKeyDown) {
+            this.document.chapters[this.current_chapter].paragraphs.splice(paragraphIndex+1,0, new Paragraph("",[]));
+            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("", []), paragraphIndex, true, false)
+            this.documentService.sendDiff(diff);
+        }
+        else {
+            var para: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
+            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, para.id, para, paragraphIndex, false, false)
+            this.documentService.sendDiff(diff);
+        }
+    }
+
+    public auto_grow(element) {
+        element.style.height = "5px";
+        element.style.height = (element.scrollHeight)+"px";
     }
 }
