@@ -122,4 +122,24 @@ export class DocumentService{
     getParsedHTML(documentJSON){
         return this._jsonParser.getParsedHTML(documentJSON);
     }
+    public getDocuments() : Document[]{
+        var documents: Document[] = [];
+        var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
+        var para = new Paragraph(rawStart, []);      
+        var paras = [];
+        paras.push(para);
+        var chapters = [];
+
+        chapters.push(new Chapter("Header kap 2", paras));
+        chapters.push(new Chapter("Header kap 3", paras));
+        var documentStart = new Document(1, "document1 ", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
+        var documentStart2 = new Document(2, "document2", "documentName", ["Bjon", "thomasbassen"], chapters);
+        var documentStart3 = new Document(3, "document3", "documentName", ["Borgar", "jorg"], chapters);
+                 
+        documents.push(documentStart);
+        documents.push(documentStart2);
+        documents.push(documentStart3);
+        return documents;   
+        
+    }
 }

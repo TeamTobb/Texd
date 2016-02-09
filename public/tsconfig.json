@@ -19,6 +19,7 @@
     },
     "files": [
         "controllers/dashboard.ts",
+        "controllers/docview.ts",
         "controllers/editor.ts",
         "controllers/index.ts",
         "controllers/mainview.ts",
