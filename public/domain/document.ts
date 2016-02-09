@@ -1,4 +1,5 @@
 export class Document{
+    private _id: string; 
     private _idTest: number; 
     private _title: string;
     private _documentname: string;
@@ -6,7 +7,7 @@ export class Document{
     private _chapters: Chapter [];
     
     constructor(idTest?, title?, documentname?, authors?, chapters?){
-        if(idTest && title && documentname && authors && chapters){
+        if(idTest && title && documentname && authors && chapters){ 
             this._idTest = idTest; 
             this._title = title; 
             this._documentname = documentname; 
@@ -14,12 +15,20 @@ export class Document{
             this._chapters = chapters;  
         }
     }
-
-    get id(): number{
-        return this._idTest; 
+    
+    get id(): string{
+        return this._id; 
     }
     
     set id(value){
+        this._id = value;
+    }
+
+    get idTest(): number{
+        return this._idTest; 
+    }
+    
+    set idTest(value){
         this._idTest = value; 
     }
     
@@ -58,12 +67,21 @@ export class Document{
 
 
 export class Chapter{
+    private _id: string; 
     private _header: string;
     private _paragraphs: Paragraph[];
 
-    constructor(header, paragraphs){
+    constructor(header, paragraphs){ 
         this._header = header; 
         this._paragraphs = paragraphs; 
+    }
+    
+    get id(): string{
+        return this._id; 
+    }
+    
+    set id(value){
+        this._id = value; 
     }
 
     get header(): string{
@@ -84,12 +102,21 @@ export class Chapter{
 }
 
 export class Paragraph{
+    private _id: string; 
     private _raw: string;
     private _metadata: any[];
     
     constructor(raw, metadata){
         this._raw = raw; 
         this._metadata = metadata; 
+    }
+    
+    get id(): string{
+        return this._id; 
+    }
+    
+    set id(value){
+        this._id = value; 
     }
 
     get raw(): string{

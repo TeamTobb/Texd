@@ -9,13 +9,12 @@ import mongoose = require('mongoose');
 import WebSocket = require('ws');
 
 
-import pluginsRoutes = require('./server/resources/plugins');
-
-import routes = require('./server/resources/index');
-import documentRoutes = require('./server/resources/document');
 import models = require('./server/dao/messageModel');
 import Diff = require('./server/domain/diff');
 
+import pluginsRoutes = require('./server/resources/plugins');
+import routes = require('./server/resources/index');
+import documentRoutes = require('./server/resources/document');
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
@@ -28,15 +27,17 @@ var server = new WebSocketServer({ port: wsPort });
 server.on('connection', ws => {
 	ws.on('message', message => {
 		try {
-            var obj = JSON.parse(message); 
+            var obj = JSON.parse(message);
             if(obj.newDiff){
-                var difftest = new Diff({}, {}, 0, false, false, obj.newDiff); 
-                broadcast(JSON.stringify({senderId: obj.senderId, newDiff: difftest}));
-                documentRoutes.updateDocumentText(difftest); 
+                // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
+                var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);  
+                documentRoutes.updateDocumentText(difftest, (elementId) => {
+                    broadcast(JSON.stringify({senderId: obj.senderId, elementId: elementId, newDiff: difftest}));    
+                });
             }else{
-                broadcast(message);    
+                broadcast(message);
             }
-		} catch (e) { 
+		} catch (e) {
 			console.error(e.message);
 		}
 	});
@@ -64,10 +65,10 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.get('/', routes.index);
 app.get('/plugins', pluginsRoutes.read);
 app.get('/document', documentRoutes.read);
 app.post('/document', documentRoutes.update);
+app.get('/*', routes.index);
 
 // app.post('/document/:documentid', documentRoutes.update)
 // app.put('/document/:documentid', documentRoutes.update)

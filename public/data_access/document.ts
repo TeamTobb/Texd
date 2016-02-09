@@ -25,24 +25,32 @@ export class DocumentService{
         this._jsonParser = new jsonToHtml();
 
         this._socket = new WebSocket('ws://localhost:3001');
+        //TODO: Clean this up
         this._socket.onmessage = message => {
-            var parsed = JSON.parse(message.data);
-            if(this._senderId != parsed.senderId){
-                if(parsed.newDiff){
-                    var diff: Diff = new Diff([], [], [], [], [], parsed.newDiff);
-                    if(diff.newchapter == true){
-                        this.document.chapters.splice(diff.chapter+1, 0, new Chapter("New Chapter", [diff.paragraph]));
-                    } else {
-                       if(diff.newelement){
-                            this.document.chapters[diff.chapter].paragraphs.splice(diff.index+1, 0, diff.paragraph);
-                        }else {
-                            this.document.chapters[diff.chapter].paragraphs[diff.index] = diff.paragraph;
+            var parsed = JSON.parse(message.data);  
+            if(parsed.newDiff){
+                var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff); 
+                if(diff.newchapter == true){
+                    if(this._senderId != parsed.senderId){
+                        this.document.chapters.splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [diff.paragraph]));
+                        this.document.chapters[diff.chapterIndex+1].id = parsed.elementId;    
+                    } else{
+                        this.document.chapters[diff.chapterIndex+1].id = parsed.elementId;
+                    }
+                } else {
+                    if(diff.newelement==true){
+                        if(this._senderId != parsed.senderId){
+                            this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index+1, 0, diff.paragraph);
+                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index+1].id = parsed.elementId;
+                        } else {
+                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index+1].id = parsed.elementId;
                         }
+                    }else if(this._senderId != parsed.senderId){
+                        this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
                     }
                 }
-                if(parsed.message){
-                    this.document.title = parsed.message;
-                }
+            }if(parsed.message){
+                this.document.title = parsed.message;
             }
         }
     }
@@ -62,26 +70,28 @@ export class DocumentService{
         );
     }
 
-    public sendDiff(diff: Diff){
+    public sendDiff(diff: Diff){ 
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));
     }
-    //mock implementation
     public getDocument(documentId: number, callback: any){
         // Have to manually assign all of the parameters - TODO:
-        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => {
+        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => { 
+            this.document.id = res._id; 
             this.document.title = res._title;
             this.document.documentname = res._documentname;
-            this.document.id = res._idTest;
+            this.document.idTest = res._idTest;
             this.document.authors = res._authors;
             this.document.chapters = res._chapters;
 
             for(var i = 0; i<this.document.chapters.length; i++){
+                this.document.chapters[i].id = res._chapters[i]._id; 
                 this.document.chapters[i].header = res._chapters[i]._header;
-                this.document.chapters[i].paragraphs = res._chapters[i]._paragraphs;
-
-                for(var j = 0; j<this.document.chapters[i].paragraphs.length; j++){
-                    this.document.chapters[i].paragraphs[j].raw = res._chapters[i]._paragraphs[j]._raw;
-                    this.document.chapters[i].paragraphs[j].metadata = res._chapters[i]._paragraphs[j]._metadata;
+                this.document.chapters[i].paragraphs = []; 
+                var paragraphLength = res._chapters[i]._paragraphs.length;  
+                
+                for(var j = 0; j<paragraphLength; j++){
+                    this.document.chapters[i].paragraphs[j] = new Paragraph(res._chapters[i]._paragraphs[j]._raw, res._chapters[i]._paragraphs[j]._metadata);
+                    this.document.chapters[i].paragraphs[j].id = res._chapters[i]._paragraphs[j]._id;
                 }
             }
             callback();
@@ -105,5 +115,25 @@ export class DocumentService{
     }
     getParsedHTML(documentJSON){
         return this._jsonParser.getParsedHTML(documentJSON);
+    }
+    public getDocuments() : Document[]{
+        var documents: Document[] = [];
+        var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
+        var para = new Paragraph(rawStart, []);      
+        var paras = [];
+        paras.push(para);
+        var chapters = [];
+
+        chapters.push(new Chapter("Header kap 2", paras));
+        chapters.push(new Chapter("Header kap 3", paras));
+        var documentStart = new Document(1, "document1 ", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
+        var documentStart2 = new Document(2, "document2", "documentName", ["Bjon", "thomasbassen"], chapters);
+        var documentStart3 = new Document(3, "document3", "documentName", ["Borgar", "jorg"], chapters);
+                 
+        documents.push(documentStart);
+        documents.push(documentStart2);
+        documents.push(documentStart3);
+        return documents;   
+        
     }
 }

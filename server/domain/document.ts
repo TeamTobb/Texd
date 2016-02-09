@@ -2,6 +2,7 @@ import Paragraph = require('./paragraph')
 import Chapter = require('./chapter');
 
 class Document{
+    private _id: string;
     private _idTest: number; 
     private _title: string;
     private _documentname: string;
@@ -17,12 +18,20 @@ class Document{
             this._chapters = chapters;  
         }
     }
-
-    get id(): number{
-        return this._idTest; 
+    
+    get id(): string{
+        return this._id; 
     }
     
     set id(value){
+        this._id = value; 
+    }
+
+    get idTest(): number{
+        return this._idTest; 
+    }
+    
+    set idTest(value){
         this._idTest = value; 
     }
     

@@ -1,29 +1,43 @@
 <div id="wrapper">
-  <div id="title">
-    <h1>{{title}}</h1>
-  </div>
-  <div id="body">
-    <div id="documentName">Document name: {{documentName}}</div>
-    <div id="changeDocumentName">
-      Change document name: <input id="changeDocumentNameInput" [(ngModel)]="documentName" placeholder="name">
-      <button (click)="changeName()">save</button>
+    <div id="title">
+        <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1>
     </div>
-    <br>
-    <div id="cointainer">
-        <div id="left">
-            <textarea id="textArea" (keyup)="changeDocument()" rows="30" cols="1" [(ngModel)]="documentText"></textarea>
-        </div>
-        <div id="center">
-            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentJSON"></textarea>
-        </div>
-        <div id="right">
-            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentHTML"></textarea>
+    <div id="body">
+        Hints:
+        <br>
+        CTRL + P = parse
+        <br>
+        CTRL + N = new paragraph
+        <br>
+        CTRL + C = new chapter
+        <br>
+        Goto chapter (index+enter): <input value="" type="text" #current (keydown)="gotoChapter($event, current.value)">
+        <br><br>
+        <div id="container">
+            <div id="left">
+                <ul>
+                    <li id="chapterLi" *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)">{{chapter.header}}</li>
+                </ul>
+            </div>
+            <div id="center">
+                <!-- <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'
+                    #current contenteditable (keydown)="modifierKeyDownPress($event)"
+                    (keyup)="changeDocument($event, i, current.innerText)">
+                    {{p.raw}}
+                    <div #current contenteditable (keydown)="modifierKeyDownPress($event)" (keyup)="changeDocument($event, i, current.innerText)">{{p.raw}}</div>
+                </div>
+                -->
+                <!-- <input [(ngModel)]="p.raw" (keydown)="modifierKeyDownPress($event)"
+                (keyup)="changeDocument($event, i, current.innerText)"></input> -->
+                <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
+                    <textarea id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;"
+                    (keydown)="modifierKeyDownPress($event)"
+                    (keyup)="changeDocument($event, i)"></textarea>
+                </div>
+            </div>
+            <div id="right">
+                <iframe id="previewFrame" src="about:blank"></iframe>
+            </div>
         </div>
     </div>
-    <!--
-    <div id="textAreaWrapper">
-      <textarea id="textArea" (keyup)="changeDocument()" rows="80" cols="150" [(ngModel)]="documentText"></textarea>
-    </div>
-    -->
-  </div>
 </div>

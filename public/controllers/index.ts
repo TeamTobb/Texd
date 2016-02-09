@@ -1,4 +1,5 @@
 import {bootstrap} from 'angular2/platform/browser';
-import {EditorController2} from './editor2';
+import {MainView} from './mainview';
+import {ROUTER_PROVIDERS} from 'angular2/router';
 
-bootstrap(EditorController2);
+bootstrap(MainView, [ROUTER_PROVIDERS]);
