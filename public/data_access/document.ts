@@ -78,6 +78,29 @@ export class DocumentService{
             }
         );
     }
+    
+     //TODO implement changeChapterName()
+     public changeChapterName(id: string, newchapterName: string, chapterId: number){
+        /*var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        this.http.post('./document/' + id,
+            JSON.stringify({ newchapterName: newchapterName}),
+            {headers: headers}).subscribe(res => {
+                console.log(res)
+                // Only actually change the title and send socket messages if status==OK
+                if(res.status==200){
+                    this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newchapterName, senderId: "hello" }));
+                    this.document.chapters[chapterId] = newchapterName; 
+                }
+            }
+        );*/
+       
+    }
+    
+    public deleteChapter(chapterName: string){
+        console.log(this.document.chapters)
+    }
+    
 
     public sendDiff(diff: Diff){
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));

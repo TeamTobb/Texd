@@ -30,12 +30,7 @@ export class EditorController {
     // CTRL + P = parse
     // CTRL + N = new paragraph
 
-<<<<<<< Updated upstream
     constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams ) {
-=======
-    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private elRef: ElementRef) {
-        this.document = this.documentService.document;
->>>>>>> Stashed changes
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -148,10 +143,5 @@ export class EditorController {
     public auto_grow(element) {
         element.style.height = "5px";
         element.style.height = (element.scrollHeight)+"px";
-    }
-    
-    onBlur(value: any) {
- 		  console.log("enBlur() in Editor.ts")
-           
     }
 }

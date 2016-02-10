@@ -17,7 +17,7 @@
             <div id="left">
                 <ul>
                     <li>     
-                        <chapteritem [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"></chapteritem>
+                        <chapteritem [(chapterId)]="chapter.id" [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"></chapteritem>
                     </li>
                 </ul>
             </div>

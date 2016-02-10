@@ -2,10 +2,11 @@ import {Component, Input, Output, OnChanges, SimpleChange} from 'angular2/core';
 import {Directive} from "angular2/core";
 import {OnInit} from 'angular2/core';
 import {EventEmitter} from "angular2/src/facade/async";
-import {OnChanges} from "angular2/core";
 import {isPropertyUpdated} from "angular2/src/common/forms/directives/shared";
+import {DocumentService} from '../data_access/document.ts';
+import {Document, Paragraph, Chapter} from '../domain/document.ts';
 
-//<docview *ngFor="#document of documents; #i = index" [title]="documents[i].name" [preview]="documents[i].chapters[0].text" />
+
 @Component({
   selector: 'chapteritem',
   templateUrl: 'views/components/chapteritem.html'
@@ -13,24 +14,32 @@ import {isPropertyUpdated} from "angular2/src/common/forms/directives/shared";
 })
 export class ChapterItem implements OnChanges {
   @Input() chapterName: string;
-  @Input() delete: {};
-  @Input() rename: {};
+  @Input() chapterId: string; 
     
-  constructor() {
+  constructor(private documentService: DocumentService) {
   }
-  
+  //Implement this
   delete(value: any){
-    console.log("delete") 
-    console.log(value)
+    //Make this alert, sure you want to delete this chapter? 
+    var chapters: Chapter[] = this.documentService.document.chapters;
+    
+    for (var index = 0; index < chapters.length; index++) {
+        var element = chapters[index];
+        if (element.id==value){
+            chapters.splice(index, 1);
+            break;
+        }
+    }            
   }
-  
+  //TODO Implmentent this
   rename($event){
     console.log("rename")     
-    console.log($event.target.innerHTML)
+    var newName: string = $event.target.innerHTML
+    this.documentService.changeChapterName("1", newName, 1);
   }
    
    ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    console.log("Change +-+-+-+-") 
+    console.log("Something has Changed in chapterItem") 
     
   }
 
