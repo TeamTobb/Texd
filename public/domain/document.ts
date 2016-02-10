@@ -6,14 +6,32 @@ export class Document{
     private _authors: string[];
     private _chapters: Chapter [];
     
-    constructor(idTest?, title?, documentname?, authors?, chapters?){
-        if(idTest && title && documentname && authors && chapters){ 
+    constructor(idTest?, title?, documentname?, authors?, chapters?, payload?){
+        if(payload){
+            this._id = payload._id; 
+            this._title = payload._title;
+            this._documentname = payload._documentname;
+            this._idTest = payload._idTest;
+            this._authors = payload._authors;
+            this._chapters = new Array<Chapter>();
+            
+            for(var i = 0; i<payload._chapters.length; i++){
+                this._chapters.push(new Chapter(payload._chapters[i]._header, []));
+                this._chapters[i].id = payload._chapters[i]._id; 
+                var paragraphLength = payload._chapters[i]._paragraphs.length;  
+                
+                for(var j = 0; j<paragraphLength; j++){
+                    this._chapters[i].paragraphs[j] = new Paragraph(payload._chapters[i]._paragraphs[j]._raw, payload._chapters[i]._paragraphs[j]._metadata);
+                    this._chapters[i].paragraphs[j].id = payload._chapters[i]._paragraphs[j]._id;
+                }
+            }
+        }else if(idTest && title && documentname && authors && chapters){ 
             this._idTest = idTest; 
             this._title = title; 
             this._documentname = documentname; 
             this._authors = authors; 
             this._chapters = chapters;  
-        }
+        } 
     }
     
     get id(): string{

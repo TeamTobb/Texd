@@ -66,8 +66,9 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/plugins', pluginsRoutes.read);
-app.get('/document', documentRoutes.read);
-app.post('/document', documentRoutes.update);
+app.get('/document/:id', documentRoutes.read);
+app.get('/documents', documentRoutes.getDocuments);
+app.post('/document/:id', documentRoutes.update);
 app.get('/*', routes.index);
 
 // app.post('/document/:documentid', documentRoutes.update)

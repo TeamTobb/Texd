@@ -14,45 +14,74 @@ import paragraphModel = documentModel.paragraphModel;
 
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
-
-
-    var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
-    var para = new Document(rawStart, []);
+    // console.log("here is req: " + JSON.stringify(req.params, null, 2));  
     
-    var chapterHeaderStart: string = "Kapittel header";
-    var paras = [];
-    paras.push(para);
 
-    var chapter = new Chapter(chapterHeaderStart, paras);
-    var chapters = [];
-    chapters.push(chapter);
-    chapters.push(new Chapter("Header kap 2", paras));
-    chapters.push(new Chapter("Header kap 3", paras));
-    var documentStart = new Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
 
-    repository.findOne({_idTest: 2}, (error, document) => {
+    // var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
+    // var para = new Document(rawStart, []);
+    
+    // var chapterHeaderStart: string = "Kapittel header";
+    // var paras = [];
+    // paras.push(para);
+
+    // var chapter = new Chapter(chapterHeaderStart, paras);
+    // var chapters = [];
+    // chapters.push(chapter);
+    // chapters.push(new Chapter("Header kap 2", paras));
+    // chapters.push(new Chapter("Header kap 3", paras));
+    // var documentStart = new Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
+
+    repository.findOne({_id: req.params.id}, (error, document) => {
         if(error){
             res.send(error);
         } else {
-            if(!document){
-                repository.create(documentStart, (error, document2) => {
-                    if(error){
-                        res.send(error);
-                    } else {
-                        res.jsonp(document2);
-                    }
-                });
-            } else {
-                res.jsonp(document);
-            }
+            res.jsonp(document);
         }
     });
-};
+}
+
+export function getDocuments(req: express.Request, res: express.Response){
+    console.log("getDocuments()"); 
+    var paragraphs1 = [new Paragraph("Doc1 paragraph1", []), new Paragraph("Doc1 paragraph2", []), new Paragraph("Doc1 paragraph3", [])];
+    var paragraphs2 = [new Paragraph("Doc2 paragraph1", []), new Paragraph("Doc2 paragraph2", []), new Paragraph("Doc2 paragraph3", [])];
+    var paragraphs3 = [new Paragraph("Doc3 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    
+    var chapters1 = [new Chapter("Doc1 chapter1", paragraphs1)];
+    var chapters2 = [new Chapter("Doc2 chapter1", paragraphs2)];
+    var chapters3 = [new Chapter("Doc3 chapter1", paragraphs3)];
+    
+    var document1 = new Document(1, "Title 1", "Name 1", ["Jorgen", "Borgar"], chapters1);
+    var document2 = new Document(2, "Title 2", "Name 2", ["Jorgen", "Bjon"], chapters2);
+    var document3 = new Document(3, "Title 3", "Name 3", ["Bjon", "Borgar"], chapters3);
+    
+    var documentArray = []; 
+    documentArray.push(document1, document2, document3); 
+    
+    repository.find({}, (error, documents) => {
+       if(error){
+           console.log(error); 
+           res.jsonp(error);
+       } else if(!documents.length){
+           console.log("No documents found");
+            repository.create((documentArray), (error, document2) => {
+                if(error){
+                    console.log(error); 
+                }else{
+                    getDocuments(req, res);    
+                }
+            });     
+       } else{
+           console.log("We found documents"); 
+           res.jsonp(documents); 
+       }
+    });
+}
 
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
 
-    repository.update({_idTest: 2}, {_title: req.body.documentTitle}, (error, document) => {
+    repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
         if(error){
             res.send(error);
         } else {

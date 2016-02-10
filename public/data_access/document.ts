@@ -27,7 +27,8 @@ export class DocumentService{
         this._socket = new WebSocket('ws://localhost:3001');
         //TODO: Clean this up
         this._socket.onmessage = message => {
-            var parsed = JSON.parse(message.data);  
+            var parsed = JSON.parse(message.data);
+            console.log("Recieved socket message. Our senderId " + this._senderId + " message senderId " + parsed.senderId);  
             if(parsed.newDiff){
                 var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff); 
                 if(diff.newchapter == true){
@@ -49,21 +50,21 @@ export class DocumentService{
                         this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
                     }
                 }
-            }if(parsed.message){
+            }if(parsed.message && parsed.documentId == this._document.id){
                 this.document.title = parsed.message;
             }
         }
     }
 
-     public changeTitle(newTitle: string){
+     public changeTitle(id: string, newTitle: string){
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        this.http.post('./document',
+        this.http.post('./document/' + id,
             JSON.stringify({ documentTitle: newTitle}),
             {headers: headers}).subscribe(res => {
                 // Only actually change the title and send socket messages if status==OK
                 if(res.status==200){
-                    this._socket.send(JSON.stringify({ name: 'name', message: newTitle, senderId: "hello" }));
+                    this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newTitle, senderId: "hello" }));
                     this.document.title = newTitle; 
                 }
             }
@@ -73,33 +74,11 @@ export class DocumentService{
     public sendDiff(diff: Diff){ 
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));
     }
-    public getDocument(documentId: number, callback: any){
-        // Have to manually assign all of the parameters - TODO:
-        this.http.get('./document').map((res: Response) => res.json()).subscribe(res => { 
-            this.document.id = res._id; 
-            this.document.title = res._title;
-            this.document.documentname = res._documentname;
-            this.document.idTest = res._idTest;
-            this.document.authors = res._authors;
-            this.document.chapters = res._chapters;
-
-            for(var i = 0; i<this.document.chapters.length; i++){
-                this.document.chapters[i].id = res._chapters[i]._id; 
-                this.document.chapters[i].header = res._chapters[i]._header;
-                this.document.chapters[i].paragraphs = []; 
-                var paragraphLength = res._chapters[i]._paragraphs.length;  
-                
-                for(var j = 0; j<paragraphLength; j++){
-                    this.document.chapters[i].paragraphs[j] = new Paragraph(res._chapters[i]._paragraphs[j]._raw, res._chapters[i]._paragraphs[j]._metadata);
-                    this.document.chapters[i].paragraphs[j].id = res._chapters[i]._paragraphs[j]._id;
-                }
-            }
-            callback();
-        });
-    }
-
-    public getDocumentTest(){
-        return this._document;
+    public getDocument(documentId: string, callback: (document: Document) => any){
+        this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
+                this.document = new Document([], [], [], [], [], res);
+                callback(this.document);
+            })
     }
 
     get document(): Document{
@@ -116,24 +95,13 @@ export class DocumentService{
     getParsedHTML(documentJSON){
         return this._jsonParser.getParsedHTML(documentJSON);
     }
-    public getDocuments() : Document[]{
-        var documents: Document[] = [];
-        var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
-        var para = new Paragraph(rawStart, []);      
-        var paras = [];
-        paras.push(para);
-        var chapters = [];
-
-        chapters.push(new Chapter("Header kap 2", paras));
-        chapters.push(new Chapter("Header kap 3", paras));
-        var documentStart = new Document(1, "document1 ", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
-        var documentStart2 = new Document(2, "document2", "documentName", ["Bjon", "thomasbassen"], chapters);
-        var documentStart3 = new Document(3, "document3", "documentName", ["Borgar", "jorg"], chapters);
-                 
-        documents.push(documentStart);
-        documents.push(documentStart2);
-        documents.push(documentStart3);
-        return documents;   
-        
+    public getDocuments(callback: (documents: Document[]) => void ){
+        var documents: Document[] = Array<Document>();
+        this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
+            res.forEach((document) => {
+                documents.push(new Document([], [], [], [], [], document));
+                callback(documents); 	
+            })   
+        });
     }
 }

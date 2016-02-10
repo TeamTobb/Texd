@@ -12,17 +12,24 @@ import {DocView} from './docview';
   providers: [DocumentService, HTTP_BINDINGS], 
   directives: [DocView]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit{
   public text: string = "test string in dashboard";
   private documents : Document[];
   
   constructor(private _router: Router, private _documentService : DocumentService) {
-        this.documents = this._documentService.getDocuments();
+        this._documentService.getDocuments((documents) => {
+            this.documents = documents; 
+        });
         console.log(this.documents);
   }
 
-  public goToDocument(documentId : number) {
+  public goToDocument(documentId : string) {
+      console.log("passing id " + documentId);
       this._router.navigate(['Editor', {id : documentId}]);
   }
-
-}
+  
+  ngOnInit(){
+      console.log("dashboard.onInit()"); 
+  }   
+}          
+            

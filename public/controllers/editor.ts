@@ -1,7 +1,8 @@
 import {ParseMap} from "../utils/parseMap.ts";
-import {Component, ElementRef, Renderer} from 'angular2/core';
+import {Component, ElementRef, Renderer, Input} from 'angular2/core';
 import {HTTP_BINDINGS} from 'angular2/http';
 import {Injectable,} from 'angular2/core';
+import {RouteParams} from 'angular2/router'; 
 import 'rxjs/Rx';
 
 import {Parser} from '../utils/parser.ts';
@@ -17,7 +18,8 @@ import {DocumentService} from '../data_access/document.ts';
 })
 
 export class EditorController {
-    private document: Document;
+    private document: Document = new Document([], [], [], [], [{}, {}, {}]);
+    // @Input() document; 
     public current_chapter : number = 0;
     public modifierKeyDown : boolean = false;
     public element : ElementRef;
@@ -26,20 +28,23 @@ export class EditorController {
     // CTRL + P = parse
     // CTRL + N = new paragraph
 
-    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer ) {
-        this.document = this.documentService.document;
+    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams ) {
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
-        this.documentService.getDocument(2, () => {
-            setTimeout( () => {
-                var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
-                for (var i in elem) {
-                    this.auto_grow(elem[i]);
-                }
-            }, 10);
-        })
+        if(this._routeParams.get('id')){
+            this.documentService.getDocument(this._routeParams.get('id'), (document) => {
+                this.document = document
+                setTimeout( () => {
+                    var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
+                    for (var i in elem) {
+                        this.auto_grow(elem[i]);
+                    }
+                }, 10);
+            })
+        }
+       
     }
 
      public createChapter() {
@@ -60,7 +65,7 @@ export class EditorController {
 
     public changeDocumentTitle($event) {
         if(!($event.target.innerHTML == this.document.title)){
-            this.documentService.changeTitle($event.target.innerHTML);
+            this.documentService.changeTitle(this.document.id, $event.target.innerHTML);
         }
     }
 
