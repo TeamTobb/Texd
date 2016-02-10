@@ -1,48 +1,54 @@
 import {Document, Paragraph, Chapter} from '../domain/document.ts';
 
 export class Parser {
+    private hashMap : { [id : string] : Plugin } = {};
+
+    constructor(hashMap : any) {
+        this.hashMap = hashMap;
+    }
 
     public getParsedJSON(inputText : Paragraph[]) : string {
-        var hashMap: { [id: string]: parseMap} = {};
+        // var hashMap: { [id: string]: parseMap} = {};
 
-        hashMap["#b "] = <parseMap> ({
-            getRef: (obj) => {
-                var b = [];
-                obj.push({b : b});
-                return b;
-            }
-        });
-        hashMap["#h1 "] = <parseMap> ({
-            getRef: (obj) => {
-                var h1 = [];
-                obj.push({h1 : h1});
-                return h1;
-            }
-        });
-        // need to handle this differently tho
-        hashMap["#p "] = <parseMap> ({
-            getRef: (obj) => {
-                var p = [];
-                obj.push({p : p});
-                return p;
-            }
-        });
+        // this.hashMap["#b "] = <parseMap> ({
+        //     getRef: (obj) => {
+        //         var b = [];
+        //         obj.push({b : b});
+        //         return b;
+        //     }
+        // });
+        // this.hashMap["#h1 "] = <parseMap> ({
+        //     getRef: (obj) => {
+        //         var h1 = [];
+        //         obj.push({h1 : h1});
+        //         return h1;
+        //     }
+        // });
+        // // need to handle this differently tho
+        // this.hashMap["#p "] = <parseMap> ({
+        //     getRef: (obj) => {
+        //         var p = [];
+        //         obj.push({p : p});
+        //         return p;
+        //     }
+        // });
 
-        return this.parseText(hashMap, inputText);
+        return this.parseText(this.hashMap, inputText);
     }
 
     public parseText(hashMap : any, inputText : Paragraph[] ) : string {
 
-
+        console.log("test");
+        console.log(hashMap);
 
         var outputJSON : any = {};
 
         var mergedParas = "";
 
         for (var para in inputText) {
-            mergedParas += " #p "
+            mergedParas += " #p ";
             mergedParas += inputText[para].raw;
-            mergedParas += " # "
+            mergedParas += " # ";
         }
 
         // var list = mergedParas.split(" ");
@@ -57,17 +63,17 @@ export class Parser {
         refStack.push(outputJSON.content);
 
         for (var elem in list){
-            if (hashMap[list[elem]]) {
+            if (hashMap[list[elem].trim()]) {
                 // reached a valid starting hashtag
                 if (tempText != "") {
                     refStack[refStack.length-1].push({text : tempText});
                     tempText = "";
                 }
                 // push new tag to refStack
-                refStack.push(hashMap[list[elem]].getRef(refStack[refStack.length-1]));
+                refStack.push(hashMap[list[elem].trim()].getRef(refStack[refStack.length-1]));
                 // TODO: maybe rename getRef to createRef or something more precise
             }
-            else if (list[elem] == "# ") {
+            else if (list[elem].trim() == "#") {
                 // reached an ending tag
                 if (tempText != "") {
                     refStack[refStack.length-1].push({text : tempText});

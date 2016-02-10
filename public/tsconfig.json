@@ -27,6 +27,7 @@
         "controllers/settings.ts",
         "controllers/settingspage.ts",
         "utils/jsonToHtml.ts",
+        "utils/keymap.ts",
         "utils/parseMap.ts",
         "utils/parser.spec.ts",
         "utils/parser.ts",
