@@ -5,7 +5,7 @@ import {Document} from '../domain/document';
 import {DocumentService} from '../data_access/document.ts';
 import {DocView} from './docview';
  
-//<docview *ngFor="#document of documents; #i = index" [title]="documents[i].name" [preview]="documents[i].chapters[0].text" />
+
 @Component({
   selector: 'dashboard',
   templateUrl: 'views/documents.html',

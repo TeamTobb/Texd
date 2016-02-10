@@ -10,11 +10,13 @@ import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Paragraph, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
+import {ChapterItem} from './chapteritem.ts'
 
 @Component({
   selector: 'my-app',
   templateUrl:'views/editor.html',
-  providers: [DocumentService, HTTP_BINDINGS]
+  providers: [DocumentService, HTTP_BINDINGS],
+  directives: [ChapterItem]
 })
 
 export class EditorController {
@@ -24,11 +26,16 @@ export class EditorController {
     public modifierKeyDown : boolean = false;
     public element : ElementRef;
     public documentHTML : string = "preview";
-
+   
     // CTRL + P = parse
     // CTRL + N = new paragraph
 
+<<<<<<< Updated upstream
     constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams ) {
+=======
+    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private elRef: ElementRef) {
+        this.document = this.documentService.document;
+>>>>>>> Stashed changes
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -141,5 +148,10 @@ export class EditorController {
     public auto_grow(element) {
         element.style.height = "5px";
         element.style.height = (element.scrollHeight)+"px";
+    }
+    
+    onBlur(value: any) {
+ 		  console.log("enBlur() in Editor.ts")
+           
     }
 }

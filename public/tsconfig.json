@@ -18,6 +18,7 @@
         "rewriteTsconfig": true
     },
     "files": [
+        "controllers/chapteritem.ts",
         "controllers/dashboard.ts",
         "controllers/docview.ts",
         "controllers/editor.ts",

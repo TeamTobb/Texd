@@ -16,9 +16,13 @@
         <div id="container">
             <div id="left">
                 <ul>
-                    <li id="chapterLi" *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)">{{chapter.header}}</li>
+                    <li>     
+                        <chapteritem [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"></chapteritem>
+                    </li>
                 </ul>
             </div>
+            
+            
             <div id="center">
                 <!-- <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'
                     #current contenteditable (keydown)="modifierKeyDownPress($event)"
