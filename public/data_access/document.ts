@@ -7,10 +7,12 @@ import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Chapter, Paragraph} from "../domain/document.ts"
 import {Diff} from "../domain/diff.ts";
+import {ParseMap} from "../utils/parseMap.ts";
 
 @Injectable()
 export class DocumentService{
     private _socket;
+    public parseMap : ParseMap = new ParseMap();
 
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
     private _current_chapter: number;
@@ -21,20 +23,26 @@ export class DocumentService{
 
     constructor(private http: Http){
         this._senderId = "" + Math.random();
-        this._textParser = new Parser();
+
+        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+            this.parseMap.generateParseMap(res);
+            this._textParser = new Parser(this.parseMap.parseMap);
+        });
+
+        // this._textParser = new Parser();
         this._jsonParser = new jsonToHtml();
 
         this._socket = new WebSocket('ws://localhost:3001');
         //TODO: Clean this up
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data);
-            console.log("Recieved socket message. Our senderId " + this._senderId + " message senderId " + parsed.senderId);  
+            console.log("Recieved socket message. Our senderId " + this._senderId + " message senderId " + parsed.senderId);
             if(parsed.newDiff){
-                var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff); 
+                var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
                 if(diff.newchapter == true){
                     if(this._senderId != parsed.senderId){
                         this.document.chapters.splice(diff.chapterIndex+1, 0, new Chapter("New Chapter", [diff.paragraph]));
-                        this.document.chapters[diff.chapterIndex+1].id = parsed.elementId;    
+                        this.document.chapters[diff.chapterIndex+1].id = parsed.elementId;
                     } else{
                         this.document.chapters[diff.chapterIndex+1].id = parsed.elementId;
                     }
@@ -65,13 +73,13 @@ export class DocumentService{
                 // Only actually change the title and send socket messages if status==OK
                 if(res.status==200){
                     this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newTitle, senderId: "hello" }));
-                    this.document.title = newTitle; 
+                    this.document.title = newTitle;
                 }
             }
         );
     }
 
-    public sendDiff(diff: Diff){ 
+    public sendDiff(diff: Diff){
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));
     }
     public getDocument(documentId: string, callback: (document: Document) => any){
@@ -100,8 +108,8 @@ export class DocumentService{
         this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
             res.forEach((document) => {
                 documents.push(new Document([], [], [], [], [], document));
-                callback(documents); 	
-            })   
+                callback(documents);
+            })
         });
     }
 }
