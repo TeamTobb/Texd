@@ -80,20 +80,29 @@ export class DocumentService{
     }
     
      //TODO implement changeChapterName()
-     public changeChapterName(id: string, newchapterName: string, chapterId: number){
-        /*var headers = new Headers();
+    //this.documentService.changeChapterName("1", newName, 1);
+     public changeChapterName(documentId: string, newchapterName: string, chapterId: number){
+         console.log(documentId)
+         console.log(chapterId)
+
+         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + id,
-            JSON.stringify({ newchapterName: newchapterName}),
+        this.http.post('./document/' + documentId,
+            JSON.stringify({ 
+                documentId: documentId,
+                newchapterName: newchapterName,
+                chapterId: chapterId             
+                }),
             {headers: headers}).subscribe(res => {
                 console.log(res)
+                //TODO send out socket change to everyone
                 // Only actually change the title and send socket messages if status==OK
-                if(res.status==200){
+                /*if(res.status==200){
                     this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newchapterName, senderId: "hello" }));
                     this.document.chapters[chapterId] = newchapterName; 
-                }
+                }*/
             }
-        );*/
+        );
        
     }
     
