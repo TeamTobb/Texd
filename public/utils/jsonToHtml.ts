@@ -10,17 +10,20 @@ export class jsonToHtml {
     public iterate(obj, stack) {
         var temp_html = "";
         for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
+            console.log(property);
+            if(property=="attributes") {
+                // do nothing
+            }
+            else if (obj.hasOwnProperty(property)) {
                 if (typeof obj[property] == "object") {
                     // tag exists
                     if(this.hashMap[property]) {
                         var attributeList = obj[property][0].attributes;
                         temp_html += this.hashMap[property].generateHtmlWithAttr(attributeList, this.iterate(obj[property], stack + '.' + property));
-                        // tag does not exist -> drop it
-                    } else {
+                    }
+                    else {
                         temp_html += this.iterate(obj[property], stack + '.' + property);
                     }
-                    // no object => text only?
                 } else {
                     temp_html += obj[property];
                 }
