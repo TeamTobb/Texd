@@ -78,7 +78,7 @@ export class ParseMap{
                                 console.log(attributeList);
                                 if (attributeList["@" + temp_tag]) {
                                     console.log("works??");
-                                    html += attributeList[temp_tag];
+                                    html += attributeList["@" + temp_tag];
                                 } else {
                                     // attribute is not present in the raw paragraph
                                     console.log("error2");
