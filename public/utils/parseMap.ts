@@ -21,6 +21,8 @@ export class ParseMap{
         var p1 = <Plugin> ({
             getRef: (parentRef) => {
                 var temp = [];
+                var attributeList = {};
+                temp.push({attributes : attributeList});
                 parentRef.push({p : temp});
                 return temp;
             }
@@ -51,8 +53,10 @@ export class ParseMap{
         var p = <Plugin> ({
             getRef: (parentRef) => {
                 var temp = [];
+                var attributeList = {};
+                temp.push({attributes : attributeList});
                 var obj = {};
-                obj[plugin.tagname] = temp;
+                obj["#" + plugin.tagname] = temp;
                 parentRef.push(obj);
                 return temp;
             },
@@ -70,9 +74,13 @@ export class ParseMap{
                             if (temp_tag == "value") {
                                 html += value;
                             } else if (legalAttributes[temp_tag]) {
-                                if (attributeList[temp_tag]) {
+                                console.log("@" + temp_tag);
+                                console.log(attributeList);
+                                if (attributeList["@" + temp_tag]) {
+                                    console.log("works??");
                                     html += attributeList[temp_tag];
                                 } else {
+                                    // attribute is not present in the raw paragraph
                                     console.log("error2");
                                 }
                             } else {
