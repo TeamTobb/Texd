@@ -109,10 +109,11 @@ export function update(req: express.Request, res: express.Response) {
         });
        
     }
+}
 
         
     	
-    export function updateDocumentText(diff: Diff, callback){ 
+export function updateDocumentText(diff: Diff, callback){ 
     console.log("documentController.testUpdateDocument()");
     var chaptersIndex = "_chapters.$._paragraphs"
     var chaptersIndexWithDot = "_chapters.$._paragraphs."
