@@ -19,8 +19,6 @@ export class Parser {
     }
 
     public parseText(hashMap : any, inputText : Paragraph[] ) : string {
-        // console.log("Inside parseText");
-        // console.log(hashMap);
         var outputJSON : any = {};
         var mergedParas = "";
         for (var para in inputText) {
@@ -28,20 +26,12 @@ export class Parser {
             mergedParas += inputText[para].raw;
             mergedParas += " # ";
         }
-        // var list = mergedParas.split(/[\n ]+/);
-        // var list = mergedParas.split(/[^\\s\"']+|\"([^\"]*)\"|'([^']*)'+/);
         var list = this.parseString(mergedParas);
         for (var i = 0; i < list.length; i++) list[i] += " ";
 
         var refStack : any = [];
         var tempText : string = "";
         var attributeList : any[] = [];
-
-        // var attributeList = [];
-        // attributeList["src"] = "my_funny_picture2.jpg";
-        // attributeList["height"] = "40px";
-
-        // console.log(list);
 
         outputJSON.content = [];
         refStack.push(outputJSON.content);
@@ -73,21 +63,9 @@ export class Parser {
                 }
             }
             else {
-                // normal text
-                // TODO: trim the tags and dont remove space on split instead
-                // elem = elem+1;
                 if (list[elem].startsWith("@")) {
-                    // console.log("starts with: " + list[elem]);
-                    // dirty fix -> make next elem empty starting
-                    // var attribute = {};
-                    // attribute[list[elem].trim()] = list[parseInt(elem) + 1];
-                    // list[elem+1] = "";
-                    // list.splice(parseInt(elem)+1,1);
-                    // console.log(refStack[refStack.length-1]);
-                    // refStack[refStack.length-1][0].attributes.push(attribute);
-                    refStack[refStack.length-1][0].attributes[list[elem].trim()] = list[parseInt(elem) + 1];
+                    refStack[refStack.length-1][0].attributes[list[elem].trim()] = list[parseInt(elem) + 1].trim();
                     list.splice(parseInt(elem)+1,1);
-                    // console.log(refStack);
                 }
                 else {
                     tempText += list[elem];
@@ -99,10 +77,6 @@ export class Parser {
             refStack[refStack.length-1].push({text : tempText});
         }
 
-        // console.log(JSON.stringify(refStack,null,2));
-
-        // this.writeJSONtoFile(outputJSON, "test.json");
-        // console.log(outputJSON);
         return JSON.stringify(outputJSON, null, 2);
     }
 
