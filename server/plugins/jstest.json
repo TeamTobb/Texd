@@ -1,0 +1,6 @@
+{
+	"tagname" : "jstest",
+	"html" : "<div id='scripttest'>Numbers: </div><script>for(var i=0; i<'$value'; i++){document.getElementById('scripttest').innerHTML+=i;}</script>",
+	"attr" : [],
+	"optattr" : []
+}

@@ -89,10 +89,10 @@ export class DocumentService{
          var headers = new Headers();
         headers.append('Content-Type', 'application/json');
         this.http.post('./document/' + documentId,
-            JSON.stringify({ 
+            JSON.stringify({
                 documentId: documentId,
                 newchapterName: newchapterName,
-                chapterId: chapterId             
+                chapterId: chapterId
                 }),
             {headers: headers}).subscribe(res => {
                 console.log(res)
@@ -100,7 +100,7 @@ export class DocumentService{
                 // Only actually change the title and send socket messages if status==OK
                /* if(res.status==200){
                     this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newchapterName, senderId: "hello" }));
-                    this.document.chapters[chapterId] = newchapterName; 
+                    this.document.chapters[chapterId] = newchapterName;
                 }*/
             }
         );
@@ -142,6 +142,7 @@ export class DocumentService{
                 documents.push(new Document([], [], [], [], [], document));
                 callback(documents);
             })
+            console.log(JSON.stringify(documents,null,2));
         });
     }
 }
