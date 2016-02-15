@@ -1,4 +1,4 @@
 <div> 
-    <div  (blur)="rename($event)" id="el" style="display: inline" contenteditable="true">{{chapterName}}</div> 
+    <div (dblclick)="ondblclickChapter($event)" (blur)="rename($event, chapterId, documentId)" id="el" style="display: inline" >{{chapterName}}</div> 
     <div><button (click)="delete(chapterId)">del</button> </div>
-</div>
+</div>   

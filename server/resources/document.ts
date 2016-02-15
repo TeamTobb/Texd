@@ -80,27 +80,48 @@ export function getDocuments(req: express.Request, res: express.Response){
 
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
+    if(req.body.documentTitle != null){
+        console.log("UPDATING TITLE")   
+        repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
+            if(error){
+                res.send(error);
+            } else {
+                res.jsonp(document);
+            }
+    	});        
+    }
+            
+    if(req.body.newchapterName != null){
+        var query = {$set: {}};
+        query.$set["_chapters.$._header"] = req.body.newchapterName
+        
+        repository.update({
+            _id: new mongoose.Types.ObjectId(req.params.id),
+            "_chapters._id": new mongoose.Types.ObjectId(req.body.chapterId)
+        }, 
+            query 
+        , (error, document) => {
+            if(error){             
+                res.send(error);
+            } else {
+                res.jsonp(document);
+            }
+        });
+       
+    }
 
-    repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
-        if(error){
-            res.send(error);
-        } else {
-            res.jsonp(document);
-        }
-    });
-
-};
-
-export function updateDocumentText(diff: Diff, callback){ 
+        
+    	
+    export function updateDocumentText(diff: Diff, callback){ 
     console.log("documentController.testUpdateDocument()");
-    var chaptersIndex = "_chapters."+diff.chapterIndex+"._paragraphs"
-    var chaptersIndexWithDot = "_chapters."+diff.chapterIndex+"._paragraphs."
-
+    var chaptersIndex = "_chapters.$._paragraphs"
+    var chaptersIndexWithDot = "_chapters.$._paragraphs."
+​
     var query = {$set: {}};
     query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
     
     var newParagraph = new paragraphModel({_raw: "...", _metadata: []});
-
+​
     var paraQuery = {$push: {}};
     paraQuery.$push[chaptersIndex] = {$each: [newParagraph], $position: diff.index+1};
     if(diff.newchapter){

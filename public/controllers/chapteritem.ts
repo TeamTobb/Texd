@@ -15,6 +15,7 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 export class ChapterItem implements OnChanges {
   @Input() chapterName: string;
   @Input() chapterId: string; 
+  @Input() documentId: string; 
     
   constructor(private documentService: DocumentService) {
   }
@@ -31,16 +32,19 @@ export class ChapterItem implements OnChanges {
         }
     }            
   }
-  //TODO Implmentent this
-  rename($event){
-    console.log("rename")     
-    var newName: string = $event.target.innerHTML
-    this.documentService.changeChapterName("1", newName, 1);
-  }
-   
-   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    console.log("Something has Changed in chapterItem") 
-    
-  }
+    rename($event, chapterId, documentId){         
+        var newName: string = $event.target.innerHTML
+        this.documentService.changeChapterName(documentId, newName, chapterId);
+        $event.target.setAttribute("contenteditable", "false");
+    }
 
+    ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+    console.log("Something has Changed in chapterItem") 
+
+    }
+
+    ondblclickChapter($event){
+        console.log("ondblclickChapter")  
+        $event.target.setAttribute("contenteditable", "true");
+    }
 }
