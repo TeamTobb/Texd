@@ -8,6 +8,7 @@ import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Chapter, Paragraph} from "../domain/document.ts"
 import {Diff} from "../domain/diff.ts";
 import {ParseMap} from "../utils/parseMap.ts";
+import {SnappetParser} from "../utils/snappetParser.ts";
 
 @Injectable()
 export class DocumentService {
@@ -20,6 +21,7 @@ export class DocumentService {
     public _senderId: string;
     private _textParser: Parser;
     private _jsonParser: jsonToHtml;
+    private snappetParser: SnappetParser; 
 
     constructor(private http: Http) {
         this._senderId = "" + Math.random();
@@ -29,7 +31,7 @@ export class DocumentService {
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
-
+    
         // this._textParser = new Parser();
         // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 

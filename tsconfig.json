@@ -32,6 +32,7 @@
         "./server/domain/paragraph.ts",
         "./server/resources/document.ts",
         "./server/resources/index.ts",
-        "./server/resources/plugins.ts"
+        "./server/resources/plugins.ts",
+        "./server/resources/snappets.ts"
     ]
 }

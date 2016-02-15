@@ -1,6 +1,6 @@
 import {ParseMap} from "../utils/parseMap.ts";
 import {Component, ElementRef, Renderer, Input} from 'angular2/core';
-import {HTTP_BINDINGS} from 'angular2/http';
+import {Http, HTTP_BINDINGS, Response} from 'angular2/http';
 import {Injectable,} from 'angular2/core';
 import {RouteParams} from 'angular2/router'; 
 import 'rxjs/Rx';
@@ -11,6 +11,7 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
+import {SnappetParser} from "../utils/snappetParser.ts";
 
 @Component({
   selector: 'my-app',
@@ -26,11 +27,13 @@ export class EditorController {
     public modifierKeyDown : boolean = false;
     public element : ElementRef;
     public documentHTML : string = "preview";
+    private snappetParser: SnappetParser;  
+    
    
     // CTRL + P = parse
     // CTRL + N = new paragraph
 
-    constructor(public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams ) {
+    constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams ) {
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -46,6 +49,22 @@ export class EditorController {
                 }, 10);
             })
         }
+        
+            
+        this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
+            console.log(JSON.stringify(res, null, 2));
+            var snappets: any[] = []; 
+            // JSON.parse(res); 
+            // res.forEach((snappet) => {
+            //     snappets.push(snappet); 
+            // })
+            this.snappetParser = new SnappetParser(this.element, res); 
+             
+            // this.parseMap.generateParseMap(res);
+            // this._textParser = new Parser(this.parseMap.parseMap);
+            // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
+        });
+        
        
     }
     
@@ -96,7 +115,7 @@ export class EditorController {
             }
         }, 10);
     }
-
+    
     public globalKeyEvent($event) {
         console.log($event.which);
         var keyMap = {};
@@ -110,6 +129,17 @@ export class EditorController {
         }
         keyMap[82] = () => {
             console.log("ctrl+r");
+        }
+        
+        keyMap[79] = () => {
+            var node = document.getSelection().anchorNode;
+            if(node.nodeType == 3){
+                console.log("sending node: " + node.parentNode)
+                this.snappetParser.parseSnappet(node.parentNode); 
+            }else{
+                this.snappetParser.parseSnappet(node);
+                console.log("sending node: " + node)
+            }
         }
         if($event.ctrlKey) {
             if (keyMap[$event.which]) {

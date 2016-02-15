@@ -1,0 +1,10 @@
+{
+    "img" : {
+        "prefix": "img",
+        "body": "#img \n @src ${1:'test.png'} @width: ${2:'40px'} @height: ${3:'40px'} \n # \n $4" 
+    }, 
+    "h1":{
+        "prefix": "h1", 
+        "body": "#h1 $1 # $2"
+    }
+}

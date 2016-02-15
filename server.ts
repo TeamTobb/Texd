@@ -13,6 +13,7 @@ import models = require('./server/dao/messageModel');
 import Diff = require('./server/domain/diff');
 
 import pluginsRoutes = require('./server/resources/plugins');
+import snappetRoutes = require('./server/resources/snappets');
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
 var wsPort: number = process.env.PORT || 3001;
@@ -66,6 +67,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/plugins', pluginsRoutes.read);
+app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 app.get('/documents', documentRoutes.getDocuments);
 app.post('/document/:id', documentRoutes.update);
