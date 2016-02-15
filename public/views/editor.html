@@ -15,24 +15,13 @@
         <br><br>
         <div id="container">
             <div id="left">
-                <ul>
-                    
-                        <chapteritem  [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"  (click)="changeChapter(i)"></chapteritem>
-                   
+                <ul>                    
+                    <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"  (click)="changeChapter(i)"></chapteritem>                   
                 </ul>
             </div>
             
             
-            <div id="center">
-                <!-- <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'
-                    #current contenteditable (keydown)="modifierKeyDownPress($event)"
-                    (keyup)="changeDocument($event, i, current.innerText)">
-                    {{p.raw}}
-                    <div #current contenteditable (keydown)="modifierKeyDownPress($event)" (keyup)="changeDocument($event, i, current.innerText)">{{p.raw}}</div>
-                </div>
-                -->
-                <!-- <input [(ngModel)]="p.raw" (keydown)="modifierKeyDownPress($event)"
-                (keyup)="changeDocument($event, i, current.innerText)"></input> -->
+            <div id="center">            
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
                     <textarea id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;"
                     (keydown)="modifierKeyDownPress($event)"

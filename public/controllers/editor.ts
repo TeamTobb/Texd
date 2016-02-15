@@ -48,6 +48,21 @@ export class EditorController {
         }
        
     }
+    
+    public deleteChapterFromDB(value:string){
+        console.log("deleteChapterFromDB("+value+")");
+        
+        var chapters: Chapter[] = this.documentService.document.chapters;
+    
+    	    for (var index = 0; index < chapters.length; index++) {
+                var element = chapters[index];
+                if (element.id==value){
+                    chapters.splice(index, 1);
+                       break;
+        }
+    }    
+        
+    }
 
      public createChapter() {
          var p = new Paragraph("Text", []);

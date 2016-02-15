@@ -16,30 +16,27 @@ export class ChapterItem implements OnChanges {
   @Input() chapterName: string;
   @Input() chapterId: string; 
   @Input() documentId: string; 
-    
+  @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
+  
+  
   constructor(private documentService: DocumentService) {
+
   }
-  //Implement this
+    // TODO Make alert, sure you want to delete this chapter? 
   delete(value: any){
-    //Make this alert, sure you want to delete this chapter? 
-    var chapters: Chapter[] = this.documentService.document.chapters;
-    
-    for (var index = 0; index < chapters.length; index++) {
-        var element = chapters[index];
-        if (element.id==value){
-            chapters.splice(index, 1);
-            break;
-        }
-    }            
+    console.log("Delete()")
+    this.toBeDeleted.emit(value)    
   }
-    rename($event, chapterId, documentId){         
+  
+    rename($event, chapterId, documentId){       
+         //this.toBeDeleted.emit("event")  
         var newName: string = $event.target.innerHTML
         this.documentService.changeChapterName(documentId, newName, chapterId);
         $event.target.setAttribute("contenteditable", "false");
     }
 
     ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    console.log("Something has Changed in chapterItem") 
+     //console.log("Something has Changed in chapterItem") 
 
     }
 
