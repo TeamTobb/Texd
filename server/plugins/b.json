@@ -1,6 +1,6 @@
 {
-	"tagname" : "b",
-	"html" : "<b>$value</b>",
-	"attr" : [],
-	"optattr" : []
+    "tagname": "b",
+    "html": "<b>$value</b>",
+    "attr": [],
+    "optattr": []
 }

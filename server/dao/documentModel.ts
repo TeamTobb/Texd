@@ -7,16 +7,16 @@ var paragraphSchema = new mongoose.Schema({
 });
 
 var chapterSchema = new mongoose.Schema({
-     _header: String,
-     _paragraphs:[paragraphSchema]
+    _header: String,
+    _paragraphs: [paragraphSchema]
 });
 
 var documentSchema = new mongoose.Schema({
-     _idTest: Number,
-     _title: String,
-     _documentname: String,
-     _authors: [],
-     _chapters:[chapterSchema]
+    _idTest: Number,
+    _title: String,
+    _documentname: String,
+    _authors: [],
+    _chapters: [chapterSchema]
 })
 export var paragraphModel = mongoose.model("paragraph", paragraphSchema);
 export var chapterModel = mongoose.model("chapter", chapterSchema);

@@ -1,5 +1,5 @@
 export class KeyMap {
-    public keys : { [name : string] : number };
+    public keys: { [name: string]: number };
 
     constructor() {
         // first get standard key settings
@@ -21,7 +21,7 @@ export class KeyMap {
     }
 
     // user should have validation by some sort (?) in db?
-    public saveNewUserKeySetting(user : string, keyName : string, keyNumber : number) {
+    public saveNewUserKeySetting(user: string, keyName: string, keyNumber: number) {
         this.keys[keyName] = keyNumber;
         // save to db
     }

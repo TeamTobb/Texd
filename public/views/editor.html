@@ -4,27 +4,25 @@
     </div>
     <div id="body">
         Hints:
+        <br> CTRL + P = parse
+        <br> CTRL + N = new paragraph
+        <br> CTRL + C = new chapter
+        <br> Goto chapter (index+enter):
+        <input value="" type="text" #current (keydown)="gotoChapter($event, current.value)">
         <br>
-        CTRL + P = parse
         <br>
-        CTRL + N = new paragraph
-        <br>
-        CTRL + C = new chapter
-        <br>
-        Goto chapter (index+enter): <input value="" type="text" #current (keydown)="gotoChapter($event, current.value)">
-        <br><br>
         <div id="container">
             <div id="left">
-                <ul>                    
-                    <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header" *ngFor="#chapter of document.chapters; #i = index"  (click)="changeChapter(i)"></chapteritem>                   
+                <ul>
+                    <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
+                    *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)"></chapteritem>
                 </ul>
             </div>
-            
-            
-            <div id="center">            
+
+
+            <div id="center">
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
-                    <textarea id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;"
-                    (keydown)="modifierKeyDownPress($event)"
+                    <textarea id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;" (keydown)="modifierKeyDownPress($event)"
                     (keyup)="changeDocument($event, i)"></textarea>
                 </div>
             </div>
