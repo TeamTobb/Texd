@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title>MEAN skeleton</title>
-    <script>document.write('<base href="' + document.location.origin + '" />');</script>
+    <script>
+        document.write('<base href="' + document.location.origin + '" />');
+    </script>
     <script src="angular2/bundles/angular2-polyfills.js"></script>
     <script src="typescript/lib/typescript.js"></script>
     <script src="systemjs/dist/system.js"></script>
@@ -15,7 +18,7 @@
     <script src="https://code.angularjs.org/2.0.0-beta.3/router.dev.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
     <script>
-      System.config({
+        System.config({
         transpiler: 'typescript',
         typescriptOptions: { emitDecoratorMetadata: true },
         packages: {'controllers': {defaultExtension: 'ts'}}
@@ -23,8 +26,10 @@
       System.import('controllers/index')
             .then(null, console.error.bind(console));
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <my-app>Loading...</my-app>
-  </body>
+</body>
+
 </html>

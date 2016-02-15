@@ -1,35 +1,35 @@
-class Paragraph{
-    private _id: string; 
+class Paragraph {
+    private _id: string;
     private _raw: string;
     private _metadata: any[];
-    
-    constructor(raw, metadata){
-        this._raw = raw; 
-        this._metadata = metadata; 
-    }
-    
-    get id(): string{
-        return this._id; 
-    }
-    
-    set id(value){
-        this._id = value; 
+
+    constructor(raw, metadata) {
+        this._raw = raw;
+        this._metadata = metadata;
     }
 
-    get raw(): string{
+    get id(): string {
+        return this._id;
+    }
+
+    set id(value) {
+        this._id = value;
+    }
+
+    get raw(): string {
         return this._raw;
     }
 
-    set raw(value){
+    set raw(value) {
         this._raw = value;
     }
 
-    get metadata(): any[] {
+    get metadata(): any[]  {
         return this._metadata;
     }
-    
-    set metadata(value){
-        this._metadata = value; 
+
+    set metadata(value) {
+        this._metadata = value;
     }
 }
 

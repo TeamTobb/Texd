@@ -1,6 +1,12 @@
 {
-	"tagname" : "img",
-	"html" : "<img id='$ref' src='$src' height='$height' width='$width' alt='$value'>",
-	"attr" : ["src"],
-	"optattr" : ["height","width", "ref"]
+    "tagname": "img",
+    "html": "<img id='$ref' src='$src' height='$height' width='$width' alt='$value'>",
+    "attr": [
+        "src"
+    ],
+    "optattr": [
+        "height",
+        "width",
+        "ref"
+    ]
 }

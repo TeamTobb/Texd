@@ -1,8 +1,8 @@
-export class ParseMap{
-    public parseMap : { [tagname : string] : Plugin } = {}; // TODO: Make static
+export class ParseMap {
+    public parseMap: { [tagname: string]: Plugin } = {}; // TODO: Make static
 
-    generateParseMap(plugins: any[]){
-        plugins.forEach((plugin)=>{
+    generateParseMap(plugins: any[]) {
+        plugins.forEach((plugin) => {
             this.generatePlugin(plugin);
         });
 
@@ -23,12 +23,12 @@ export class ParseMap{
         return temp;
     }
 
-    generatePlugin(plugin : any) {
-        var p = <Plugin> ({
+    generatePlugin(plugin: any) {
+        var p = <Plugin>({
             getRef: (parentRef) => {
                 var temp = [];
                 var attributeList = {};
-                temp.push({attributes : attributeList});
+                temp.push({ attributes: attributeList });
                 var obj = {};
                 obj["#" + plugin.tagname] = temp;
                 parentRef.push(obj);
@@ -81,7 +81,7 @@ export class ParseMap{
     }
 }
 
-export interface Plugin{
+export interface Plugin {
     getRef: (parentRef) => any;
     generateHtmlWithAttr: (attributeList, value) => any;
 }

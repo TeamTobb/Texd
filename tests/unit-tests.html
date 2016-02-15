@@ -1,23 +1,22 @@
-
-
 <html>
+
 <head>
-  <title>1st Jasmine Tests</title>
-  <link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
-  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
-  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
-  <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
+    <title>1st Jasmine Tests</title>
+    <link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+    <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+    <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+    <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 </head>
 
 <body>
     <script src="../node_modules/systemjs/dist/system.src.js"></script>
 
     <script>
-      it('true is true', function(){ expect(true).toEqual(true); });
+        it('true is true', function(){ expect(true).toEqual(true); });
     </script>
 
     <script>
-    // #2. Configure systemjs to use the .js extension
+        // #2. Configure systemjs to use the .js extension
     //     for imports from the app folder
     System.config({
       packages: {
@@ -35,8 +34,8 @@
       //     or explain what went wrong
       .then(window.onload)
       .catch(console.error.bind(console));
-
     </script>
 
 </body>
+
 </html>
