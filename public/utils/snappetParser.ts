@@ -2,10 +2,21 @@ import {Renderer} from 'angular2/core';
 export class SnappetParser {
     private snippets;
     private element;
+    private placeHolders = [];
 
     constructor(element, snippets) {
         this.element = element;
         this.snippets = snippets;
+    }
+    
+    public nextPlaceholder(element: Node) {
+        var placeHolder = this.placeHolders[0];
+        if ('selectionStart' in element.childNodes["1"]) {
+            element.childNodes["1"].selectionStart = placeHolder.start;
+            element.childNodes["1"].selectionEnd = placeHolder.start+placeHolder.length;
+            element.childNodes["1"].focus ();
+        }
+        this.placeHolders.splice(0,1);
     }
 
     public parseSnappet(element: Node) {
@@ -38,52 +49,23 @@ export class SnappetParser {
             var afterString = value.substring(end, value.length);
 
             var snappetString = this.snippets[prefix].body; 
-            
-            // element.childNodes["1"].setSelectionRange(0, 5); 
+             
             element.childNodes["1"].value = beforestring + snappetString + afterString;
-            // var range = element.childNodes["1"].createTextRange();
-            // var range = document.createRange(); 
-            // range.setStart(element.childNodes["1"], 5);
-            // range.setEnd(element.childNodes["1"], 10); 
-
-
-            // var input = document.getElementById("para222");
-            // console.log(element.childNodes); 
-            // element.childNodes["1"].setSelectionRange(2, 5); 	
-            // element.childNodes["1"].setSelectionRange(0, element.childNodes["1"].value.length);
             
-
-            // var $newSelection = element.childNodes["1"]
-            // var selection = window.getSelection();
-            // var range = document.createRange();
-            // range.setStartBefore($newSelection.first()[0]);
-            // range.setEndAfter($newSelection.last()[0]);
-            // selection.removeAllRanges();
-            // selection.addRange(range);
-            
-            
-            if ('selectionStart' in element.childNodes["1"]) {
-                // element.childNodes["1"].focus ();
-                // input.selectionStart = 3;
-                // input.selectionEnd = 5;
-                // input.focus ();
-                element.childNodes["1"].selectionStart = 3;
-                element.childNodes["1"].selectionEnd = 5;
-                element.childNodes["1"].focus ();
-            }
-            // else {  // Internet Explorer before version 9
-            //     // var inputRange = input.createTextRange ();
-            //     // inputRange.moveStart ("character", 1);
-            //     // inputRange.collapse ();
-            //     // inputRange.moveEnd ("character", 1);
-            //     // inputRange.select ();
-            // }
-            // range.collapse(true);
-            // range.moveStart('character', 5);
-            // range.moveEnd('character', 10);
-            // range.select();
-            
+             
+            this.placeHolders = [];
+            var placeHolder : any = {};
+            placeHolder.start = 10;
+            placeHolder.length = 4;
+            this.placeHolders.push(placeHolder);
+            var placeHolder : any = {};
+            placeHolder.start = 20;
+            placeHolder.length = 4;
+            this.placeHolders.push(placeHolder);
+            var placeHolder : any = {};
+            placeHolder.start = 30;
+            placeHolder.length = 4;
+            this.placeHolders.push(placeHolder);
         }
-
     }
 }

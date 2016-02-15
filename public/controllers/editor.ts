@@ -119,6 +119,27 @@ export class EditorController {
     public globalKeyEvent($event) {
         console.log($event.which);
         var keyMap = {};
+        // keyMap[9] = () => {
+        //     var node = document.getSelection().anchorNode;
+        //     if(node.nodeType == 3){
+        //         console.log("sending node: " + node.parentNode)
+        //         this.snappetParser.parseSnappet(node.parentNode); 
+        //     }else{
+        //         this.snappetParser.parseSnappet(node);
+        //         console.log("sending node: " + node)
+        //     }
+        // }
+        keyMap[69] = () => {
+            var next = 10;
+            var node = document.getSelection().anchorNode;
+            if(node.nodeType == 3){
+                console.log("sending node: " + node.parentNode)
+                this.snappetParser.nextPlaceholder(node.parentNode); 
+            }else{
+                this.snappetParser.nextPlaceholder(node);
+                console.log("sending node: " + node)
+            }
+        }
         keyMap[80] = () => {
             console.log("ctrl+p");
             this.parseCurrentChapter();
@@ -129,10 +150,7 @@ export class EditorController {
         }
         keyMap[82] = () => {
             console.log("ctrl+r");
-        }
-        
-        keyMap[79] = () => {
-            var node = document.getSelection().anchorNode;
+             var node = document.getSelection().anchorNode;
             if(node.nodeType == 3){
                 console.log("sending node: " + node.parentNode)
                 this.snappetParser.parseSnappet(node.parentNode); 
@@ -141,8 +159,10 @@ export class EditorController {
                 console.log("sending node: " + node)
             }
         }
+        
         if($event.ctrlKey) {
             if (keyMap[$event.which]) {
+                $event.preventDefault();
                 keyMap[$event.which]();
             }
         }
