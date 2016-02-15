@@ -8,56 +8,40 @@ export class Parser {
     }
 
     public getParsedJSON(inputText : Paragraph[]) : string {
-        // var hashMap: { [id: string]: parseMap} = {};
-
-        // this.hashMap["#b "] = <parseMap> ({
-        //     getRef: (obj) => {
-        //         var b = [];
-        //         obj.push({b : b});
-        //         return b;
-        //     }
-        // });
-        // this.hashMap["#h1 "] = <parseMap> ({
-        //     getRef: (obj) => {
-        //         var h1 = [];
-        //         obj.push({h1 : h1});
-        //         return h1;
-        //     }
-        // });
-        // // need to handle this differently tho
-        // this.hashMap["#p "] = <parseMap> ({
-        //     getRef: (obj) => {
-        //         var p = [];
-        //         obj.push({p : p});
-        //         return p;
-        //     }
-        // });
-
         return this.parseText(this.hashMap, inputText);
     }
 
+    public parseString(str) {
+        var re = /(?:")([^"]+)(?:")|([^\s"]+)(?=\s+|$)/g;
+        var res=[], arr=null;
+        while (arr = re.exec(str)) { res.push(arr[1] ? arr[1] : arr[0]); }
+        return res;
+    }
+
     public parseText(hashMap : any, inputText : Paragraph[] ) : string {
-
-        console.log("test");
-        console.log(hashMap);
-
+        // console.log("Inside parseText");
+        // console.log(hashMap);
         var outputJSON : any = {};
-
         var mergedParas = "";
-
         for (var para in inputText) {
             mergedParas += " #p ";
             mergedParas += inputText[para].raw;
             mergedParas += " # ";
         }
-
-        // var list = mergedParas.split(" ");
-        // var list = mergedParas.split(/<br \/>(?=&#?[a-zA-Z0-9]+;)/g);
-        var list = mergedParas.split(/[\n ]+/);
+        // var list = mergedParas.split(/[\n ]+/);
+        // var list = mergedParas.split(/[^\\s\"']+|\"([^\"]*)\"|'([^']*)'+/);
+        var list = this.parseString(mergedParas);
         for (var i = 0; i < list.length; i++) list[i] += " ";
 
         var refStack : any = [];
         var tempText : string = "";
+        var attributeList : any[] = [];
+
+        // var attributeList = [];
+        // attributeList["src"] = "my_funny_picture2.jpg";
+        // attributeList["height"] = "40px";
+
+        // console.log(list);
 
         outputJSON.content = [];
         refStack.push(outputJSON.content);
@@ -91,13 +75,31 @@ export class Parser {
             else {
                 // normal text
                 // TODO: trim the tags and dont remove space on split instead
-                tempText += list[elem];
+                // elem = elem+1;
+                if (list[elem].startsWith("@")) {
+                    // console.log("starts with: " + list[elem]);
+                    // dirty fix -> make next elem empty starting
+                    // var attribute = {};
+                    // attribute[list[elem].trim()] = list[parseInt(elem) + 1];
+                    // list[elem+1] = "";
+                    // list.splice(parseInt(elem)+1,1);
+                    // console.log(refStack[refStack.length-1]);
+                    // refStack[refStack.length-1][0].attributes.push(attribute);
+                    refStack[refStack.length-1][0].attributes[list[elem].trim()] = list[parseInt(elem) + 1];
+                    list.splice(parseInt(elem)+1,1);
+                    // console.log(refStack);
+                }
+                else {
+                    tempText += list[elem];
+                }
             }
         }
 
         if (tempText != "") {
             refStack[refStack.length-1].push({text : tempText});
         }
+
+        // console.log(JSON.stringify(refStack,null,2));
 
         // this.writeJSONtoFile(outputJSON, "test.json");
         // console.log(outputJSON);
@@ -123,8 +125,4 @@ export class Parser {
             }
         }
     }
-}
-
-interface parseMap {
-    getRef: (obj) => any;
 }

@@ -27,10 +27,11 @@ export class DocumentService{
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
+            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
 
         // this._textParser = new Parser();
-        this._jsonParser = new jsonToHtml();
+        // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
         this._socket = new WebSocket('ws://localhost:3001');
         //TODO: Clean this up
@@ -78,7 +79,7 @@ export class DocumentService{
             }
         );
     }
-    
+
      //TODO implement changeChapterName()
     //this.documentService.changeChapterName("1", newName, 1);
      public changeChapterName(documentId: string, newchapterName: string, chapterId: number){
@@ -97,19 +98,18 @@ export class DocumentService{
                 console.log(res)
                 //TODO send out socket change to everyone
                 // Only actually change the title and send socket messages if status==OK
-                /*if(res.status==200){
+               /* if(res.status==200){
                     this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newchapterName, senderId: "hello" }));
                     this.document.chapters[chapterId] = newchapterName; 
                 }*/
             }
         );
-       
     }
-    
+
     public deleteChapter(chapterName: string){
         console.log(this.document.chapters)
     }
-    
+
 
     public sendDiff(diff: Diff){
         this._socket.send(JSON.stringify({senderId: this._senderId, newDiff: diff}));
