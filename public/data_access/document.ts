@@ -35,7 +35,7 @@ export class DocumentService {
         // this._textParser = new Parser();
         // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
-        this._socket = new WebSocket('ws://158.38.209.42:3001');
+        this._socket = new WebSocket('ws://localhost:3001');
         //TODO: Clean this up
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data);
