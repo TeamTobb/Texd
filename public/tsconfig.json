@@ -26,6 +26,7 @@
         "controllers/mainview.ts",
         "controllers/settings.ts",
         "controllers/settingspage.ts",
+        "controllers/cmcomponent.ts",
         "utils/jsonToHtml.ts",
         "utils/keymap.ts",
         "utils/parseMap.ts",

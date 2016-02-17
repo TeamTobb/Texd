@@ -35,35 +35,37 @@ export class DocumentService {
         // this._textParser = new Parser();
         // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
-        this._socket = new WebSocket('ws://localhost:3001');
+        this._socket = new WebSocket('ws://158.38.209.42:3001');
         //TODO: Clean this up
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data);
-            console.log("Recieved socket message. Our senderId " + this._senderId + " message senderId " + parsed.senderId);
-            if (parsed.newDiff) {
-                var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
-                if (diff.newchapter == true) {
-                    if (this._senderId != parsed.senderId) {
-                        this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));
-                        this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
-                    } else {
-                        this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
-                    }
-                } else {
-                    if (diff.newelement == true) {
-                        if (this._senderId != parsed.senderId) {
-                            this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index + 1, 0, diff.paragraph);
-                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
+                if (parsed.newDiff) {
+                    var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
+                    if(diff.documentId == this.document.id){
+                        console.log("same doc");
+                        if (diff.newchapter == true) {
+                            if (this._senderId != parsed.senderId) {
+                                this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));
+                                this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
+                            } else {
+                                this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
+                            }
                         } else {
-                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
+                            if (diff.newelement == true) {
+                                if (this._senderId != parsed.senderId) {
+                                    this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index + 1, 0, diff.paragraph);
+                                    this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
+                                } else {
+                                    this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
+                                }
+                            } else if (this._senderId != parsed.senderId) {
+                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
+                            }
                         }
-                    } else if (this._senderId != parsed.senderId) {
-                        this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
                     }
+                } if (parsed.message && parsed.documentId == this.document.id) {
+                    this.document.title = parsed.message;
                 }
-            } if (parsed.message && parsed.documentId == this._document.id) {
-                this.document.title = parsed.message;
-            }
         }
     }
 
@@ -146,5 +148,11 @@ export class DocumentService {
             })
             console.log(JSON.stringify(documents,null,2));
         });
+    }
+    
+    public testDiffSend(diff: Diff){
+        diff.documentId = this.document.id 
+        diff.chapterIndex = 0; 
+        this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
     }
 }

@@ -76,7 +76,7 @@ export class Parser {
         if (tempText != "") {
             refStack[refStack.length - 1].push({ text: tempText });
         }
-
+        console.log(JSON.stringify(outputJSON, null, 2));
         return JSON.stringify(outputJSON, null, 2);
     }
 
