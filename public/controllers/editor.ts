@@ -74,30 +74,24 @@ export class EditorController {
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
-
-            var parser: Parser = new Parser(this.parseMap.parseMap)
-            var nonParsedParagraphs: Paragraph[] = this.document.chapters[0].paragraphs
+            var nonParsedParagraphs: Paragraph[] = this.document.chapters[this.current_chapter].paragraphs
 
             for (var index = 0; index < nonParsedParagraphs.length; index++) {
                 var element: Paragraph = nonParsedParagraphs[index];
-                var parsedElem = parser.getParsedJSONSingle(element)
+                var parsedElem = this._textParser.getParsedJSONSingle(element)
                 var html = this._jsonParser.getParsedHTML(parsedElem)
                 this.parsedParagraph.push(html);
-                //this.paragraphParsedAndNot.notParsed =              
             }
-
         });
-
-
     }
-    public exitEditablePara($event, index) {
-        console.log("EXIT" + event)
-
-    }
-
-    public showEditablePara($event, index) {
-        console.log("clicked with: " + event.srcElement.setAttribute("hidden", "true") + " with index: " + index)
-
+    
+    public outdatedParsedParagraph(paragraphIndex: number) {
+        var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
+        var parsedElem = this._textParser.getParsedJSONSingle(element)
+        var html = this._jsonParser.getParsedHTML(parsedElem)
+        console.log("Old: " + this.parsedParagraph[paragraphIndex])
+        console.log("new: " + html)
+        this.parsedParagraph[paragraphIndex] = html
 
     }
 
