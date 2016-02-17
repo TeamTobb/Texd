@@ -21,14 +21,20 @@ import {SnappetParser} from "../utils/snappetParser.ts";
     directives: [ChapterItem, CmComponent]
 })
 
-export class EditorController{
+export class EditorController {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
     // @Input() document; 
     public current_chapter: number = 0;
     public modifierKeyDown: boolean = false;
     public element: ElementRef;
     public documentHTML: string = "preview";
-    private snappetParser: SnappetParser;  
+    private snappetParser: SnappetParser;
+    public parsedParagraph: string[] = [];
+    public parseMap: ParseMap = new ParseMap();
+    private _textParser: Parser;
+    private _jsonParser: jsonToHtml;
+    
+   
     
    
     // CTRL + P = parse
@@ -42,6 +48,7 @@ export class EditorController{
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
+                this.parseAllPara()
             })
         }
 
@@ -59,6 +66,41 @@ export class EditorController{
             // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
     }
+
+    public parseAllPara() {
+
+        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+            this.parseMap.generateParseMap(res);
+            this._textParser = new Parser(this.parseMap.parseMap);
+            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
+
+
+            var parser: Parser = new Parser(this.parseMap.parseMap)
+            var nonParsedParagraphs: Paragraph[] = this.document.chapters[0].paragraphs
+
+            for (var index = 0; index < nonParsedParagraphs.length; index++) {
+                var element: Paragraph = nonParsedParagraphs[index];
+                var parsedElem = parser.getParsedJSONSingle(element)
+                var html = this._jsonParser.getParsedHTML(parsedElem)
+                this.parsedParagraph.push(html);
+                //this.paragraphParsedAndNot.notParsed =              
+            }
+
+        });
+
+
+    }
+    public exitEditablePara($event, index) {
+        console.log("EXIT" + event)
+
+    }
+
+    public showEditablePara($event, index) {
+        console.log("clicked with: " + event.srcElement.setAttribute("hidden", "true") + " with index: " + index)
+
+
+    }
+
 
     public deleteChapterFromDB(value: string) {
         console.log("deleteChapterFromDB(" + value + ")");
