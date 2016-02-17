@@ -31,9 +31,7 @@
                     <!--<textarea class="testclass" id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;" (keydown)="modifierKeyDownPress($event)"
                     (keyup)="changeDocument($event, i)"></textarea>-->
                     <!--<textarea class="testclass" id="para" type="text"style="width: 100%; height: 100%;">hei på dere</textarea>-->
-                    <cmcomponent [index]=i [chapterId]=document.chapters[current_chapter].id [paragraph]=p></cmcomponent>
-                    <div [innerHTML]="parsedParagraph[i]" (click)="showEditablePara($event, i)"></div>
-
+                    <cmcomponent [index]=i [parsedParagraph]="parsedParagraph[i]" [chapterId]=document.chapters[current_chapter].id [paragraph]=p></cmcomponent>
 
                 </div>
                 <!--<textarea class="testclass">{{document.chapters[0].paragraphs[0].raw}}</textarea>-->

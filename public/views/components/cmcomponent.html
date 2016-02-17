@@ -1,1 +1,5 @@
 <textarea id="editor{{index}}" [(ngModel)]="paragraph.raw"></textarea>
+
+<section id="parsedID{{index}}" *ngIf="!editable">
+    <div [innerHTML]="parsedParagraph" (click)="showEditablePara()"></div>
+</section>
