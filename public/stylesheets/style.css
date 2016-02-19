@@ -85,3 +85,9 @@ textarea {
 #chapterLi:hover {
     color: blue;
 }
+
+.widget-templates {display:none}
+
+.bold-widget {
+    font-weight: bold;
+}
