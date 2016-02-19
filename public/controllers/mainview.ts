@@ -3,11 +3,15 @@ import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
 import {EditorController} from './editor';
 import {DashboardComponent} from './dashboard';
 import {SettingsComponent} from './settings';
+import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
+import {CORE_DIRECTIVES} from 'angular2/common';
+
+
 
 @Component({
   selector: 'my-app',
   templateUrl:'views/mainview.html',
-  directives: [ROUTER_DIRECTIVES]
+  directives: [ROUTER_DIRECTIVES, TAB_DIRECTIVES, CORE_DIRECTIVES]
 })
 @RouteConfig([
   {path: '/docs', name: 'Dashboard', component: DashboardComponent, useAsDefault: true},
