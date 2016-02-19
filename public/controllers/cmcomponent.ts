@@ -5,7 +5,8 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
- 
+import {Widget, BoldWidget} from "./widget.ts";
+
 //<docview *ngFor="#document of documents; #i = index" [title]="documents[i].name" [preview]="documents[i].chapters[0].text" />
 @Component({
     selector: 'cmcomponent',
@@ -21,6 +22,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public editable: boolean = false
     public editor;
+    public widgets : any[];
+    public isFocused : boolean = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
 
@@ -44,15 +47,42 @@ export class CmComponent implements AfterViewInit, OnChanges {
             cm.getValue();
         });
         this.editor.on("blur", (cm, change) => {
-            this.showParsedPara()
+            this.showParsedPara();
+            this.isFocused = false;
+        });
+        this.editor.on("focus", (cm, change) => {
+            this.isFocused = true;
+        });
+        this.editor.on("keypress", (cm, e) => {
+            this.onKeyPressEvent(cm, e);
         });
 
+        // make this outside of this component with a loop
         var elements = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         for (var index = 0; index < elements.length; index++) {
             this.hideParagraph(index)
+            console.log("way too many calls? from each and loop");
         }
 
+        // should probably be defined somewhere else
+        $("#insertbold").click( () => {
+            if(this.isFocused) {
+                new BoldWidget(this.editor);
+            }
+        });
+
     }
+
+    // Ctrl + B = BOLD
+    public onKeyPressEvent(cm, e) {
+        console.log("Keyeventwwwww");
+        if(e.ctrlKey) {
+            if(e.code==="KeyJ") {
+                new BoldWidget(this.editor);
+            }
+        }
+    }
+
     public showEditablePara() {
         console.log("showEditablePara()")
         this.editable = true;

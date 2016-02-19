@@ -26,9 +26,12 @@
         <br>
         <br>
 
-        <div id="title">
+            
+      <div id="title">
             <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1>
         </div>
+
+            <button id="insertbold">Insert Bold</button>
 
         <br>
         <br>
@@ -47,4 +50,8 @@
             </div>
         </div>
     </div>
+</div>
+<!-- widgets -->
+<div class="widget-templates">
+    <span contenteditable="true" class="bold-widget"></span>
 </div>

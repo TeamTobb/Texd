@@ -84,3 +84,8 @@ textarea {
       outline: black solid 5px;
       outline-offset: 5px;
   }
+.widget-templates {display:none}
+
+.bold-widget {
+    font-weight: bold;
+}
