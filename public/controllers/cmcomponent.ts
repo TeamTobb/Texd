@@ -11,7 +11,7 @@ import {EventEmitter} from "angular2/src/facade/async";
     selector: 'cmcomponent',
     templateUrl: 'views/components/cmcomponent.html'
 })
-export class CmComponent implements AfterViewInit {
+export class CmComponent implements AfterViewInit, OnChanges {
     @Input() paragraph: Paragraph;
     @Input() index: number;
     @Input() chapterId: string;
@@ -24,8 +24,13 @@ export class CmComponent implements AfterViewInit {
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
 
+    
     }
-
+    
+    //Parsing on all changes
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+        this.outdatedParsedParagraph.emit(this.index)
+    }
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("editor" + this.index), {
             mode: "javascript",
@@ -56,19 +61,19 @@ export class CmComponent implements AfterViewInit {
     }
 
     public showParsedPara() {
-        this.outdatedParsedParagraph.emit(this.index)    
+        this.outdatedParsedParagraph.emit(this.index)
         console.log("private showParsedPara() ")
         this.editable = false;
-        this.hideParagraph(this.index)        
+        this.hideParagraph(this.index)
     }
-    
-    private hideParagraph(index){
+
+    private hideParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        element[index].setAttribute("style", "display: none");     
+        element[index].setAttribute("style", "display: none");
     }
-    private showParagraph(index){
+    private showParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        element[index].setAttribute("style", "display: block");     
+        element[index].setAttribute("style", "display: block");
     }
 
 
