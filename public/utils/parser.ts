@@ -23,7 +23,9 @@ export class Parser {
     }
     
      public getParsedJSONSingle(inputText: Paragraph): string {
-        return this.parseText(this.hashMap, this.parseString(inputText.raw));
+        var list = this.parseString(inputText.raw);
+        for (var i = 0; i < list.length; i++) list[i] += " ";
+        return this.parseText(this.hashMap, list);
     }
 
     public parseString(str) {

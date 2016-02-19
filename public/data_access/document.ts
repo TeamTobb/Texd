@@ -103,8 +103,8 @@ export class DocumentService {
                 //TODO send out socket change to everyone
                 // Only actually change the title and send socket messages if status==OK
                 /* if(res.status==200){
-                     this._socket.send(JSON.stringify({name: 'name', documentId: id, message: newchapterName, senderId: "hello" }));
-                     this.document.chapters[chapterId] = newchapterName;
+                     this._socket.send(JSON.stringify({chapterHeader: 'name', chapterId: chapterId, documentId: documentId, message: newchapterName, senderId: "hello" }));
+                     this.document.chapters[chapterId].header = newchapterName;
                  }*/
             }
             );

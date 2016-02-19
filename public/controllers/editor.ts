@@ -67,8 +67,7 @@ export class EditorController {
         });
     }
 
-    public parseAllPara() {
-
+    public parseAllPara() {	 
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
@@ -96,6 +95,7 @@ export class EditorController {
     }
 
 
+    //TODO implement this, to be deleted in DB
     public deleteChapterFromDB(value: string) {
         console.log("deleteChapterFromDB(" + value + ")");
 
