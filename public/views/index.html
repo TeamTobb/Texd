@@ -40,6 +40,14 @@
       System.import('controllers/index')
             .then(null, console.error.bind(console));
     </script>
+
+
+    <script>     
+    $(window).scroll(function(){
+        $("#buttonsContainer").css("top",Math.max(0,250 -$(this).scrollTop()));
+   });
+    </script>
+
 </head>
 
 <body>

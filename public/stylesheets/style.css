@@ -89,3 +89,15 @@ textarea {
 .bold-widget {
     font-weight: bold;
 }
+
+#buttonsContainer {
+    width: 84.5%;
+    background-color: #ccc;
+    position:fixed;
+    top:250px;
+    border: 1 px solid black;
+        padding: 5px;
+        border-radius: 3px;
+
+    
+}

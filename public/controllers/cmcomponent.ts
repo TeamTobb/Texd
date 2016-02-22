@@ -19,7 +19,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() parsedParagraph: string;
     @Output() outdatedParsedParagraph: EventEmitter<any> = new EventEmitter();
 
-
     public editable: boolean = false
     public editor;
     public widgets : any[];
@@ -27,7 +26,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
 
-    
     }
     
     //Parsing on all changes
@@ -70,14 +68,14 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 new BoldWidget(this.editor);
             }
         });
-
     }
 
     // Ctrl + B = BOLD
     public onKeyPressEvent(cm, e) {
-        console.log("Keyeventwwwww");
         if(e.ctrlKey) {
+            console.log(e);
             if(e.code==="KeyJ") {
+                console.log("test");
                 new BoldWidget(this.editor);
             }
         }
@@ -91,6 +89,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public showParsedPara() {
+        console.log("showparsed");
         this.outdatedParsedParagraph.emit(this.index)
         console.log("private showParsedPara() ")
         this.editable = false;
@@ -105,9 +104,4 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
     }
-
-
-
-
-
 }
