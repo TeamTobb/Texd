@@ -2,6 +2,7 @@ export function Widget(cm) {
     // the subclass must define this.domNode before calling this constructor
     var _this = this;
     this.cm = cm;
+    this.value = cm.getSelection();
     cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
     var from = cm.getCursor("from");
     var to = cm.getCursor("to");
@@ -47,7 +48,7 @@ export function BoldWidget(cm) {
     this.node = $(".widget-templates .bold-widget").clone();
     this.domNode = this.node[0];
     Widget.apply(this, arguments);
-    this.value = this.getText();
+    // this.value = this.getText();
     this.setValue(this.value);
 }
 BoldWidget.prototype = Object.create(Widget.prototype)
@@ -74,6 +75,6 @@ BoldWidget.prototype.exit = function(direction) {
 
 BoldWidget.prototype.setValue = function(val) {
     this.value = val;
-    this.setText(this.value.toString());
+    // this.setText(this.value.toString());
     this.node[0].textContent = this.value;
 }

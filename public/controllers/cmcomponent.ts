@@ -17,23 +17,32 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() index: number;
     @Input() chapterId: string;
     @Input() parsedParagraph: string;
+    @Input() isFocusedList: boolean[];
+    @Input() isFocused: boolean;
     @Output() outdatedParsedParagraph: EventEmitter<any> = new EventEmitter();
-
+    @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
 
     public editable: boolean = false
     public editor;
     public widgets : any[];
-    public isFocused : boolean = false;
+    // public isFocused : boolean = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
-
-    
+        // this.isFocused = false;
     }
-    
+
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        this.outdatedParsedParagraph.emit(this.index)
+        if(changes["isFocused"]) {
+            if(!changes["isFocused"].currentValue) {
+                this.showParsedPara();
+            }
+        }
+        if(changes["parsedParagraph"]) {
+            this.outdatedParsedParagraph.emit(this.index);
+        }
     }
+
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("editor" + this.index), {
             mode: "javascript",
@@ -46,12 +55,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
             this.documentService.testDiffSend(new Diff({}, this.chapterId, {}, this.paragraph.id, para, this.index, false, false));
             cm.getValue();
         });
-        this.editor.on("blur", (cm, change) => {
-            this.showParsedPara();
-            this.isFocused = false;
-        });
         this.editor.on("focus", (cm, change) => {
-            this.isFocused = true;
+            this.isFocusedList[this.index] = true;
+            this.onFocusEmit.emit(this.index);
         });
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
@@ -73,9 +79,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     }
 
-    // Ctrl + B = BOLD
+    // Ctrl + J = BOLD
     public onKeyPressEvent(cm, e) {
-        console.log("Keyeventwwwww");
         if(e.ctrlKey) {
             if(e.code==="KeyJ") {
                 new BoldWidget(this.editor);
@@ -84,7 +89,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public showEditablePara() {
-        console.log("showEditablePara()")
         this.editable = true;
         this.showParagraph(this.index)
         this.editor.focus()
@@ -92,22 +96,19 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public showParsedPara() {
         this.outdatedParsedParagraph.emit(this.index)
-        console.log("private showParsedPara() ")
         this.editable = false;
         this.hideParagraph(this.index)
     }
 
     private hideParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        element[index].setAttribute("style", "display: none");
+        if(element[index]) {
+            element[index].setAttribute("style", "display: none");
+        }
     }
+
     private showParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
     }
-
-
-
-
-
 }

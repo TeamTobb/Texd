@@ -18,7 +18,6 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 
-
 @Component({
     selector: 'my-app',
     templateUrl: 'views/editor.html',
@@ -38,9 +37,7 @@ export class EditorController {
     public parseMap: ParseMap = new ParseMap();
     private _textParser: Parser;
     private _jsonParser: jsonToHtml;
-
-
-
+    private cmFocused : boolean[] = [];
 
     // CTRL + P = parse
     // CTRL + N = new paragraph
@@ -72,6 +69,14 @@ export class EditorController {
         });
     }
 
+    public cmOnFocusEmit(index) {
+        for(var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
+            if(i != index) {
+                this.cmFocused[i] = false;
+            }
+        }
+     }
+
     public parseAllPara() {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
@@ -91,12 +96,13 @@ export class EditorController {
 
     public outdatedParsedParagraph(paragraphIndex: number) {
         var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
-        var parsedElem = this._textParser.getParsedJSONSingle(element)
-        var html = this._jsonParser.getParsedHTML(parsedElem)
-        // console.log("Old: " + this.parsedParagraph[paragraphIndex])
-        // console.log("new: " + html)
-        this.parsedParagraph[paragraphIndex] = html
-
+        if(this._textParser) {
+            var parsedElem = this._textParser.getParsedJSONSingle(element)
+            var html = this._jsonParser.getParsedHTML(parsedElem)
+            // console.log("Old: " + this.parsedParagraph[paragraphIndex])
+            // console.log("new: " + html)
+            this.parsedParagraph[paragraphIndex] = html
+        }
     }
 
 
