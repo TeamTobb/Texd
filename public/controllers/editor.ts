@@ -28,7 +28,7 @@ import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 export class EditorController {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
-    // @Input() document; 
+    // @Input() document;
     public current_chapter: number = 0;
     public modifierKeyDown: boolean = false;
     public element: ElementRef;
@@ -38,13 +38,13 @@ export class EditorController {
     public parseMap: ParseMap = new ParseMap();
     private _textParser: Parser;
     private _jsonParser: jsonToHtml;
-    
-   
-    
-   
+
+
+
+
     // CTRL + P = parse
     // CTRL + N = new paragraph
-    
+
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
@@ -59,20 +59,20 @@ export class EditorController {
 
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
             console.log(JSON.stringify(res, null, 2));
-            var snappets: any[] = []; 
-            // JSON.parse(res); 
+            var snappets: any[] = [];
+            // JSON.parse(res);
             // res.forEach((snappet) => {
-            //     snappets.push(snappet); 
+            //     snappets.push(snappet);
             // })
-            this.snappetParser = new SnappetParser(this.element, res); 
-             
+            this.snappetParser = new SnappetParser(this.element, res);
+
             // this.parseMap.generateParseMap(res);
             // this._textParser = new Parser(this.parseMap.parseMap);
             // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
     }
 
-    public parseAllPara() {	 
+    public parseAllPara() {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
@@ -88,13 +88,13 @@ export class EditorController {
             }
         });
     }
-    
+
     public outdatedParsedParagraph(paragraphIndex: number) {
         var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
         var parsedElem = this._textParser.getParsedJSONSingle(element)
         var html = this._jsonParser.getParsedHTML(parsedElem)
-        console.log("Old: " + this.parsedParagraph[paragraphIndex])
-        console.log("new: " + html)
+        // console.log("Old: " + this.parsedParagraph[paragraphIndex])
+        // console.log("new: " + html)
         this.parsedParagraph[paragraphIndex] = html
 
     }
@@ -210,7 +210,7 @@ export class EditorController {
     }
 
     public changeDocument($event, paragraphIndex: number) {
-        console.log("changedocument"); 
+        console.log("changedocument");
         // this.auto_grow($event.target);
         if ($event.which === 17) {
             this.modifierKeyDown = false;

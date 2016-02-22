@@ -22,7 +22,7 @@
     "es6-shim": "latest",
     "express": "^4.13.3",
     "kerberos": "latest",
-    "moment": "file:node_modules/moment",
+    "moment": "latest",
     "mongodb": ">= 1.4.29",
     "mongoose": "latest",
     "ng2-bootstrap": "^1.0.3",
