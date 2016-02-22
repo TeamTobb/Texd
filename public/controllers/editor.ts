@@ -29,6 +29,7 @@ export class EditorController {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
     // @Input() document;
     public current_chapter: number = 0;
+    public current_paragraph: number = 0; 
     public modifierKeyDown: boolean = false;
     public element: ElementRef;
     public documentHTML: string = "preview";
@@ -73,6 +74,9 @@ export class EditorController {
         for(var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
             if(i != index) {
                 this.cmFocused[i] = false;
+            } else{
+                this.cmFocused[i] = true; 
+                this.current_paragraph = index; 
             }
         }
      }
@@ -163,6 +167,11 @@ export class EditorController {
                 console.log("sending node: " + node)
             }
         }
+        keyMap[78] = () => {
+            this.document.chapters[this.current_chapter].paragraphs.splice(this.current_paragraph + 1, 0, new Paragraph("...", []));
+            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("...", []), this.current_paragraph, true, false)
+            this.documentService.sendDiff(diff);
+        }
         keyMap[80] = () => {
             console.log("ctrl+p");
             this.parseCurrentChapter();
@@ -171,18 +180,7 @@ export class EditorController {
             console.log("ctrl+c");
             this.createChapter();
         }
-        keyMap[82] = () => {
-            console.log("ctrl+r");
-            var node = document.getSelection().anchorNode;
-            if (node.nodeType == 3) {
-                console.log("sending node: " + node.parentNode)
-                this.snappetParser.parseSnappet(node.parentNode);
-            } else {
-                this.snappetParser.parseSnappet(node);
-                console.log("sending node: " + node)
-            }
-        }
-
+        
         if ($event.ctrlKey) {
             if (keyMap[$event.which]) {
                 $event.preventDefault();

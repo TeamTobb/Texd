@@ -49,7 +49,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             lineNumbers: true,
             lineWrapping: true,
             extraKeys: {
-                "Ctrl-Space": "autocomplete"
+                "Ctrl-Space": "autocomplete" 
             }
         })
         this.editor.on("change", (cm, change) => {
