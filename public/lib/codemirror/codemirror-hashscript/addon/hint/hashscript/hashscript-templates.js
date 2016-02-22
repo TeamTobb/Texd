@@ -5,7 +5,7 @@
         "templates": [{
             "name": "img",
             "description": "insert image",
-            "template": "#img \n\t@src=\"${src.png}\" @width=\"${width}\" @height=\"${height}\" \n # \n ${cursor}"
+            "template": "#img \n\t@src ${docs/test.png} @width ${width} @height ${height} \n # \n ${cursor}"
         }
         ]
     };

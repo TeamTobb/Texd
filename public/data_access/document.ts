@@ -16,7 +16,6 @@ export class DocumentService {
     public parseMap: ParseMap = new ParseMap();
 
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
-    private _current_chapter: number;
 
     public _senderId: string;
     private _textParser: Parser;
@@ -42,7 +41,6 @@ export class DocumentService {
                 if (parsed.newDiff) {
                     var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
                     if(diff.documentId == this.document.id){
-                        console.log("same doc");
                         if (diff.newchapter == true) {
                             if (this._senderId != parsed.senderId) {
                                 this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));

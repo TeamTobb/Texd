@@ -1,34 +1,52 @@
+// helper function to move caret - from http://stackoverflow.com/questions/10778291/move-the-cursor-position-with-javascript
+function moveCaret(win, charCount) {
+    var sel, range;
+    if (win.getSelection) {
+        sel = win.getSelection();
+        if (sel.rangeCount > 0) {
+            var textNode = sel.focusNode;
+            var newOffset = sel.focusOffset + charCount;
+            sel.collapse(textNode, Math.min(textNode.length, newOffset));
+        }
+    } else if ( (sel = win.document.selection) ) {
+        if (sel.type != "Control") {
+            range = sel.createRange();
+            range.move("character", charCount);
+            range.select();
+        }
+    }
+}
+
+// helper function to get caret position - from http://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
+function getCaretPosition(editableDiv) {
+  var caretPos = 0,
+    sel, range;
+  if (window.getSelection) {
+    sel = window.getSelection();
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+      if (range.commonAncestorContainer.parentNode == editableDiv) {
+        caretPos = range.endOffset;
+      }
+    }
+  } else if (document.selection && document.selection.createRange) {
+    range = document.selection.createRange();
+    if (range.parentElement() == editableDiv) {
+      var tempEl = document.createElement("span");
+      editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+      var tempRange = range.duplicate();
+      tempRange.moveToElementText(tempEl);
+      tempRange.setEndPoint("EndToEnd", range);
+      caretPos = tempRange.text.length;
+    }
+  }
+  return caretPos;
+}
+
 export function Widget(cm) {
-    // the subclass must define this.domNode before calling this constructor
-    var _this = this;
     this.cm = cm;
     this.value = cm.getSelection();
-    cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-    if (this.enter) {
-        CodeMirror.on(this.mark, "beforeCursorEnter", function(e) {
-            // register the enter function
-            // the actual movement happens if the cursor movement was a plain navigation
-            // but not if it was a backspace or selection extension, etc.
-            var direction = posEq(_this.cm.getCursor(), _this.mark.find().from) ? 'left' : 'right';
-            cm.widgetEnter = $.proxy(_this, 'enterIfDefined', direction);
-        });
-    }
-    cm.setCursor(to);
-    cm.refresh()
 }
-
-Widget.prototype.enterIfDefined = function(direction) {
-    if (this.mark.find()) {
-        this.enter(direction);
-    } else {
-        this.cm.refresh();
-    }
-}
-
 Widget.prototype.range = function() {
     var find = this.mark.find()
     find.from.ch+=1
@@ -46,35 +64,56 @@ Widget.prototype.getText = function() {
 
 export function BoldWidget(cm) {
     this.node = $(".widget-templates .bold-widget").clone();
+
+    // adding listener to change event
+    this.node[0].addEventListener("input", (e) => {
+        this.setValue(this.node[0].innerText);
+    }, false);
+
     this.domNode = this.node[0];
     Widget.apply(this, arguments);
-    // this.value = this.getText();
-    this.setValue(this.value);
+    this.node[0].textContent = this.value;
+
+    cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
+    var from = cm.getCursor("from");
+    var to = cm.getCursor("to");
+    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
+
+    cm.setCursor(to);
+    cm.refresh()
 }
 BoldWidget.prototype = Object.create(Widget.prototype)
-BoldWidget.prototype.enter = function(direction) {
-    // var t = this.node.find('.value');
-    var t = this.node;
-    t.focus();
-    if (direction==='left') {
-        t.setCursorPosition(0);
-    } else {
-        t.setCursorPosition(t.val().length)
-    }
-}
-
-BoldWidget.prototype.exit = function(direction) {
-    var range = this.mark.find();
-    this.cm.focus();
-    if (direction==='left') {
-        this.cm.setCursor(range.from)
-    } else {
-        this.cm.setCursor(range.to)
-    }
-}
-
 BoldWidget.prototype.setValue = function(val) {
     this.value = val;
-    // this.setText(this.value.toString());
+    var pos = getCaretPosition(this.node[0]);
+    this.setText(" #b " + this.value.toString() + " # ");
+    moveCaret(window, pos);
+}
+
+export function HeaderWidget(cm) {
+    this.node = $(".widget-templates .header-widget").clone();
+
+    // adding listener to change event
+    this.node[0].addEventListener("input", () => {
+        this.setValue(this.node[0].innerText);
+    }, false);
+
+    this.domNode = this.node[0];
+    Widget.apply(this, arguments);
     this.node[0].textContent = this.value;
+
+    cm.replaceSelection(" #h1 " + cm.getSelection() + " # ", "around");
+    var from = cm.getCursor("from");
+    var to = cm.getCursor("to");
+    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
+
+    cm.setCursor(to);
+    cm.refresh()
+}
+HeaderWidget.prototype = Object.create(Widget.prototype)
+HeaderWidget.prototype.setValue = function(val) {
+    this.value = val;
+    var pos = getCaretPosition(this.node[0]);
+    this.setText(" #h1 " + this.value.toString() + " # ");
+    moveCaret(window, pos);
 }

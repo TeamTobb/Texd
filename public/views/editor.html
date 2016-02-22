@@ -44,6 +44,7 @@
                     <button id="insertItalic" style="font-style: italic">italic</button>
                     <button id="insertUnderline" style="text-decoration: underline;">underline</button>
                     <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
+                    <button id="insertheader" style="font-style: bold">header</button>
 
                 </div>
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
@@ -62,7 +63,8 @@
 </div>
 <!-- widgets -->
 <div class="widget-templates">
-    <span contenteditable="true" class="bold-widget"></span>
+    <span contenteditable="true" class="bold-widget"></span>   
+    <h1 contenteditable="true" class="header-widget"></h1>
 </div>
 
 <section *ngIf="showUploadDiv">
@@ -73,3 +75,4 @@
 
     </div>
 </section>
+
