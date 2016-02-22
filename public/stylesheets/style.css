@@ -90,6 +90,14 @@ textarea {
     font-weight: bold;
 }
 
+.italic-widget {
+    font-style: italic;
+}
+
+.underline-widget {
+    text-decoration: underline;
+}
+
 .header-widget {
 
 }

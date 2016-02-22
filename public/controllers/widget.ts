@@ -80,7 +80,7 @@ export function BoldWidget(cm) {
     this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
 
     cm.setCursor(to);
-    cm.refresh()
+    cm.refresh();
 }
 BoldWidget.prototype = Object.create(Widget.prototype)
 BoldWidget.prototype.setValue = function(val) {
@@ -108,12 +108,68 @@ export function HeaderWidget(cm) {
     this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
 
     cm.setCursor(to);
-    cm.refresh()
+    cm.refresh();
 }
 HeaderWidget.prototype = Object.create(Widget.prototype)
 HeaderWidget.prototype.setValue = function(val) {
     this.value = val;
     var pos = getCaretPosition(this.node[0]);
     this.setText(" #h1 " + this.value.toString() + " # ");
+    moveCaret(window, pos);
+}
+
+export function ItalicWidget(cm) {
+    this.node = $(".widget-templates .italic-widget").clone();
+
+    // adding listener to change event
+    this.node[0].addEventListener("input", () => {
+        this.setValue(this.node[0].innerText);
+    }, false);
+
+    this.domNode = this.node[0];
+    Widget.apply(this, arguments);
+    this.node[0].textContent = this.value;
+
+    cm.replaceSelection(" #i " + cm.getSelection() + " # ", "around");
+    var from = cm.getCursor("from");
+    var to = cm.getCursor("to");
+    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
+
+    cm.setCursor(to);
+    cm.refresh();
+}
+ItalicWidget.prototype = Object.create(Widget.prototype)
+ItalicWidget.prototype.setValue = function(val) {
+    this.value = val;
+    var pos = getCaretPosition(this.node[0]);
+    this.setText(" #i " + this.value.toString() + " # ");
+    moveCaret(window, pos);
+}
+
+export function UnderlineWidget(cm) {
+    this.node = $(".widget-templates .underline-widget").clone();
+
+    // adding listener to change event
+    this.node[0].addEventListener("input", () => {
+        this.setValue(this.node[0].innerText);
+    }, false);
+
+    this.domNode = this.node[0];
+    Widget.apply(this, arguments);
+    this.node[0].textContent = this.value;
+
+    cm.replaceSelection(" #u " + cm.getSelection() + " # ", "around");
+    var from = cm.getCursor("from");
+    var to = cm.getCursor("to");
+    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
+
+    cm.setCursor(to);
+    cm.refresh();
+}
+UnderlineWidget.prototype = Object.create(Widget.prototype)
+UnderlineWidget.prototype.setValue = function(val) {
+    this.value = val;
+    var pos = getCaretPosition(this.node[0]);
+    this.setText(" #u " + this.value.toString() + " # ");
     moveCaret(window, pos);
 }
