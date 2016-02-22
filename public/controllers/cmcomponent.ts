@@ -28,7 +28,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     // public isFocused : boolean = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
-        // this.isFocused = false;
+        this.setupCMAutocomplete();
     }
 
     //Parsing on all changes
@@ -45,9 +45,12 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("editor" + this.index), {
-            mode: "javascript",
+             mode: "javascript",
             lineNumbers: true,
-            lineWrapping: true
+            lineWrapping: true,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete"
+            }
         })
         this.editor.on("change", (cm, change) => {
             var para = this.paragraph
@@ -110,5 +113,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
     private showParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
+    }
+       
+    private setupCMAutocomplete(){
+        CodeMirror.commands.autocomplete = function(cm) {
+            CodeMirror.showHint(cm, function(cm){
+                return CodeMirror.showHint(cm, CodeMirror.ternHint, {async: true});
+            });
+        }
     }
 }
