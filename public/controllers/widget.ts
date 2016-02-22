@@ -1,3 +1,48 @@
+// helper function to move caret - from http://stackoverflow.com/questions/10778291/move-the-cursor-position-with-javascript
+function moveCaret(win, charCount) {
+    var sel, range;
+    if (win.getSelection) {
+        sel = win.getSelection();
+        if (sel.rangeCount > 0) {
+            var textNode = sel.focusNode;
+            var newOffset = sel.focusOffset + charCount;
+            sel.collapse(textNode, Math.min(textNode.length, newOffset));
+        }
+    } else if ( (sel = win.document.selection) ) {
+        if (sel.type != "Control") {
+            range = sel.createRange();
+            range.move("character", charCount);
+            range.select();
+        }
+    }
+}
+
+// helper function to get caret position - from http://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
+function getCaretPosition(editableDiv) {
+  var caretPos = 0,
+    sel, range;
+  if (window.getSelection) {
+    sel = window.getSelection();
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+      if (range.commonAncestorContainer.parentNode == editableDiv) {
+        caretPos = range.endOffset;
+      }
+    }
+  } else if (document.selection && document.selection.createRange) {
+    range = document.selection.createRange();
+    if (range.parentElement() == editableDiv) {
+      var tempEl = document.createElement("span");
+      editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+      var tempRange = range.duplicate();
+      tempRange.moveToElementText(tempEl);
+      tempRange.setEndPoint("EndToEnd", range);
+      caretPos = tempRange.text.length;
+    }
+  }
+  return caretPos;
+}
+
 export function Widget(cm) {
     this.cm = cm;
     this.value = cm.getSelection();
@@ -21,7 +66,7 @@ export function BoldWidget(cm) {
     this.node = $(".widget-templates .bold-widget").clone();
 
     // adding listener to change event
-    this.node[0].addEventListener("input", () => {
+    this.node[0].addEventListener("input", (e) => {
         this.setValue(this.node[0].innerText);
     }, false);
 
@@ -40,7 +85,9 @@ export function BoldWidget(cm) {
 BoldWidget.prototype = Object.create(Widget.prototype)
 BoldWidget.prototype.setValue = function(val) {
     this.value = val;
+    var pos = getCaretPosition(this.node[0]);
     this.setText(" #b " + this.value.toString() + " # ");
+    moveCaret(window, pos);
 }
 
 export function HeaderWidget(cm) {
@@ -66,5 +113,7 @@ export function HeaderWidget(cm) {
 HeaderWidget.prototype = Object.create(Widget.prototype)
 HeaderWidget.prototype.setValue = function(val) {
     this.value = val;
+    var pos = getCaretPosition(this.node[0]);
     this.setText(" #h1 " + this.value.toString() + " # ");
+    moveCaret(window, pos);
 }
