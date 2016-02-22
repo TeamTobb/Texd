@@ -20,6 +20,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() isFocusedList: boolean[];
     @Input() isFocused: boolean;
     @Output() outdatedParsedParagraph: EventEmitter<any> = new EventEmitter();
+
     @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
 
     public editable: boolean = false
@@ -79,13 +80,14 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 new BoldWidget(this.editor);
             }
         });
-
     }
 
     // Ctrl + J = BOLD
     public onKeyPressEvent(cm, e) {
         if(e.ctrlKey) {
+            console.log(e);
             if(e.code==="KeyJ") {
+                console.log("test");
                 new BoldWidget(this.editor);
             }
         }
@@ -98,6 +100,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public showParsedPara() {
+        console.log("showparsed");
         this.outdatedParsedParagraph.emit(this.index)
         this.editable = false;
         this.hideParagraph(this.index)
@@ -114,7 +117,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
     }
-       
+
     private setupCMAutocomplete(){
         CodeMirror.commands.autocomplete = function(cm) {
             CodeMirror.showHint(cm, function(cm){
@@ -122,4 +125,5 @@ export class CmComponent implements AfterViewInit, OnChanges {
             });
         }
     }
+
 }

@@ -27,7 +27,6 @@ import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 export class EditorController {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
-    // @Input() document;
     public current_chapter: number = 0;
     public current_paragraph: number = 0; 
     public modifierKeyDown: boolean = false;
@@ -40,8 +39,6 @@ export class EditorController {
     private _jsonParser: jsonToHtml;
     private cmFocused : boolean[] = [];
 
-    // CTRL + P = parse
-    // CTRL + N = new paragraph
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
         this.element = currElement;
@@ -57,16 +54,8 @@ export class EditorController {
 
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
             console.log(JSON.stringify(res, null, 2));
-            var snappets: any[] = [];
-            // JSON.parse(res);
-            // res.forEach((snappet) => {
-            //     snappets.push(snappet);
-            // })
+            var snappets: any[] = [];       
             this.snappetParser = new SnappetParser(this.element, res);
-
-            // this.parseMap.generateParseMap(res);
-            // this._textParser = new Parser(this.parseMap.parseMap);
-            // this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
     }
 
@@ -84,6 +73,7 @@ export class EditorController {
     public parseAllPara() {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
+            console.log("heiiiiii")
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
@@ -99,12 +89,10 @@ export class EditorController {
     }
 
     public outdatedParsedParagraph(paragraphIndex: number) {
-        var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
-        if(this._textParser) {
+        if (this._jsonParser) {
+            var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
             var parsedElem = this._textParser.getParsedJSONSingle(element)
             var html = this._jsonParser.getParsedHTML(parsedElem)
-            // console.log("Old: " + this.parsedParagraph[paragraphIndex])
-            // console.log("new: " + html)
             this.parsedParagraph[paragraphIndex] = html
         }
     }
@@ -230,17 +218,17 @@ export class EditorController {
 }
 
 export class DropdownDemo {
-  private disabled:boolean = false;
-  private status:{isopen:boolean} = {isopen: false};
-  private items:Array<string> = ['The first choice!', 'And another choice for you.', 'but wait! A third!'];
+    private disabled: boolean = false;
+    private status: { isopen: boolean } = { isopen: false };
+    private items: Array<string> = ['The first choice!', 'And another choice for you.', 'but wait! A third!'];
 
-  private toggled(open:boolean):void {
-    console.log('Dropdown is now: ', open);
-  }
+    private toggled(open: boolean): void {
+        console.log('Dropdown is now: ', open);
+    }
 
-  private toggleDropdown($event:MouseEvent):void {
-    $event.preventDefault();
-    $event.stopPropagation();
-    this.status.isopen = !this.status.isopen;
-  }
+    private toggleDropdown($event: MouseEvent): void {
+        $event.preventDefault();
+        $event.stopPropagation();
+        this.status.isopen = !this.status.isopen;
+    }
 }
