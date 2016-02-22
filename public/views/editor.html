@@ -43,6 +43,7 @@
                     <button id="insertbold" style="font-weight: bold">bold</button>
                     <button id="insertbold" style="font-style: italic">italic</button>
                     <button id="insertbold" style="text-decoration: underline;">underline</button>
+                    <button id="insertheader" style="font-style: bold">header</button>
 
                 </div>
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
@@ -61,4 +62,5 @@
 <!-- widgets -->
 <div class="widget-templates">
     <span contenteditable="true" class="bold-widget"></span>
+    <h1 contenteditable="true" class="header-widget"></h1>
 </div>

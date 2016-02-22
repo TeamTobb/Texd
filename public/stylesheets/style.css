@@ -90,6 +90,10 @@ textarea {
     font-weight: bold;
 }
 
+.header-widget {
+    
+}
+
 #buttonsContainer {
     width: 84.5%;
     background-color: #ccc;
@@ -99,5 +103,5 @@ textarea {
         padding: 5px;
         border-radius: 3px;
 
-    
+
 }
