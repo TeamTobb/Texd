@@ -141,12 +141,6 @@ export class EditorController {
     public changeChapter(chapter_number: number) {
         console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
         this.current_chapter = chapter_number;
-        setTimeout(() => {
-            var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
-            for (var i in elem) {
-                this.auto_grow(elem[i]);
-            }
-        }, 10);
     }
 
     public globalKeyEvent($event) {
