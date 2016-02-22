@@ -17,26 +17,41 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() index: number;
     @Input() chapterId: string;
     @Input() parsedParagraph: string;
+    @Input() isFocusedList: boolean[];
+    @Input() isFocused: boolean;
     @Output() outdatedParsedParagraph: EventEmitter<any> = new EventEmitter();
+
+    @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
 
     public editable: boolean = false
     public editor;
     public widgets : any[];
-    public isFocused : boolean = false;
+    // public isFocused : boolean = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
-
+        this.setupCMAutocomplete();
     }
-    
+
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        this.outdatedParsedParagraph.emit(this.index)
+        if(changes["isFocused"]) {
+            if(!changes["isFocused"].currentValue) {
+                this.showParsedPara();
+            }
+        }
+        if(changes["parsedParagraph"]) {
+            this.outdatedParsedParagraph.emit(this.index);
+        }
     }
+
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("editor" + this.index), {
-            mode: "javascript",
+             mode: "javascript",
             lineNumbers: true,
-            lineWrapping: true
+            lineWrapping: true,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete"
+            }
         })
         this.editor.on("change", (cm, change) => {
             var para = this.paragraph
@@ -44,12 +59,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
             this.documentService.testDiffSend(new Diff({}, this.chapterId, {}, this.paragraph.id, para, this.index, false, false));
             cm.getValue();
         });
-        this.editor.on("blur", (cm, change) => {
-            this.showParsedPara();
-            this.isFocused = false;
-        });
         this.editor.on("focus", (cm, change) => {
-            this.isFocused = true;
+            this.isFocusedList[this.index] = true;
+            this.onFocusEmit.emit(this.index);
         });
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
@@ -70,7 +82,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
     }
 
-    // Ctrl + B = BOLD
+    // Ctrl + J = BOLD
     public onKeyPressEvent(cm, e) {
         if(e.ctrlKey) {
             console.log(e);
@@ -82,7 +94,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public showEditablePara() {
-        console.log("showEditablePara()")
         this.editable = true;
         this.showParagraph(this.index)
         this.editor.focus()
@@ -91,17 +102,28 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public showParsedPara() {
         console.log("showparsed");
         this.outdatedParsedParagraph.emit(this.index)
-        console.log("private showParsedPara() ")
         this.editable = false;
         this.hideParagraph(this.index)
     }
 
     private hideParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        element[index].setAttribute("style", "display: none");
+        if(element[index]) {
+            element[index].setAttribute("style", "display: none");
+        }
     }
+
     private showParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
     }
+
+    private setupCMAutocomplete(){
+        CodeMirror.commands.autocomplete = function(cm) {
+            CodeMirror.showHint(cm, function(cm){
+                return CodeMirror.showHint(cm, CodeMirror.ternHint, {async: true});
+            });
+        }
+    }
+
 }

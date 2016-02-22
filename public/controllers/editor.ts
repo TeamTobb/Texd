@@ -18,7 +18,6 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 
-
 @Component({
     selector: 'my-app',
     templateUrl: 'views/editor.html',
@@ -37,6 +36,8 @@ export class EditorController {
     public parseMap: ParseMap = new ParseMap();
     private _textParser: Parser;
     private _jsonParser: jsonToHtml;
+    private cmFocused : boolean[] = [];
+
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
         this.element = currElement;
@@ -56,6 +57,14 @@ export class EditorController {
             this.snappetParser = new SnappetParser(this.element, res);
         });
     }
+
+    public cmOnFocusEmit(index) {
+        for(var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
+            if(i != index) {
+                this.cmFocused[i] = false;
+            }
+        }
+     }
 
     public parseAllPara() {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
@@ -82,7 +91,6 @@ export class EditorController {
             var html = this._jsonParser.getParsedHTML(parsedElem)
             this.parsedParagraph[paragraphIndex] = html
         }
-
     }
 
 
@@ -127,12 +135,6 @@ export class EditorController {
     public changeChapter(chapter_number: number) {
         console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
         this.current_chapter = chapter_number;
-        setTimeout(() => {
-            var elem = jQuery(this.element.nativeElement).find('[id=para]').toArray();
-            for (var i in elem) {
-                this.auto_grow(elem[i]);
-            }
-        }, 10);
     }
 
     public globalKeyEvent($event) {
