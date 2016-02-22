@@ -91,13 +91,14 @@ textarea {
 }
 
 .header-widget {
-    
+
 }
 
 #buttonsContainer {
     width: 84.5%;
     background-color: #ccc;
     position:fixed;
+    z-index: 99;
     top:250px;
     border: 1 px solid black;
         padding: 5px;
