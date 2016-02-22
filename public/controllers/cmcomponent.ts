@@ -5,7 +5,7 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget} from "./widget.ts";
+import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from "./widget.ts";
 
 //<docview *ngFor="#document of documents; #i = index" [title]="documents[i].name" [preview]="documents[i].chapters[0].text" />
 @Component({
@@ -83,6 +83,16 @@ export class CmComponent implements AfterViewInit, OnChanges {
         $("#insertheader").click( () => {
             if(this.isFocused) {
                 new HeaderWidget(this.editor);
+            }
+        });
+        $("#insertitalic").click( () => {
+            if(this.isFocused) {
+                new ItalicWidget(this.editor);
+            }
+        });
+        $("#insertunderline").click( () => {
+            if(this.isFocused) {
+                new UnderlineWidget(this.editor);
             }
         });
     }
