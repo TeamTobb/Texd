@@ -15,7 +15,7 @@ import { ACCORDION_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
     providers: [DocumentService, HTTP_BINDINGS],
     directives: [DocView, ACCORDION_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
     public text: string = "test string in dashboard";
     private documents: Document[];
     private maxColumns = 3;
@@ -26,7 +26,6 @@ export class DashboardComponent implements OnInit {
             this.documents = documents;
 
             var row = Math.ceil(documents.length / this.maxColumns)
-            console.log(row)
             var tempDoc = []
             var iter = 0;
             for (var index = 0; index < row; index++) {
@@ -39,24 +38,17 @@ export class DashboardComponent implements OnInit {
                         } else{
                             break;
                         }
-
-
                     }
                 } else {
                     break;
                 }
             }
             this.documentGrid = tempDoc;
-            console.log(this.documentGrid[2])
         });
     }
 
     public goToDocument(documentId: string) {
         console.log("passing id " + documentId);
         this._router.navigate(['Editor', { id: documentId }]);
-    }
-
-    ngOnInit() {
-        console.log("dashboard.onInit()");
     }
 }          

@@ -20,7 +20,7 @@ export class ChapterItem implements OnChanges {
   
   
   constructor(private documentService: DocumentService) {
-
+      
   }
     // TODO Make alert, sure you want to delete this chapter? 
   delete(value: any){
@@ -29,7 +29,6 @@ export class ChapterItem implements OnChanges {
   }
   
     rename($event, chapterId, documentId){       
-         //this.toBeDeleted.emit("event")  
         var newName: string = $event.target.innerHTML
         this.documentService.changeChapterName(documentId, newName, chapterId);
         $event.target.setAttribute("contenteditable", "false");
