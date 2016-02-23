@@ -28,7 +28,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public widgets: any[];
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
-        console.log("CONSTRUCK")
         this.setupCMAutocomplete();
     }
 
@@ -39,8 +38,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 this.showParsedPara();
             }
         }
-        if(changes["parsedParagraph"] || changes["paragraphraw"]) {
+        if(changes["paragraphraw"]) {
             this.outdatedParsedParagraph.emit(this.index);
+            if(changes["paragraphraw"]){
+                if(this.editor && !this.editable){
+                    this.editor.getDoc().setValue(this.paragraphraw);    
+                }
+            }
         }
     }
 
@@ -59,6 +63,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             this.documentService.sendDiff(new Diff({}, this.chapterId, {}, this.paragraph.id, para, this.index, false, false));
         });
         this.editor.on("focus", (cm, change) => {
+            this.editor.getDoc().setValue(this.paragraphraw);
             this.isFocusedList[this.index] = true;
             this.onFocusEmit.emit(this.index);
         });

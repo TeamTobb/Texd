@@ -52,28 +52,24 @@ export class DocumentService {
                         } else if (this._senderId != parsed.senderId) {
                             this._document.chapters.forEach((chapter) => {
                                 if(chapter.id == diff.chapterId){
-                                    chapter.paragraphs[diff.index] = diff.paragraph
+                                    // chapter.paragraphs[diff.index] = diff.paragraph
+                                    chapter.paragraphs[diff.index].raw = diff.paragraph.raw;
+                                    chapter.paragraphs[diff.index].metadata = diff.paragraph.metadata
                                 }
-<<<<<<< HEAD
-                            } else if (this._senderId != parsed.senderId) {
+                            })
+                        } else if (this._senderId != parsed.senderId) {
                                 this.document.chapters[diff.chapterIndex].paragraphs[diff.index].raw = diff.paragraph.raw;
                                 this.document.chapters[diff.chapterIndex].paragraphs[diff.index].metadata = diff.paragraph.metadata
                             }
-=======
-                            })
-                            //this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
->>>>>>> 771d600f2f43444acf45f9f03e8b8affbf6b2bb3
                         }
                     }
                 }
-            }
-
-            if (parsed.title && parsed.documentId == this.document.id) {
-                this.document.title = parsed.title;
-            }
+                if (parsed.title && parsed.documentId == this.document.id) {
+                    this.document.title = parsed.title;
+                }
+            }            
         }
-    }
-
+    
     public changeTitle(id: string, newTitle: string) {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
