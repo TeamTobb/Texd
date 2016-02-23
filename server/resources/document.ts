@@ -14,24 +14,6 @@ import paragraphModel = documentModel.paragraphModel;
 
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
-    // console.log("here is req: " + JSON.stringify(req.params, null, 2));  
-    
-
-
-    // var rawStart: String = "Hei #b bloggen #h1 dette er megastort # # ";
-    // var para = new Document(rawStart, []);
-    
-    // var chapterHeaderStart: string = "Kapittel header";
-    // var paras = [];
-    // paras.push(para);
-
-    // var chapter = new Chapter(chapterHeaderStart, paras);
-    // var chapters = [];
-    // chapters.push(chapter);
-    // chapters.push(new Chapter("Header kap 2", paras));
-    // chapters.push(new Chapter("Header kap 3", paras));
-    // var documentStart = new Document(2, "This is document title", "documentName", ["Borgar", "jorg", "Bjon", "thomasbassen"], chapters);
-
     repository.findOne({_id: req.params.id}, (error, document) => {
         if(error){
             res.send(error);
@@ -46,10 +28,10 @@ export function getDocuments(req: express.Request, res: express.Response){
     var paragraphs1 = [new Paragraph("Doc1 paragraph1", []), new Paragraph("Doc1 paragraph2", []), new Paragraph("Doc1 paragraph3", [])];
     var paragraphs2 = [new Paragraph("Doc2 paragraph1", []), new Paragraph("Doc2 paragraph2", []), new Paragraph("Doc2 paragraph3", [])];
     var paragraphs3 = [new Paragraph("Doc3 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs4 = [new Paragraph("Doc4 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs5 = [new Paragraph("Doc5 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs6 = [new Paragraph("Doc6 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs7 = [new Paragraph("Doc7 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    var paragraphs4 = [new Paragraph("Doc4 paragraph1", []), new Paragraph("Doc4 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    var paragraphs5 = [new Paragraph("Doc5 paragraph1", []), new Paragraph("Doc5 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    var paragraphs6 = [new Paragraph("Doc6 paragraph1", []), new Paragraph("Doc6 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    var paragraphs7 = [new Paragraph("Doc7 paragraph1", []), new Paragraph("Doc7 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
     
     var chapters1 = [new Chapter("Doc1 chapter1", paragraphs1)];
     var chapters2 = [new Chapter("Doc2 chapter1", paragraphs2)];
@@ -93,7 +75,6 @@ export function getDocuments(req: express.Request, res: express.Response){
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
     if(req.body.documentTitle != null){
-        console.log("UPDATING TITLE")   
         repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
             if(error){
                 res.send(error);
@@ -110,9 +91,7 @@ export function update(req: express.Request, res: express.Response) {
         repository.update({
             _id: new mongoose.Types.ObjectId(req.params.id),
             "_chapters._id": new mongoose.Types.ObjectId(req.body.chapterId)
-        }, 
-            query 
-        , (error, document) => {
+        }, query, (error, document) => {
             if(error){             
                 res.send(error);
             } else {
@@ -122,8 +101,6 @@ export function update(req: express.Request, res: express.Response) {
        
     }
 }
-
-        
     	
 export function updateDocumentText(diff: Diff, callback){ 
     console.log("documentController.testUpdateDocument()"); 

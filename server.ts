@@ -8,14 +8,12 @@ import path = require('path');
 import mongoose = require('mongoose');
 import WebSocket = require('ws');
 
-
-import models = require('./server/dao/messageModel');
 import Diff = require('./server/domain/diff');
-
 import pluginsRoutes = require('./server/resources/plugins');
 import snappetRoutes = require('./server/resources/snappets');
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
+
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
@@ -30,10 +28,9 @@ server.on('connection', ws => {
         try {
             var obj = JSON.parse(message);
             if (obj.newDiff) {
-                // var difftest = new Diff({}, {}, 0, false, false, obj.newDiff);
-                var difftest: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
-                documentRoutes.updateDocumentText(difftest, (elementId) => {
-                    broadcast(JSON.stringify({ senderId: obj.senderId, elementId: elementId, newDiff: difftest }));
+                var diff: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
+                documentRoutes.updateDocumentText(diff, (elementId) => {
+                    broadcast(JSON.stringify({ senderId: obj.senderId, elementId: elementId, newDiff: diff }));
                 });
             } else {
                 broadcast(message);
@@ -72,15 +69,6 @@ app.get('/document/:id', documentRoutes.read);
 app.get('/documents', documentRoutes.getDocuments);
 app.post('/document/:id', documentRoutes.update);
 app.get('/*', routes.index);
-
-// app.post('/document/:documentid', documentRoutes.update)
-// app.put('/document/:documentid', documentRoutes.update)
-
-// app.post('/document/:documentid/:chapterid', documentRoutes.update)
-// app.put('/document/:documentid/:chapterid', documentRoutes.update)
-
-// app.post('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
-// app.put('/document/:documentid/:chapterid/:paragraphid', documentRoutes.update)
 
 app.listen(httpPort, function() {
     console.log("Demo Express server listening on port %d", httpPort);

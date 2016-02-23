@@ -1,14 +1,6 @@
 <div id="wrapper">
     <div id="body">
-        <!-- Hints:
-        <br> CTRL + P = parse
-        <br> CTRL + N = new paragraph
-        <br> CTRL + C = new chapter
-        <br> Goto chapter (index+enter):
-        <input value="" type="text" #current (keydown)="gotoChapter($event, current.value)">
-        <br>-->
         <br>
-        <!-- Single button with keyboard nav -->
         <div class="btn-group" dropdown keyboardNav="true">
             <button id="simple-btn-keyboard-nav" type="button" class="btn btn-primary" dropdownToggle>
                 Choose chapter <span class="caret"></span>
@@ -22,21 +14,12 @@
                 <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
             </ul>
         </div>
-
         <br>
         <br>
-
-
         <div id="title">
-
-            <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1>
-        </div>
-
-
-
+            <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1></div>
         <br>
         <br>
-
         <div id="container">
             <div class="roundedBorder" id="center">
                 <div id="buttonsContainer">
@@ -45,36 +28,27 @@
                     <button id="insertitalic" style="font-style: italic">italic</button>
                     <button id="insertunderline" style="text-decoration: underline;">underline</button>
                     <button id="insertheader" style="font-style: bold">header</button>
-
                 </div>
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
-                    <!--<textarea class="testclass" id="para" type="text" [(ngModel)]="p.raw" style="width: 100%; height: 100%;" (keydown)="modifierKeyDownPress($event)"
-                    (keyup)="changeDocument($event, i)"></textarea>-->
-                    <!--<textarea class="testclass" id="para" type="text"style="width: 100%; height: 100%;">hei på dere</textarea>-->
                     <cmcomponent [index]=i [parsedParagraph]="parsedParagraph[i]" [chapterId]=document.chapters[current_chapter].id [paragraph]=p
                     [isFocusedList]="cmFocused" [isFocused]="cmFocused[i]" (outdatedParsedParagraph)="outdatedParsedParagraph(i)"
                     (onFocusEmit)="cmOnFocusEmit(i)"></cmcomponent>
-
                 </div>
-                <!--<textarea class="testclass">{{document.chapters[0].paragraphs[0].raw}}</textarea>-->
             </div>
         </div>
     </div>
 </div>
+
 <!-- widgets -->
 <div class="widget-templates">
-    <span contenteditable="true" class="bold-widget"></span>   
+    <span contenteditable="true" class="bold-widget"></span>
     <span contenteditable="true" class="italic-widget"></span>
     <span contenteditable="true" class="underline-widget"></span>
     <h1 contenteditable="true" class="header-widget"></h1>
 </div>
 
 <section *ngIf="showUploadDiv">
-
-
     <div id="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
-
     </div>
 </section>
-

@@ -18,10 +18,8 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
 
-
-
 @Component({
-    selector: 'my-app',
+    selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
     directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES]
@@ -30,19 +28,13 @@ import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 export class EditorController {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter: number = 0;
-    public current_paragraph: number = 0; 
-    public modifierKeyDown: boolean = false;
+    public current_paragraph: number = 0;
     public element: ElementRef;
-    public documentHTML: string = "preview";
     private snappetParser: SnappetParser;
     public parsedParagraph: string[] = [];
-    public parseMap: ParseMap = new ParseMap();
-    private _textParser: Parser;
-    private _jsonParser: jsonToHtml;
-    private cmFocused : boolean[] = [];
-    private showUploadDiv = false; 
+    private cmFocused: boolean[] = [];
+    private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
-
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
         this.element = currElement;
@@ -55,52 +47,37 @@ export class EditorController {
                 this.parseAllPara()
             })
         }
-
+        //TODO integrate with codemirror
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
             console.log(JSON.stringify(res, null, 2));
-            var snappets: any[] = [];       
+            var snappets: any[] = [];
             this.snappetParser = new SnappetParser(this.element, res);
         });
     }
-
+    
+    // from cmComponent output emit
     public cmOnFocusEmit(index) {
-        for(var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
-            if(i != index) {
+        this.current_paragraph = index;
+        for (var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
+            if (i != index) {
                 this.cmFocused[i] = false;
-            } else{
-                this.cmFocused[i] = true; 
-                this.current_paragraph = index; 
             }
         }
-     }
+    }
 
     public parseAllPara() {
-        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
-            this.parseMap.generateParseMap(res);
-            console.log("heiiiiii")
-            this._textParser = new Parser(this.parseMap.parseMap);
-            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
-
-            var nonParsedParagraphs: Paragraph[] = this.document.chapters[this.current_chapter].paragraphs
-
-            for (var index = 0; index < nonParsedParagraphs.length; index++) {
-                var element: Paragraph = nonParsedParagraphs[index];
-                var parsedElem = this._textParser.getParsedJSONSingle(element)
-                var html = this._jsonParser.getParsedHTML(parsedElem)
-                this.parsedParagraph.push(html);
-            }
-        });
+        this.documentService.parseChapter(this.current_chapter, (parsedParagraphs) => {
+            // this may not work because of async (plugins may not be available for service yet)
+            this.parsedParagraph = parsedParagraphs;
+        })
     }
-
+    
+    // from cmComponent output emit
     public outdatedParsedParagraph(paragraphIndex: number) {
-        if (this._jsonParser) {
-            var element: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex]
-            var parsedElem = this._textParser.getParsedJSONSingle(element)
-            var html = this._jsonParser.getParsedHTML(parsedElem)
-            this.parsedParagraph[paragraphIndex] = html
-        }
+        // this may not work because of async (plugins may not be available for service yet)
+        var para : Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
+        this.parsedParagraph[paragraphIndex] = this.documentService.parseSingleParagraph(para);
     }
-
 
     //TODO implement this, to be deleted in DB
     public deleteChapterFromDB(value: string) {
@@ -148,17 +125,6 @@ export class EditorController {
     public globalKeyEvent($event) {
         console.log($event.which);
         var keyMap = {};
-        keyMap[69] = () => {
-            var next = 10;
-            var node = document.getSelection().anchorNode;
-            if (node.nodeType == 3) {
-                console.log("sending node: " + node.parentNode)
-                this.snappetParser.nextPlaceholder(node.parentNode);
-            } else {
-                this.snappetParser.nextPlaceholder(node);
-                console.log("sending node: " + node)
-            }
-        }
         keyMap[78] = () => {
             this.document.chapters[this.current_chapter].paragraphs.splice(this.current_paragraph + 1, 0, new Paragraph("...", []));
             var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("...", []), this.current_paragraph, true, false)
@@ -166,13 +132,12 @@ export class EditorController {
         }
         keyMap[80] = () => {
             console.log("ctrl+p");
-            this.parseCurrentChapter();
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
             this.createChapter();
         }
-        
+
         if ($event.ctrlKey) {
             if (keyMap[$event.which]) {
                 $event.preventDefault();
@@ -181,51 +146,13 @@ export class EditorController {
         }
     }
 
-    public parseCurrentChapter() {
-        console.log("parsing");
-        var rawParagraphs = this.document.chapters[this.current_chapter].paragraphs;
-        var documentJSON = this.documentService.getParsedJSON(rawParagraphs);
-        this.documentHTML = this.documentService.getParsedHTML(documentJSON);
-        // update previewFrame
-        var doc = jQuery(this.element.nativeElement).find('#previewFrame')[0].contentWindow.document;
-        doc.open();
-        doc.write(this.documentHTML);
-        doc.close();
-    }
 
-    public modifierKeyDownPress($event) {
-        if ($event.which === 17) {
-            this.modifierKeyDown = true;
-        }
-    }
-
-    public changeDocument($event, paragraphIndex: number) {
-        console.log("changedocument");
-        // this.auto_grow($event.target);
-        if ($event.which === 17) {
-            this.modifierKeyDown = false;
-        }
-        else if ($event.which === 80 && this.modifierKeyDown) {
-            this.parseCurrentChapter();
-        }
-        else if ($event.which === 78 && this.modifierKeyDown) {
-            this.document.chapters[this.current_chapter].paragraphs.splice(paragraphIndex + 1, 0, new Paragraph("", []));
-            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("", []), paragraphIndex, true, false)
-            this.documentService.sendDiff(diff);
-        }
-        else {
-            var para: Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
-            var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, para.id, para, paragraphIndex, false, false)
-            this.documentService.sendDiff(diff);
-        }
-    }
-    
-    public showUploadDivToggle(hide){
+    public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
-     
+
     }
-    
-    
+
+
 
 }
 

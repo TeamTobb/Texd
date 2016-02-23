@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>MEAN skeleton</title>
+    <title>Texd</title>
     <script>
         document.write('<base href="' + document.location.origin + '" />');
     </script>
@@ -52,6 +52,7 @@
     <!--keeping JS templates for testing purposes-->
     <script src="lib/codemirror/codemirror-javascript/addon/hint/javascript/javascript-templates.js"></script>
 
+    <!-- bootstrap -->
     <script src="ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
@@ -68,11 +69,11 @@
             .then(null, console.error.bind(console));
     </script>
 
-
+    <!-- TODO remove -->
     <script>     
-    $(window).scroll(function(){
-        $("#buttonsContainer").css("top",Math.max(0,250 -$(this).scrollTop()));
-   });
+      $(window).scroll(function () {
+          $("#buttonsContainer").css("top", Math.max(0, 250 - $(this).scrollTop()));
+      });
     </script>
 
 </head>
