@@ -39,10 +39,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
         if(changes["paragraphraw"]) {
             this.parsedParagraph = this.documentService.parseSingleParagraph(new Paragraph(this.paragraphraw, []));
-            if(changes["paragraphraw"]){
-                if(this.editor && !this.editable){
-                    this.editor.getDoc().setValue(this.paragraphraw);
-                }
+            if(this.editor && !this.editable){
+                this.editor.getDoc().setValue(this.paragraphraw);
             }
         }
     }
