@@ -57,7 +57,8 @@ export class DocumentService {
                                     this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
                                 }
                             } else if (this._senderId != parsed.senderId) {
-                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index] = diff.paragraph;
+                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index].raw = diff.paragraph.raw;
+                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index].metadata = diff.paragraph.metadata
                             }
                         }
                     }

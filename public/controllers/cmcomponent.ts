@@ -14,6 +14,7 @@ import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from ".
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() paragraph: Paragraph;
+    @Input() paragraphraw: string; 
     @Input() index: number;
     @Input() chapterId: string;
     @Input() parsedParagraph: string;
@@ -39,7 +40,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 this.showParsedPara();
             }
         }
-        if(changes["parsedParagraph"]) {
+        if(changes["parsedParagraph"] || changes["paragraphraw"]) {
             this.outdatedParsedParagraph.emit(this.index);
         }
     }
