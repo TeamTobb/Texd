@@ -31,7 +31,6 @@ export class EditorController {
     public current_paragraph: number = 0;
     public element: ElementRef;
     private snappetParser: SnappetParser;
-    public parsedParagraph: string[] = [];
     private cmFocused: boolean[] = [];
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
@@ -44,7 +43,6 @@ export class EditorController {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
-                this.parseAllPara()
             })
         }
         //TODO integrate with codemirror
@@ -54,7 +52,7 @@ export class EditorController {
             this.snappetParser = new SnappetParser(this.element, res);
         });
     }
-    
+
     // from cmComponent output emit
     public cmOnFocusEmit(index) {
         this.current_paragraph = index;
@@ -63,20 +61,6 @@ export class EditorController {
                 this.cmFocused[i] = false;
             }
         }
-    }
-
-    public parseAllPara() {
-        this.documentService.parseChapter(this.current_chapter, (parsedParagraphs) => {
-            // this may not work because of async (plugins may not be available for service yet)
-            this.parsedParagraph = parsedParagraphs;
-        })
-    }
-    
-    // from cmComponent output emit
-    public outdatedParsedParagraph(paragraphIndex: number) {
-        // this may not work because of async (plugins may not be available for service yet)
-        var para : Paragraph = this.document.chapters[this.current_chapter].paragraphs[paragraphIndex];
-        this.parsedParagraph[paragraphIndex] = this.documentService.parseSingleParagraph(para);
     }
 
     //TODO implement this, to be deleted in DB
@@ -155,4 +139,3 @@ export class EditorController {
 
 
 }
-
