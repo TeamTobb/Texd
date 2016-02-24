@@ -13,19 +13,18 @@ import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from ".
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() paragraph: Paragraph;
-    @Input() paragraphraw: string; 
+    @Input() paragraphraw: string;
     @Input() index: number;
-    // remove chapter ID and have it in service ? 
-    @Input() chapterId: string;
-    @Input() parsedParagraph: string;
+    // remove chapter ID and have it in service ?
+    @Input() chapterId: string
     @Input() isFocusedList: boolean[];
     @Input() isFocused: boolean;
-    @Output() outdatedParsedParagraph: EventEmitter<any> = new EventEmitter();
     @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
 
     public editable: boolean = false;
     public editor;
     public widgets: any[];
+    public parsedParagraph : string;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -39,11 +38,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
         }
         if(changes["paragraphraw"]) {
-            this.outdatedParsedParagraph.emit(this.index);
-            if(changes["paragraphraw"]){
-                if(this.editor && !this.editable){
-                    this.editor.getDoc().setValue(this.paragraphraw);    
-                }
+            this.parsedParagraph = this.documentService.parseSingleParagraph(new Paragraph(this.paragraphraw, []));
+            if(this.editor && !this.editable){
+                this.editor.getDoc().setValue(this.paragraphraw);
             }
         }
     }
@@ -58,9 +55,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
         })
         this.editor.on("change", (cm, change) => {
-            var para = this.paragraph
-            para.raw = cm.getValue();
-            this.documentService.sendDiff(new Diff({}, this.chapterId, {}, this.paragraph.id, para, this.index, false, false));
+            this.paragraph.raw = cm.getValue();
+            this.documentService.sendDiff(new Diff({}, this.chapterId, {}, this.paragraph.id, this.paragraph, this.index, false, false));
         });
         this.editor.on("focus", (cm, change) => {
             this.editor.getDoc().setValue(this.paragraphraw);
@@ -77,7 +73,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             this.hideParagraph(index)
             console.log("way too many calls? from each and loop");
         }
-        
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             if (this.isFocused) {
@@ -111,7 +107,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
         }
     }
-    
+
     public showEditablePara() {
         this.editable = true;
         this.showParagraph(this.index)
@@ -119,7 +115,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public showParsedPara() {
-        this.outdatedParsedParagraph.emit(this.index)
+        this.parsedParagraph = this.documentService.parseSingleParagraph(this.paragraph);
         this.editable = false;
         this.hideParagraph(this.index)
     }
@@ -130,7 +126,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             element[index].setAttribute("style", "display: none");
         }
     }
- 
+
     private showParagraph(index) {
         var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
         element[index].setAttribute("style", "display: block");
