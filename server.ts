@@ -25,19 +25,21 @@ var server = new WebSocketServer({ port: wsPort });
 
 server.on('connection', ws => {
     ws.on('message', message => {
-        try {
-            var obj = JSON.parse(message);
-            if (obj.newDiff) {
-                var diff: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
-                documentRoutes.updateDocumentText(diff, (elementId) => {
-                    broadcast(JSON.stringify({ senderId: obj.senderId, elementId: elementId, newDiff: diff }));
-                });
-            } else {
-                broadcast(message);
-            }
-        } catch (e) {
-            console.error(e.message);
-        }
+        console.log("recived socket message on server")
+        // try {
+        //     var obj = JSON.parse(message);
+        //     if (obj.newDiff) {
+        //         var diff: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
+        //         documentRoutes.updateDocumentText(diff, (elementId) => {
+        //             broadcast(JSON.stringify({ senderId: obj.senderId, elementId: elementId, newDiff: diff }));
+        //         });
+        //     } else {
+        //         broadcast(message);
+        //     }
+        // } catch (e) {
+        //     console.error(e.message);
+        // }
+        broadcast(message)
     });
 });
 

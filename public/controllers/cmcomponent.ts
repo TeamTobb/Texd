@@ -19,8 +19,11 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() chapterId: string
     @Input() isFocusedList: boolean[];
     @Input() isFocused: boolean;
+    @Input() changeOrderFrom: any; 
+    @Input() changeOrderTo: any;
+    @Input() changeOrderText: any;
     @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
-
+    
     public editable: boolean = false;
     public editor;
     public widgets: any[];
@@ -37,9 +40,19 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 this.showParsedPara();
             }
         }
+        if((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)){
+            console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
+             var pos1 = {
+                line: this.changeOrderFrom.line, 
+                ch: this.changeOrderFrom.ch
+            }
+            this.editor.getDoc().replaceRange(this.changeOrderText[0], pos1)
+        }
+        
         if(changes["paragraphraw"]) {
             this.parsedParagraph = this.documentService.parseSingleParagraph(new Paragraph(this.paragraphraw, []));
             if(this.editor && !this.editable){
+                console.log(JSON.stringify(changes, null, 2))
                 this.editor.getDoc().setValue(this.paragraphraw);
             }
         }
@@ -54,9 +67,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 "Ctrl-Space": "autocomplete"
             }
         })
-        this.editor.on("change", (cm, change) => {
+        this.editor.on("inputRead", (cm, change) => {
             this.paragraph.raw = cm.getValue();
-            this.documentService.sendDiff(new Diff({}, this.chapterId, {}, this.paragraph.id, this.paragraph, this.index, false, false));
+            this.documentService.sendDiff(change)
         });
         this.editor.on("focus", (cm, change) => {
             this.editor.getDoc().setValue(this.paragraphraw);

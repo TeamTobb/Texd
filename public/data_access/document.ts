@@ -21,6 +21,11 @@ export class DocumentService {
     private _textParser: Parser;
     private _jsonParser: jsonToHtml;
     private snappetParser: SnappetParser;
+    public changeOrder: any = {
+        from: {}, 
+        to: {}, 
+        text: {}
+    }
 
     constructor(private http: Http) {
         this._senderId = "" + Math.random();
@@ -31,42 +36,50 @@ export class DocumentService {
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
 
-        this._socket = new WebSocket('ws://localhost:3001');
+        this._socket = new WebSocket('ws://158.38.210.202:3001');
         this._socket.onmessage = message => {
-            var parsed = JSON.parse(message.data);
-            if (parsed.newDiff) {
-                var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
+            var parsed = JSON.parse(message.data)
+            if(parsed.senderId != this._senderId){
+                this.changeOrder.from = parsed.from
+                this.changeOrder.to = parsed.to
+                this.changeOrder.text = parsed.text
+            }
+           
+            
+            // var parsed = JSON.parse(message.data);
+            // if (parsed.newDiff) {
+            //     var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
 
-                if (diff.documentId == this.document.id) {
-                    if (diff.newchapter == true) {
-                        this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
-                        if (this._senderId != parsed.senderId) {
-                            this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));
-                        }
-                    } else {
-                        if (diff.newelement == true) {
-                            this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
-                            if (this._senderId != parsed.senderId) {
-                                this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index + 1, 0, diff.paragraph);
-                            }
-                        } else if (this._senderId != parsed.senderId) {
-                            this._document.chapters.forEach((chapter) => {
-                                if(chapter.id == diff.chapterId){
-                                    // chapter.paragraphs[diff.index] = diff.paragraph
-                                    chapter.paragraphs[diff.index].raw = diff.paragraph.raw;
-                                    chapter.paragraphs[diff.index].metadata = diff.paragraph.metadata
-                                }
-                            })
-                        } else if (this._senderId != parsed.senderId) {
-                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index].raw = diff.paragraph.raw;
-                                this.document.chapters[diff.chapterIndex].paragraphs[diff.index].metadata = diff.paragraph.metadata
-                            }
-                        }
-                    }
-                }
-                if (parsed.title && parsed.documentId == this.document.id) {
-                    this.document.title = parsed.title;
-                }
+            //     if (diff.documentId == this.document.id) {
+            //         if (diff.newchapter == true) {
+            //             this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
+            //             if (this._senderId != parsed.senderId) {
+            //                 this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));
+            //             }
+            //         } else {
+            //             if (diff.newelement == true) {
+            //                 this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
+            //                 if (this._senderId != parsed.senderId) {
+            //                     this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index + 1, 0, diff.paragraph);
+            //                 }
+            //             } else if (this._senderId != parsed.senderId) {
+            //                 this._document.chapters.forEach((chapter) => {
+            //                     if(chapter.id == diff.chapterId){
+            //                         // chapter.paragraphs[diff.index] = diff.paragraph
+            //                         chapter.paragraphs[diff.index].raw = diff.paragraph.raw;
+            //                         chapter.paragraphs[diff.index].metadata = diff.paragraph.metadata
+            //                     }
+            //                 })
+            //             } else if (this._senderId != parsed.senderId) {
+            //                     this.document.chapters[diff.chapterIndex].paragraphs[diff.index].raw = diff.paragraph.raw;
+            //                     this.document.chapters[diff.chapterIndex].paragraphs[diff.index].metadata = diff.paragraph.metadata
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     if (parsed.title && parsed.documentId == this.document.id) {
+            //         this.document.title = parsed.title;
+            //     }
             }            
         }
     
@@ -84,7 +97,7 @@ export class DocumentService {
             }
             );
     }
-
+    
     //TODO implement changeChapterName() new URL
     public changeChapterName(documentId: string, newchapterName: string, chapterId: number) {
         console.log(documentId)
@@ -135,9 +148,11 @@ export class DocumentService {
         return this._jsonParser.getParsedHTML(parsedJSON);
     } 
     
-    public sendDiff(diff: Diff) {
-        diff.documentId = this.document.id
-        this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
+    public sendDiff(diff: any) {
+        // diff.documentId = this.document.id
+        // this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
+        diff.senderId = this._senderId
+        this._socket.send(JSON.stringify(diff))
     }
 
     public getDocument(documentId: string, callback: (document: Document) => any) {

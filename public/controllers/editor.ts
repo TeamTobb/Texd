@@ -34,8 +34,10 @@ export class EditorController {
     private cmFocused: boolean[] = [];
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
+    public changeOrder: any;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
+        this.changeOrder = this.documentService.changeOrder
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -130,12 +132,8 @@ export class EditorController {
         }
     }
 
-
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
 
     }
-
-
-
 }

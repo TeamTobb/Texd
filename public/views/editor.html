@@ -31,7 +31,8 @@
                 </div>
                 <div *ngFor='#p of document.chapters[current_chapter].paragraphs; #i = index'>
                     <cmcomponent [index]=i [chapterId]=document.chapters[current_chapter].id [paragraph]=p [paragraphraw]=p.raw
-                    [isFocusedList]="cmFocused" [isFocused]="cmFocused[i]" (onFocusEmit)="cmOnFocusEmit(i)"></cmcomponent>
+                    [isFocusedList]="cmFocused" [isFocused]="cmFocused[i]" [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to
+                    [changeOrderText]=changeOrder.text (onFocusEmit)="cmOnFocusEmit(i)"></cmcomponent>
                 </div>
             </div>
         </div>
