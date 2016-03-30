@@ -43,9 +43,13 @@ function getCaretPosition(editableDiv) {
   return caretPos;
 }
 
-export function Widget(cm) {
+export function Widget(cm, optRange) {
     this.cm = cm;
-    this.value = cm.getSelection();
+    if (optRange != null) {
+        this.value = this.cm.getRange(optRange.from, optRange.to).trim();
+    } else {
+        this.value = cm.getSelection();
+    }
 }
 Widget.prototype.range = function() {
     var find = this.mark.find()
@@ -62,7 +66,7 @@ Widget.prototype.getText = function() {
     return this.cm.getRange(r.from, r.to)
 }
 
-export function BoldWidget(cm) {
+export function BoldWidget(cm, optRange) {
     this.node = $(".widget-templates .bold-widget").clone();
 
     // adding listener to change event
@@ -74,23 +78,30 @@ export function BoldWidget(cm) {
     Widget.apply(this, arguments);
     this.node[0].textContent = this.value;
 
-    cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-    cm.setCursor(to);
+    if (optRange != null) {
+        // need to replace 4 chars before to remove "#b" and 3 after to remove "#"
+        // optRange.from.ch -= 4;
+        // optRange.to.ch += 4;
+        // cm.replaceRange(cm.getRange(optRange.from, optRange.to), {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
+        this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch - 3}, {line: optRange.to.line, ch : optRange.to.ch + 2}, {replacedWith: this.domNode, clearWhenEmpty: false});
+    } else {
+        cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
+        var from = cm.getCursor("from");
+        var to = cm.getCursor("to");
+        this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
+        cm.setCursor(to);
+    }
     cm.refresh();
 }
 BoldWidget.prototype = Object.create(Widget.prototype)
 BoldWidget.prototype.setValue = function(val) {
     this.value = val;
     var pos = getCaretPosition(this.node[0]);
-    this.setText(" #b " + this.value.toString() + " # ");
+    this.setText("#b " + this.value.toString() + " #");
     moveCaret(window, pos);
 }
 
-export function HeaderWidget(cm) {
+export function HeaderWidget(cm, optRange) {
     this.node = $(".widget-templates .header-widget").clone();
 
     // adding listener to change event
@@ -118,7 +129,7 @@ HeaderWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 
-export function ItalicWidget(cm) {
+export function ItalicWidget(cm, optRange) {
     this.node = $(".widget-templates .italic-widget").clone();
 
     // adding listener to change event
@@ -146,7 +157,7 @@ ItalicWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 
-export function UnderlineWidget(cm) {
+export function UnderlineWidget(cm, optRange) {
     this.node = $(".widget-templates .underline-widget").clone();
 
     // adding listener to change event

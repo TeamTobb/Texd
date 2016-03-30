@@ -6,6 +6,7 @@ import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
 import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from "./widget.ts";
+import {WidgetParser} from "../utils/widgetParser.ts";
 
 @Component({
     selector: 'cmcomponent',
@@ -27,10 +28,15 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     //Parsing on all changes
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {       
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+        }
+        // parse widgets
+        if (this.editor != undefined) {
+            // parse widgets
+            this.parseWidgets(this.editor);
         }
     }
 
@@ -52,34 +58,50 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 this.documentService.sendDiff(change)
             }
         });
- 
+
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
         });
 
         // make this outside of this component with a loop
-        
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
-            if (this.isFocused) {
-                new BoldWidget(this.editor);
-            }
+            new BoldWidget(this.editor, null);
         });
         $("#insertheader").click(() => {
-            if (this.isFocused) {
-                new HeaderWidget(this.editor);
-            }
+            new HeaderWidget(this.editor, null);
         });
         $("#insertitalic").click(() => {
-            if (this.isFocused) {
-                new ItalicWidget(this.editor);
-            }
+            new ItalicWidget(this.editor, null);
         });
         $("#insertunderline").click(() => {
-            if (this.isFocused) {
-                new UnderlineWidget(this.editor);
-            }
+            new UnderlineWidget(this.editor, null);
         });
+
+        // parse widgets
+        this.parseWidgets(this.editor);
+    }
+
+    parseWidgets(cm) {
+        var lines : string[] = [];
+        for (var i = 0; i < cm.lineCount(); i++) {
+            var text : string = cm.getLine(i);
+            lines.push(text);
+        }
+        var widgetMap = [];
+        widgetMap["#b"] = true;
+        WidgetParser.searchForWidgets(widgetMap, lines, (type, range) => {
+            this.insertWidget(type, range);
+        });
+    }
+
+    // must make a proper register for widget types etc...
+    insertWidget(type, range) {
+        console.log("inserting widget type : " + type + ", range: " + JSON.stringify(range));
+        if (type == "#b") {
+            new BoldWidget(this.editor, range);
+        }
     }
 
     // Ctrl + J = BOLD
