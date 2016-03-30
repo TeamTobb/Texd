@@ -13,49 +13,29 @@ import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from ".
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() paragraph: Paragraph;
-    @Input() paragraphraw: string;
-    @Input() index: number;
-    // remove chapter ID and have it in service ?
     @Input() chapterId: string
-    @Input() isFocusedList: boolean[];
-    @Input() isFocused: boolean;
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
-    @Output() onFocusEmit: EventEmitter<any> = new EventEmitter();
 
-    public editable: boolean = false;
     public editor;
-    public widgets: any[];
-    public parsedParagraph: string;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
+        console.log("para: "+JSON.stringify(this.paragraph, null, 2))
+        console.log("chapterid: "+ this.chapterId);
     }
 
     //Parsing on all changes
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if (changes["isFocused"]) {
-            if (!changes["isFocused"].currentValue) {
-                this.showParsedPara();
-            }
-        }
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {       
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
         }
-
-        if (changes["paragraphraw"]) {
-            this.parsedParagraph = this.documentService.parseSingleParagraph(new Paragraph(this.paragraphraw, []));
-            if (this.editor && !this.editable) {
-                console.log(JSON.stringify(changes, null, 2))
-                this.editor.getDoc().setValue(this.paragraphraw);
-            }
-        }
     }
 
     ngAfterViewInit() {
-        this.editor = CodeMirror.fromTextArea(document.getElementById("editor" + this.index), {
+        this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "javascript",
             lineNumbers: true,
             lineWrapping: true,
@@ -72,23 +52,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 this.documentService.sendDiff(change)
             }
         });
-        // this.editor.on("focus", (cm, change) => {
-        //     // this.editor.getDoc().setValue(this.paragraphraw);
-        //     // this.isFocusedList[this.index] = true;
-        //     // this.onFocusEmit.emit(this.index);
-    
-        // });
+ 
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
         });
 
         // make this outside of this component with a loop
-        var elements = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        for (var index = 0; index < elements.length; index++) {
-            this.hideParagraph(index)
-            console.log("way too many calls? from each and loop");
-        }
-
+        
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             if (this.isFocused) {
@@ -121,30 +91,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 new BoldWidget(this.editor);
             }
         }
-    }
-
-    public showEditablePara() {
-        this.editable = true;
-        this.showParagraph(this.index)
-        this.editor.focus()
-    }
-
-    public showParsedPara() {
-        this.parsedParagraph = this.documentService.parseSingleParagraph(this.paragraph);
-        this.editable = false;
-        this.hideParagraph(this.index)
-    }
-
-    private hideParagraph(index) {
-        var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        if (element[index]) {
-            element[index].setAttribute("style", "display: none");
-        }
-    }
-
-    private showParagraph(index) {
-        var element = document.getElementsByClassName("CodeMirror cm-s-default CodeMirror-wrap")
-        element[index].setAttribute("style", "display: block");
     }
 
     private setupCMAutocomplete() {

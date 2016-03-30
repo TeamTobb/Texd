@@ -31,7 +31,6 @@ export class EditorController {
     public current_paragraph: number = 0;
     public element: ElementRef;
     private snappetParser: SnappetParser;
-    private cmFocused: boolean[] = [];
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
@@ -55,15 +54,7 @@ export class EditorController {
         });
     }
 
-    // from cmComponent output emit
-    public cmOnFocusEmit(index) {
-        this.current_paragraph = index;
-        for (var i = 0; i < this.document.chapters[this.current_chapter].paragraphs.length; i++) {
-            if (i != index) {
-                this.cmFocused[i] = false;
-            }
-        }
-    }
+
 
     //TODO implement this, to be deleted in DB
     public deleteChapterFromDB(value: string) {
