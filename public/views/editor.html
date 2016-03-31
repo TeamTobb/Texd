@@ -28,6 +28,7 @@
                     <button id="insertitalic" style="font-style: italic">italic</button>
                     <button id="insertunderline" style="text-decoration: underline;">underline</button>
                     <button id="insertheader" style="font-style: bold">header</button>
+                    <button id="insertimagetest" style="font-style: bold">imagetest</button>
                 </div>
                 <cmcomponent [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
                 [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
@@ -38,10 +39,18 @@
 
 <!-- widgets -->
 <div class="widget-templates">
-    <span contenteditable="true" class="bold-widget"></span>
+    <span class="bold-widget"></span>
     <span contenteditable="true" class="italic-widget"></span>
     <span contenteditable="true" class="underline-widget"></span>
     <h1 contenteditable="true" class="header-widget"></h1>
+
+    <div class="image-widget" style="background-color: #EEE">
+		<!-- <center> -->
+			<img class="image-frame" src="test.jpg" height="250px" width="250px">
+			<br>
+			<span class="image-text">This is some text</span>
+		<!-- </center> -->
+	</div>
 </div>
 
 <section *ngIf="showUploadDiv">

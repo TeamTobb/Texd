@@ -110,7 +110,7 @@ textarea {
     top:250px;
     border: 1 px solid black;
         padding: 5px;
-        border-radius: 3px;   
+        border-radius: 3px;
 }
 
 #uploadDiv{
@@ -122,5 +122,20 @@ textarea {
     margin-right: auto;
     left: 0;
     right: 0;
- 
+
+}
+
+.image-widget {
+    padding:10px 0;
+    background-color:#f4f4f4;
+    box-shadow:2px 2px 2px #DEDEDE;
+    width:96%;
+    margin:0 auto;
+    text-align:center
+}
+.image-text {
+    padding:3px 0 4px;
+    font-size:small;
+    margin:0 auto;
+    text-align:center
 }

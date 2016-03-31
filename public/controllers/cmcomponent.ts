@@ -5,8 +5,10 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget} from "./widget.ts";
+import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
+
+function posEq(a, b) {return a.line == b.line && a.ch == b.ch;}
 
 @Component({
     selector: 'cmcomponent',
@@ -20,6 +22,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() changeOrderText: any;
 
     public editor;
+
+    public widgetTest;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -44,13 +48,14 @@ export class CmComponent implements AfterViewInit, OnChanges {
         // parse widgets
         if (this.editor != undefined) {
             // parse widgets
-            this.parseWidgets(this.editor);
+            console.log("what?");
+            // this.parseWidgets(this.editor);
         }
     }
 
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
-            mode: "javascript",
+            mode: "none",
             lineNumbers: true,
             lineWrapping: true,
             extraKeys: {
@@ -74,7 +79,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
-            new BoldWidget(this.editor, null);
+            this.widgetTest = new BoldWidget(this.editor, null);
+            this.editor.widgetEnter = $.proxy(this.widgetTest, 'enterIfDefined', 'left');
         });
         $("#insertheader").click(() => {
             new HeaderWidget(this.editor, null);
@@ -84,6 +90,24 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
         $("#insertunderline").click(() => {
             new UnderlineWidget(this.editor, null);
+        });
+        $("#insertimagetest").click(() => {
+            new ImageWidget(this.editor, null);
+        });
+
+        this.editor.on("cursorActivity", function(cm) {
+            console.log("heeere 11");
+            if (cm.widgetEnter) {
+                console.log("okkok");
+                // check to see if movement is purely navigational, or if it
+                // doing something like extending selection
+                var cursorHead = cm.getCursor('head');
+                var cursorAnchor = cm.getCursor('anchor');
+                if (posEq(cursorHead, cursorAnchor)) {
+                    cm.widgetEnter();
+                }
+                cm.widgetEnter = undefined;
+            }
         });
 
         // parse widgets
@@ -108,6 +132,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         console.log("inserting widget type : " + type + ", range: " + JSON.stringify(range));
         if (type == "#b") {
             new BoldWidget(this.editor, range);
+            // this.editor.markText(range.from, range.to, {className: 'bold-widget'});
         }
     }
 

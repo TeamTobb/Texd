@@ -3,7 +3,7 @@
     <tbody>
         <tr *ngFor="#row of documentGrid; #i = index">
             <td *ngFor="#col of documentGrid[i]; #j = index">
-                <docview (click)="goToDocument(col.id)" [title]="documentGrid[i][j].title" [preview]="documentGrid[i][j].chapters[0].paragraphs[0].raw"></docview>                
+                <docview (click)="goToDocument(col.id)" [title]="documentGrid[i][j].title" [preview]="documentGrid[i][j].chapters[0].lines[0].raw"></docview>                
             </td>            
         </tr>
     </tbody>
