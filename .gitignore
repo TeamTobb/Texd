@@ -1,5 +1,6 @@
-node_modules/
-build/
-typings/
 *.js
+!public/lib/**
+node_modules/
+typings/
 *.map
+.vscode/*

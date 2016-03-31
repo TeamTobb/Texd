@@ -1,0 +1,8 @@
+<div>
+    child route coming below
+</div>
+<ul>
+    <li id="chapterLi" *ngFor="#chapter of chapters; #i = index" (click)="changeChapter(i)">{{chapter}}</li>
+</ul>
+<router-outlet></router-outlet>
+<br> 

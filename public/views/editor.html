@@ -1,29 +1,60 @@
 <div id="wrapper">
-  <div id="title">
-    <h1>{{title}}</h1>
-  </div>
-  <div id="body">
-    <div id="documentName">Document name: {{documentName}}</div>
-    <div id="changeDocumentName">
-      Change document name: <input id="changeDocumentNameInput" [(ngModel)]="documentName" placeholder="name">
-      <button (click)="changeName()">save</button>
-    </div>
-    <br>
-    <div id="cointainer">
-        <div id="left">
-            <textarea id="textArea" (keyup)="changeDocument()" rows="30" cols="1" [(ngModel)]="documentText"></textarea>
+    <div id="body">
+        <br>
+        <div class="btn-group" dropdown keyboardNav="true">
+            <button id="simple-btn-keyboard-nav" type="button" class="btn btn-primary" dropdownToggle>
+                Choose chapter <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
+                <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
+                *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)"></chapteritem>
+                <li class="divider dropdown-divider"></li>
+                <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
+                <li class="divider dropdown-divider"></li>
+                <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
+            </ul>
         </div>
-        <div id="center">
-            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentJSON"></textarea>
-        </div>
-        <div id="right">
-            <textarea readonly id="textArea" rows="30" cols="1" [(ngModel)]="documentHTML"></textarea>
+        <br>
+        <br>
+        <div id="title">
+            <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1></div>
+        <br>
+        <br>
+        <div id="container">
+            <div class="roundedBorder" id="center">
+                <div id="buttonsContainer">
+                    <button id="insertbold" style="font-weight: bold">bold</button>
+                    <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
+                    <button id="insertitalic" style="font-style: italic">italic</button>
+                    <button id="insertunderline" style="text-decoration: underline;">underline</button>
+                    <button id="insertheader" style="font-style: bold">header</button>
+                    <button id="insertimagetest" style="font-style: bold">imagetest</button>
+                </div>
+                <cmcomponent [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+                [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
+            </div>
         </div>
     </div>
-    <!--
-    <div id="textAreaWrapper">
-      <textarea id="textArea" (keyup)="changeDocument()" rows="80" cols="150" [(ngModel)]="documentText"></textarea>
-    </div>
-    -->
-  </div>
 </div>
+
+<!-- widgets -->
+<div class="widget-templates">
+    <span class="bold-widget"></span>
+    <span contenteditable="true" class="italic-widget"></span>
+    <span contenteditable="true" class="underline-widget"></span>
+    <h1 contenteditable="true" class="header-widget"></h1>
+
+    <div class="image-widget" style="background-color: #EEE">
+		<!-- <center> -->
+			<img class="image-frame" src="test.jpg" height="250px" width="250px">
+			<br>
+			<span class="image-text">This is some text</span>
+		<!-- </center> -->
+	</div>
+</div>
+
+<section *ngIf="showUploadDiv">
+    <div id="uploadDiv">
+        <button (click)="showUploadDivToggle(false)"> Close</button>
+    </div>
+</section>

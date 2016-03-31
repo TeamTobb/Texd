@@ -1,18 +1,22 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "watch": true
     },
     "filesGlob": [
         "./server.ts",
         "./server/**/*.ts",
         "./server/**/*.tsx",
         "!node_modules/**",
-        "!./public/**"
+        "!public/**/*.ts",
+        "!public/**/*.tsx",
+        "!typings/**/*.ts",
+        "!typings/**/*.tsx"
     ],
     "compileOnSave": true,
     "atom": {
@@ -22,7 +26,13 @@
         "./server.ts",
         "./server/dao/documentModel.ts",
         "./server/dao/messageModel.ts",
+        "./server/domain/chapter.ts",
+        "./server/domain/diff.ts",
+        "./server/domain/document.ts",
+        "./server/domain/paragraph.ts",
         "./server/resources/document.ts",
-        "./server/resources/index.ts"
+        "./server/resources/index.ts",
+        "./server/resources/plugins.ts",
+        "./server/resources/snappets.ts"
     ]
 }

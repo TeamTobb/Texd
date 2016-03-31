@@ -1,15 +1,24 @@
 import mongoose = require("mongoose");
+import document = require('../../public/domain/document');
 
-export var documentSchema = new mongoose.Schema({
-    title: String,
-    text: String,
-    idtest: String
+var lineSchema = new mongoose.Schema({
+    _raw: String,
+    _metadata: []
 });
 
-export interface IDocument extends mongoose.Document {
-    title: String;
-    text: String;
-    idtest: String;
-}
+var chapterSchema = new mongoose.Schema({
+    _header: String,
+    _lines: [lineSchema]
+});
 
-export var repository = mongoose.model<IDocument>("document", documentSchema);
+var documentSchema = new mongoose.Schema({
+    _idTest: Number,
+    _title: String,
+    _documentname: String,
+    _authors: [],
+    _chapters: [chapterSchema]
+})
+export var lineModel = mongoose.model("line", lineSchema);
+export var chapterModel = mongoose.model("chapter", chapterSchema);
+export var repository = mongoose.model("document", documentSchema); 
+

@@ -17,19 +17,21 @@
   },
   "homepage": "https://github.com/TeamTobb/MEAN-Typescript-Angular2-Skeleton#readme",
   "dependencies": {
-    "es6-shim": "latest",
-    "reflect-metadata": "latest",
-    "rxjs": "latest",
-    "zone.js": "latest",
     "angular2": "latest",
     "body-parser": "latest",
+    "es6-shim": "latest",
     "express": "^4.13.3",
     "kerberos": "latest",
+    "moment": "latest",
     "mongodb": ">= 1.4.29",
     "mongoose": "latest",
+    "ng2-bootstrap": "^1.0.3",
+    "reflect-metadata": "latest",
+    "rxjs": "latest",
     "systemjs": "0.19.6",
+    "typescript": "latest",
     "ws": "^1.0.1",
-    "typescript": "latest"
+    "zone.js": "latest"
   },
   "devDependencies": {
     "jasmine-core": "2.4.1"
