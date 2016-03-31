@@ -181,20 +181,23 @@ export function updateDocumentText(diff, callback){
                     console.log(error);
                 } else{
                     var lines = document[0]["_chapters"][0]["_lines"];
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-    
-                    if(fromLine == toLine){
-                        var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw; 
-                    } else if (fromLine != toLine) {
-                        var firstRaw = firstLine.slice(0, fromCh);
-                        var lastRaw = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRaw + lastRaw;
-                        lines.splice(fromLine+1, diff.removed.length-1); 
+                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == ""){
+                        var endraw = lines[diff.to.line]._raw.slice(0); 
+                        lines[diff.from.line]._raw += endraw; 
+                        lines.splice(diff.to.line, 1)
+                    } else {
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        if(fromLine == toLine){
+                            var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw; 
+                        } else if (fromLine != toLine) {
+                            var firstRaw = firstLine.slice(0, fromCh);
+                            var lastRaw = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRaw + lastRaw;
+                            lines.splice(fromLine+1, diff.removed.length-1); 
+                        }
                     }
-                    
-                    
                     var query = {$set: {}};
                     query["_chapters.0._lines"] = lines
                     repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
