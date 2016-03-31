@@ -1,4 +1,4 @@
-class Paragraph {
+class Line {
     private _id: string;
     private _raw: string;
     private _metadata: any[];
@@ -33,4 +33,4 @@ class Paragraph {
     }
 }
 
-export = Paragraph; 
+export = Line; 

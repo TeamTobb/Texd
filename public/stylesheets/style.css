@@ -25,7 +25,7 @@ textarea {
 #body {
   margin-left: auto;
   margin-right: auto;
-  width: 80%;
+  width: 90%;
   font-size: 16px;
 }
 
@@ -48,16 +48,6 @@ textarea {
   display: flex;
 }
 
-#textArea {
-  outline: none;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  border: 3px solid #888;
-  resize: none;
-  font-size: 14px;
-}
-
 /* testing */
 
 #cointainer {
@@ -66,22 +56,86 @@ textarea {
     overflow: hidden; /* contain floated elements */
     background: #ccc
 }
-#left {
-    float: left;
-    width: 15%;
-    background-color: #bbb;
-}
+
 #center {
     float: left;
     background-color: #eee;
-    width: 60%;
+    width: 100%;
 }
-#right {
-    float: left;
-    width: 25%;
-    /*background-color: #bbb;*/
-}
+
 
 #chapterLi:hover {
     color: blue;
+}
+
+
+#chapterItem {
+    margin-left: 2em;
+
+}
+
+#chapterItem:hover {
+    background-color: #ccc
+}
+
+.roundedBorder {
+    border: 2px solid black;
+      padding: 50px;
+      outline: black solid 5px;
+      outline-offset: 5px;
+  }
+.widget-templates {display:none}
+
+.bold-widget {
+    font-weight: bold;
+}
+
+.italic-widget {
+    font-style: italic;
+}
+
+.underline-widget {
+    text-decoration: underline;
+}
+
+.header-widget {
+
+}
+
+#buttonsContainer {
+    width: 84.5%;
+    background-color: #ccc;
+    position:fixed;
+    z-index: 99;
+    top:250px;
+    border: 1 px solid black;
+        padding: 5px;
+        border-radius: 3px;
+}
+
+#uploadDiv{
+    background-color: greenyellow;
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+
+}
+
+.image-widget {
+    padding:10px 0;
+    background-color:#f4f4f4;
+    box-shadow:2px 2px 2px #DEDEDE;
+    width:96%;
+    margin:0 auto;
+    text-align:center
+}
+.image-text {
+    padding:3px 0 4px;
+    font-size:small;
+    margin:0 auto;
+    text-align:center
 }

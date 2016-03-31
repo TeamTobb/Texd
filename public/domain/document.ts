@@ -18,11 +18,11 @@ export class Document {
             for (var i = 0; i < payload._chapters.length; i++) {
                 this._chapters.push(new Chapter(payload._chapters[i]._header, []));
                 this._chapters[i].id = payload._chapters[i]._id;
-                var paragraphLength = payload._chapters[i]._paragraphs.length;
+                var lineLength = payload._chapters[i]._lines.length;
 
-                for (var j = 0; j < paragraphLength; j++) {
-                    this._chapters[i].paragraphs[j] = new Paragraph(payload._chapters[i]._paragraphs[j]._raw, payload._chapters[i]._paragraphs[j]._metadata);
-                    this._chapters[i].paragraphs[j].id = payload._chapters[i]._paragraphs[j]._id;
+                for (var j = 0; j < lineLength; j++) {
+                    this._chapters[i].lines[j] = new Line(payload._chapters[i]._lines[j]._raw, payload._chapters[i]._lines[j]._metadata);
+                    this._chapters[i].lines[j].id = payload._chapters[i]._lines[j]._id;
                 }
             }
         } else if (idTest && title && documentname && authors && chapters) {
@@ -87,11 +87,11 @@ export class Document {
 export class Chapter {
     private _id: string;
     private _header: string;
-    private _paragraphs: Paragraph[];
+    private _lines: Line[];
 
-    constructor(header, paragraphs) {
+    constructor(header, lines) {
         this._header = header;
-        this._paragraphs = paragraphs;
+        this._lines = lines;
     }
 
     get id(): string {
@@ -110,16 +110,16 @@ export class Chapter {
         this._header = value;
     }
 
-    get paragraphs(): Paragraph[] {
-        return this._paragraphs;
+    get lines(): Line[] {
+        return this._lines;
     }
 
-    set paragraphs(value) {
-        this._paragraphs = value;
+    set lines(value) {
+        this._lines = value;
     }
 }
 
-export class Paragraph {
+export class Line {
     private _id: string;
     private _raw: string;
     private _metadata: any[];

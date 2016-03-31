@@ -4,22 +4,11 @@ export class Parser {
     private hashMap: { [id: string]: Plugin } = {};
 
     constructor(hashMap: any) {
-        this.hashMap = hashMap;
+        this.hashMap = hashMap; 
     }
 
     public getParsedJSON(inputText: Paragraph[]): string {
-        return this.parseText(this.hashMap, inputText);
-    }
 
-    public parseString(str) {
-        var re = /(?:")([^"]+)(?:")|([^\s"]+)(?=\s+|$)/g;
-        var res = [], arr = null;
-        while (arr = re.exec(str)) { res.push(arr[1] ? arr[1] : arr[0]); }
-        return res;
-    }
-
-    public parseText(hashMap: any, inputText: Paragraph[]): string {
-        var outputJSON: any = {};
         var mergedParas = "";
         for (var para in inputText) {
             mergedParas += " #p ";
@@ -29,6 +18,29 @@ export class Parser {
         var list = this.parseString(mergedParas);
         for (var i = 0; i < list.length; i++) list[i] += " ";
 
+        
+        return this.parseText(this.hashMap, list);
+    }
+    
+     public getParsedJSONSingle(inputText: Paragraph): string {
+        var list = this.parseString(inputText.raw);
+        for (var i = 0; i < list.length; i++) list[i] += " ";
+        return this.parseText(this.hashMap, list);
+    }
+
+    public parseString(str) {
+        var re = /(?:")([^"]+)(?:")|([^\s"]+)(?=\s+|$)/g;
+        var res = [], arr = null;
+        while (arr = re.exec(str)) { res.push(arr[1] ? arr[1] : arr[0]); }
+        return res;
+    }
+    
+    public parseText(hashMap: any, inputText: any[]): string {
+        
+         var outputJSON: any = {};
+        
+        var list = inputText;
+        
         var refStack: any = [];
         var tempText: string = "";
         var attributeList: any[] = [];

@@ -1,6 +1,8 @@
 <div id="wrapper">
-    <h1>{{title}}</h1>
-    <button (click)="goToDashboard()">Dashboard</button>
-    <button (click)="goToSettings()">Settings</button>
+    <tabset>
+        <tab heading="Dashboard" (select)="goToDashboard()"></tab>
+        <tab heading="Settings" (select)="goToSettings()"></tab>
+    </tabset>
     <router-outlet></router-outlet>
 </div>
+

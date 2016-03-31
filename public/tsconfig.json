@@ -19,6 +19,7 @@
     },
     "files": [
         "controllers/chapteritem.ts",
+        "controllers/cmcomponent.ts",
         "controllers/dashboard.ts",
         "controllers/docview.ts",
         "controllers/editor.ts",
@@ -26,11 +27,13 @@
         "controllers/mainview.ts",
         "controllers/settings.ts",
         "controllers/settingspage.ts",
+        "controllers/widget.ts",
         "utils/jsonToHtml.ts",
         "utils/keymap.ts",
         "utils/parseMap.ts",
         "utils/parser.spec.ts",
         "utils/parser.ts",
+        "utils/snappetParser.ts",
         "domain/diff.ts",
         "domain/document.ts",
         "data_access/document.ts"

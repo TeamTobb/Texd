@@ -10,7 +10,7 @@ export class jsonToHtml {
     public iterate(obj, stack) {
         var temp_html = "";
         for (var property in obj) {
-            console.log(property);
+            // console.log(property);
             if (property == "attributes") {
                 // do nothing
             }
@@ -35,7 +35,7 @@ export class jsonToHtml {
     public getParsedHTML(inputJSON: string): string {
         var content = JSON.parse(inputJSON).content;
         var t = this.iterate(content, '');
-        console.log(t);
+        // console.log(t);
         return t;
     }
 }

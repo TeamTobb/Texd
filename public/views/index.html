@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>MEAN skeleton</title>
+    <title>Texd</title>
     <script>
         document.write('<base href="' + document.location.origin + '" />');
     </script>
@@ -12,20 +12,70 @@
     <script src="rxjs/bundles/Rx.js"></script>
     <script src="angular2/bundles/angular2.js"></script>
     <script src="angular2/bundles/http.dev.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <!-- use internal instead of external router.dev.js -->
     <script src="https://code.angularjs.org/2.0.0-beta.3/router.dev.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+    
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="lib/codemirror/codemirror/lib/codemirror.css">
+    <script src="lib/codemirror/codemirror/lib/codemirror.js"></script>
+    
+    <script src="lib/codemirror/codemirror/addon/hint/show-hint.js"></script>
+        
+    <script src="lib/codemirror/codemirror/mode/javascript/javascript.js"></script>     
+    <!-- Tern JS -->
+    <script src="lib/codemirror/ternjs/acorn/dist/acorn.js"></script>
+    <script src="lib/codemirror/ternjs/acorn/dist/acorn_loose.js"></script>
+    <script src="lib/codemirror/ternjs/acorn/dist/walk.js"></script>
+    <script src="lib/codemirror/ternjs/tern/lib/signal.js"></script>
+    <script src="lib/codemirror/ternjs/tern/lib/tern.js"></script>
+    <script src="lib/codemirror/ternjs/tern/lib/infer.js"></script>
+
+    <!-- Official CodeMirror Tern addon -->
+    <script src="lib/codemirror/codemirror/addon/tern/tern.js"></script>   
+    <!-- Extension of CodeMirror Tern addon -->
+    <script src="lib/codemirror/codemirror-javascript/addon/hint/tern/tern-extension.js"></script>
+        
+    <!-- CodeMirror Extension -->  
+    <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/show-hint-eclipse.css">
+    <script src="lib/codemirror/codemirror-extension/addon/hint/show-context-info.js"></script>
+    <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/show-context-info.css">
+    
+    <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/templates-hint.css">
+    <script src="lib/codemirror/codemirror-extension/addon/hint/templates-hint.js"></script>
+    
+    <!-- CodeMirror Javascript -->
+    <script src="lib/codemirror/codemirror-hashscript/addon/hint/hashscript/hashscript-templates.js"></script>
+    <!--keeping JS templates for testing purposes-->
+    <script src="lib/codemirror/codemirror-javascript/addon/hint/javascript/javascript-templates.js"></script>
+
+    <!-- bootstrap -->
+    <script src="ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
     <script>
         System.config({
         transpiler: 'typescript',
         typescriptOptions: { emitDecoratorMetadata: true },
-        packages: {'controllers': {defaultExtension: 'ts'}}
+        packages: {'controllers': {defaultExtension: 'ts'}},
+        map: {
+            moment: 'moment/moment.js'
+    }
       });
       System.import('controllers/index')
             .then(null, console.error.bind(console));
     </script>
+
+    <!-- TODO remove -->
+    <script>     
+      $(window).scroll(function () {
+          $("#buttonsContainer").css("top", Math.max(0, 250 - $(this).scrollTop()));
+      });
+    </script>
+
 </head>
 
 <body>
