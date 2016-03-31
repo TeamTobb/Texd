@@ -103,20 +103,8 @@ export function update(req: express.Request, res: express.Response) {
 }
     	
 export function updateDocumentText(diff, callback){ 
-    console.log("updateDocumentText: " + JSON.stringify(diff, null, 2))
-//     console.log("documentController.testUpdateDocument()"); 
-//     var chaptersIndex = "_chapters.$._paragraphs"
-//     var chaptersIndexWithDot = "_chapters.$._paragraphs."
-// ​
-//     var query = {$set: {}};
-//     query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
-    
-//     var newLine = new lineModel({_raw: "...", _metadata: []});
-// ​
-//     var paraQuery = {$push: {}};
-//     paraQuery.$push[chaptersIndex] = {$each: [newLine], $position: diff.index+1};
+    console.log("updateDocumentText: " + JSON.stringify(diff, null, 2));
     if(diff.newchapter){
-        
         var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _lines: [{_raw: "...", _metadata: []}]});
         repository.update(
             {_id: diff.documentId},
@@ -136,29 +124,69 @@ export function updateDocumentText(diff, callback){
             });
     } 
     else if (typeof (diff.from !== 'undefined')){
+        console.log("trying to update: " + JSON.stringify(diff, null, 2));
         if(diff.origin == '+input'){
             var query = {$set: {}};
-            var paragraphset = "_chapters.0._lines." + diff.from.line
+            var paragraphset = "_chapters.0._lines." + diff.from.line;
             
             repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
                 if(error){
-                    console.log(error)
+                    console.log(error);
                 } else{
+                    console.log("document: " + JSON.stringify(document, null, 2));
                     var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
+                    console.log("raw: " + raw);
                     var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
-                    var newLine = {_raw: newraw, _metadata: []}
-                    query.$set[paragraphset] = newLine
+                    var newLine = {_raw: newraw, _metadata: []};
+                    query.$set[paragraphset] = newLine;
                     repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                         if(error){
-                            console.log(error)
+                            console.log(error);
                         } else{
-                            console.log("successfully updated line")
+                            console.log("successfully updated line");
                         }
                     })                
                 }
             })
-        }
-        else if (diff.origin == '+delete'){
+        } else if (diff.origin == '+delete'){ 
+            var fromLine = diff.from.line;
+            var fromCh = diff.from.ch; 
+            var toLine = diff.to.line;
+            var toCh = diff.to.ch; 
+            
+            var query = {$set: {}};
+            var paragraphset = "_chapters.0._lines." + fromLine;
+            
+            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
+                if(error){
+                    console.log(error);
+                } else{
+                    var lines = document[0]["_chapters"][0]["_lines"];
+                    var firstLine: String = lines[fromLine]._raw;
+                    var lastLine: String = lines[toLine]._raw;
+    
+                    if(fromLine == toLine){
+                        var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
+                        lines[fromLine]._raw = newraw; 
+                    } else if (fromLine != toLine) {
+                        var firstRaw = firstLine.slice(0, fromCh);
+                        var lastRaw = lastLine.slice(toCh);
+                        lines[fromLine]._raw = firstRaw + lastRaw;
+                        lines.splice(fromLine+1, diff.removed.length-1); 
+                    }
+                    
+                    
+                    var query = {$set: {}};
+                    query["_chapters.0._lines"] = lines
+                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
+                        if(error){
+                            console.log(error);
+                        } else {
+                            console.log("successfully deleted from line");
+                        }
+                    })
+                }
+            })
             
         } else if (diff.origin == 'cut'){
             
@@ -166,22 +194,4 @@ export function updateDocumentText(diff, callback){
             
         }
     }
-    
-    // else if (diff.newelement){
-    //     repository.update({
-    //         _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
-    //         if(error){
-    //             console.log(error)
-    //         }else{
-    //             callback(newLine._id)
-    //         }
-    //     })
-    // } else{
-    //         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
-    //             if(error){
-    //             } else {
-    //                 callback("");
-    //             }
-    //     });
-    // }
 }
