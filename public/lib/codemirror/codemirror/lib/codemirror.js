@@ -4975,7 +4975,8 @@
         for (var i = 0; i < len; i++) {
           var range = cm.listSelections()[i];
           cm.replaceRange("\n", range.anchor, range.head, "+input");
-          cm.indentLine(range.from().line + 1, null, true);
+        //   We no want
+        //   cm.indentLine(range.from().line + 1, null, true);
           ensureCursorVisible(cm);
         }
       });
