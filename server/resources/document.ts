@@ -133,19 +133,38 @@ export function updateDocumentText(diff, callback){
                 if(error){
                     console.log(error);
                 } else{
-                    console.log("document: " + JSON.stringify(document, null, 2));
-                    var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
-                    console.log("raw: " + raw);
-                    var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
-                    var newLine = {_raw: newraw, _metadata: []};
-                    query.$set[paragraphset] = newLine;
-                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
-                        if(error){
-                            console.log(error);
-                        } else{
-                            console.log("successfully updated line");
-                        }
-                    })                
+                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch){
+                        var lines = document[0]["_chapters"][0]["_lines"];
+                        var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
+                        var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch); 
+                        var line = new lineModel({_raw: raw, metadata: []})
+                        
+                        lines[diff.from.line]._raw = firstRaw
+                        
+                        lines.splice(diff.from.line+1, 0, line)
+                        var query2 = {$set: {}};
+                        query2["_chapters.0._lines"] = lines
+                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query2, (error, document2) => {
+                            if(error){
+                                console.log(error)
+                            } else{
+                                console.log("successfully spliced array")
+                            }
+                        })
+                            
+                    } else {
+                        var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
+                        var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
+                        var newLine = {_raw: newraw, _metadata: []};
+                        query.$set[paragraphset] = newLine;
+                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
+                            if(error){
+                                console.log(error);
+                            } else{
+                                console.log("successfully updated line");
+                            }
+                        })       
+                    }            
                 }
             })
         } else if (diff.origin == '+delete'){ 
