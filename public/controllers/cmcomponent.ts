@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, Output, AfterViewInit, ElementRef, OnChanges, SimpleChange} from 'angular2/core';
 import {NgIf} from 'angular2/common';
 import {Router} from 'angular2/router';
-import {Document, Paragraph, Chapter} from '../domain/document.ts';
+import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
@@ -15,7 +15,7 @@ function posEq(a, b) {return a.line == b.line && a.ch == b.ch;}
     templateUrl: 'views/components/cmcomponent.html'
 })
 export class CmComponent implements AfterViewInit, OnChanges {
-    @Input() paragraph: Paragraph;
+    @Input() lines: Line[];
     @Input() chapterId: string
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
@@ -27,12 +27,20 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
-        console.log("para: "+JSON.stringify(this.paragraph, null, 2))
-        console.log("chapterid: "+ this.chapterId);
+        console.log("chapterid: " + this.chapterId);
     }
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+        if (changes["lines"] && this.editor !== undefined) {
+            var arr = [];
+            for (var line in this.lines) {
+                arr.push(this.lines[line].raw)
+            }
+            console.log("arr: " + JSON.stringify(arr, null, 2))
+            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 })
+        }
+
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
@@ -57,10 +65,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         this.editor.on("change", (cm, change) => {
             // console.log("Change: " + JSON.stringify(change, null, 2))
             console.log(change)
-            if (typeof(change.origin) !== 'undefined'){
+            if (typeof (change.origin) !== 'undefined') {
                 console.log("We hav eorigin")
-                this.paragraph.raw = cm.getValue();
-                this.documentService.sendDiff(change)
+                this.documentService.sendDiff(change, this.chapterId)
             }
         });
 
@@ -104,13 +111,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
 
         // parse widgets
-        // this.parseWidgets(this.editor);
+        // this.parseWidgets(this.editor, null);
     }
 
     parseWidgets(cm) {
-        var lines : string[] = [];
+        var lines: string[] = [];
         for (var i = 0; i < cm.lineCount(); i++) {
-            var text : string = cm.getLine(i);
+            var text: string = cm.getLine(i);
             lines.push(text);
         }
         var widgetMap = [];
@@ -135,7 +142,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log(e);
             if (e.code === "KeyJ") {
                 console.log("test");
-                new BoldWidget(this.editor);
+                new BoldWidget(this.editor, null);
             }
         }
     }

@@ -26,6 +26,7 @@ var server = new WebSocketServer({ port: wsPort });
 server.on('connection', ws => {
     ws.on('message', message => {
         console.log("recived socket message on server");
+        documentRoutes.updateDocumentText(JSON.parse(message), () => {})
         // try {
         //     var obj = JSON.parse(message);
         //     if (obj.newDiff) {
