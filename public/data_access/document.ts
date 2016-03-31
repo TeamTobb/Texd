@@ -148,10 +148,12 @@ export class DocumentService {
         return this._jsonParser.getParsedHTML(parsedJSON);
     } 
     
-    public sendDiff(diff: any) {
+    public sendDiff(diff: any, chapterId: string) {
         // diff.documentId = this.document.id
         // this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
-        diff.senderId = this._senderId
+        diff.senderId = this._senderId;
+        diff.documentId = this.document.id;
+        diff.chapterId = chapterId;
         this._socket.send(JSON.stringify(diff))
     }
 

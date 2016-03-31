@@ -1,12 +1,12 @@
-import Paragraph = require('./paragraph')
+import Line = require('./line')
 class Chapter{
     private _id: string;
     private _header: string;
-    private _paragraphs: Paragraph[];
+    private _lines: Line[];
 
     constructor(header, paragraphs){
         this._header = header;
-        this._paragraphs = paragraphs;
+        this._lines = paragraphs;
     }
 
     get id(): string{
@@ -25,12 +25,12 @@ class Chapter{
         this._header = value;
     }
 
-    get paragraphs(): Paragraph[] {
-        return this._paragraphs;
+    get paragraphs(): Line[] {
+        return this._lines;
     }
 
     set paragraphs(value){
-        this._paragraphs = value;
+        this._lines = value;
     }
 }
 

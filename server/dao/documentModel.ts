@@ -8,7 +8,7 @@ var lineSchema = new mongoose.Schema({
 
 var chapterSchema = new mongoose.Schema({
     _header: String,
-    _paragraphs: [lineSchema]
+    _lines: [lineSchema]
 });
 
 var documentSchema = new mongoose.Schema({
@@ -18,7 +18,7 @@ var documentSchema = new mongoose.Schema({
     _authors: [],
     _chapters: [chapterSchema]
 })
-export var paragraphModel = mongoose.model("paragraph", lineSchema);
+export var lineModel = mongoose.model("line", lineSchema);
 export var chapterModel = mongoose.model("chapter", chapterSchema);
 export var repository = mongoose.model("document", documentSchema); 
 

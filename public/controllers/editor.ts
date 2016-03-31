@@ -76,7 +76,7 @@ export class EditorController {
         var p = new Paragraph("Text", []);
         this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [p]));
         var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
-        this.documentService.sendDiff(diff);
+        // this.documentService.sendDiff(diff);
         this.current_chapter += 1;
     }
 
@@ -105,7 +105,7 @@ export class EditorController {
         keyMap[78] = () => {
             this.document.chapters[this.current_chapter].paragraphs.splice(this.current_paragraph + 1, 0, new Paragraph("...", []));
             var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, "", new Paragraph("...", []), this.current_paragraph, true, false)
-            this.documentService.sendDiff(diff);
+            // this.documentService.sendDiff(diff);
         }
         keyMap[80] = () => {
             console.log("ctrl+p");

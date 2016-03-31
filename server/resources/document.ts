@@ -4,12 +4,12 @@ import documentModel = require("../dao/documentModel");
 import IDocument = require('../dao/documentModel');
 import Document = require("../../server/domain/document");
 import Chapter = require('../../server/domain/chapter')
-import Paragraph = require('../../server/domain/paragraph')
+import Line = require('../../server/domain/line')
 import Diff = require("../../server/domain/diff");
 var bodyParser = require('body-parser');
 import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
-import paragraphModel = documentModel.paragraphModel; 
+import lineModel = documentModel.lineModel; 
 
 
 export function read(req: express.Request, res: express.Response) {
@@ -25,21 +25,21 @@ export function read(req: express.Request, res: express.Response) {
 
 export function getDocuments(req: express.Request, res: express.Response){
     console.log("getDocuments()"); 
-    var paragraphs1 = [new Paragraph("Doc1 paragraph1", []), new Paragraph("Doc1 paragraph2", []), new Paragraph("Doc1 paragraph3", [])];
-    var paragraphs2 = [new Paragraph("Doc2 paragraph1", []), new Paragraph("Doc2 paragraph2", []), new Paragraph("Doc2 paragraph3", [])];
-    var paragraphs3 = [new Paragraph("Doc3 paragraph1", []), new Paragraph("Doc3 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs4 = [new Paragraph("Doc4 paragraph1", []), new Paragraph("Doc4 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs5 = [new Paragraph("Doc5 paragraph1", []), new Paragraph("Doc5 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs6 = [new Paragraph("Doc6 paragraph1", []), new Paragraph("Doc6 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
-    var paragraphs7 = [new Paragraph("Doc7 paragraph1", []), new Paragraph("Doc7 paragraph2", []), new Paragraph("Doc3 paragraph3", [])];
+    var lines1 = [new Line("Doc1 line1", []), new Line("Doc1 line2", []), new Line("Doc1 line3", [])];
+    var lines2 = [new Line("Doc2 line1", []), new Line("Doc2 line2", []), new Line("Doc2 line3", [])];
+    var lines3 = [new Line("Doc3 line1", []), new Line("Doc3 line2", []), new Line("Doc3 line3", [])];
+    var lines4 = [new Line("Doc4 line1", []), new Line("Doc4 line2", []), new Line("Doc3 line3", [])];
+    var lines5 = [new Line("Doc5 line1", []), new Line("Doc5 line2", []), new Line("Doc3 line3", [])];
+    var lines6 = [new Line("Doc6 line1", []), new Line("Doc6 line2", []), new Line("Doc3 line3", [])];
+    var lines7 = [new Line("Doc7 line1", []), new Line("Doc7 line2", []), new Line("Doc3 line3", [])];
     
-    var chapters1 = [new Chapter("Doc1 chapter1", paragraphs1)];
-    var chapters2 = [new Chapter("Doc2 chapter1", paragraphs2)];
-    var chapters3 = [new Chapter("Doc3 chapter1", paragraphs3)];
-    var chapters4 = [new Chapter("Doc4 chapter1", paragraphs4)];
-    var chapters5 = [new Chapter("Doc5 chapter1", paragraphs5)];
-    var chapters6 = [new Chapter("Doc6 chapter1", paragraphs6)];
-    var chapters7 = [new Chapter("Doc7 chapter1", paragraphs7)];
+    var chapters1 = [new Chapter("Doc1 chapter1", lines1)];
+    var chapters2 = [new Chapter("Doc2 chapter1", lines2)];
+    var chapters3 = [new Chapter("Doc3 chapter1", lines3)];
+    var chapters4 = [new Chapter("Doc4 chapter1", lines4)];
+    var chapters5 = [new Chapter("Doc5 chapter1", lines5)];
+    var chapters6 = [new Chapter("Doc6 chapter1", lines6)];
+    var chapters7 = [new Chapter("Doc7 chapter1", lines7)];
     
     var document1 = new Document(1, "Title 1", "Name 1", ["Jorgen", "Borgar"], chapters1);
     var document2 = new Document(2, "Title 2", "Name 2", ["Jorgen", "Bjon"], chapters2);
@@ -102,20 +102,22 @@ export function update(req: express.Request, res: express.Response) {
     }
 }
     	
-export function updateDocumentText(diff: Diff, callback){ 
-    console.log("documentController.testUpdateDocument()"); 
-    var chaptersIndex = "_chapters.$._paragraphs"
-    var chaptersIndexWithDot = "_chapters.$._paragraphs."
-​
-    var query = {$set: {}};
-    query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
+export function updateDocumentText(diff, callback){ 
+    console.log("updateDocumentText: " + JSON.stringify(diff, null, 2))
+//     console.log("documentController.testUpdateDocument()"); 
+//     var chaptersIndex = "_chapters.$._paragraphs"
+//     var chaptersIndexWithDot = "_chapters.$._paragraphs."
+// ​
+//     var query = {$set: {}};
+//     query.$set[chaptersIndexWithDot + diff.index] = diff.paragraph
     
-    var newParagraph = new paragraphModel({_raw: "...", _metadata: []});
-​
-    var paraQuery = {$push: {}};
-    paraQuery.$push[chaptersIndex] = {$each: [newParagraph], $position: diff.index+1};
+//     var newLine = new lineModel({_raw: "...", _metadata: []});
+// ​
+//     var paraQuery = {$push: {}};
+//     paraQuery.$push[chaptersIndex] = {$each: [newLine], $position: diff.index+1};
     if(diff.newchapter){
-        var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _paragraphs: [{_raw: "...", _metadata: []}]});
+        
+        var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _lines: [{_raw: "...", _metadata: []}]});
         repository.update(
             {_id: diff.documentId},
             { $push:
@@ -132,21 +134,54 @@ export function updateDocumentText(diff: Diff, callback){
                     callback(newChapter._id);
                 }
             });
-    } else if (diff.newelement){
-        repository.update({
-            _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
-            if(error){
-                console.log(error)
-            }else{
-                callback(newParagraph._id)
-            }
-        })
-    } else{
-            repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
+    } 
+    else if (typeof (diff.from !== 'undefined')){
+        if(diff.origin == '+input'){
+            var query = {$set: {}};
+            var paragraphset = "_chapters.0._lines." + diff.from.line
+            
+            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
                 if(error){
-                } else {
-                    callback("");
+                    console.log(error)
+                } else{
+                    var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
+                    var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
+                    var newLine = {_raw: newraw, _metadata: []}
+                    query.$set[paragraphset] = newLine
+                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
+                        if(error){
+                            console.log(error)
+                        } else{
+                            console.log("successfully updated line")
+                        }
+                    })                
                 }
-        });
+            })
+        }
+        else if (diff.origin == '+delete'){
+            
+        } else if (diff.origin == 'cut'){
+            
+        } else if (diff.origin == 'paste'){
+            
+        }
     }
+    
+    // else if (diff.newelement){
+    //     repository.update({
+    //         _id: diff.documentId, '_chapters._id': diff.chapterId}, paraQuery, (error, document2) =>{
+    //         if(error){
+    //             console.log(error)
+    //         }else{
+    //             callback(newLine._id)
+    //         }
+    //     })
+    // } else{
+    //         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": diff.chapterId}, query, (error, document2) => {
+    //             if(error){
+    //             } else {
+    //                 callback("");
+    //             }
+    //     });
+    // }
 }
