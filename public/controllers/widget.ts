@@ -154,6 +154,9 @@ export function BoldWidget(cm, optRange) {
         var to = cm.getCursor("to");
         // this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
         this.mark = cm.markText(from, to, {className: 'bold-widget'});
+        // this.mark = cm.removeLineClass(1, "wrap", "bold-widget");
+
+
 
         cm.markText(from, {line: from.line, ch: from.ch+4}, {replacedWith: this.domNode, clearWhenEmpty: false});
         cm.markText({line: to.line, ch: to.ch-3}, to, {replacedWith: this.domNodeEnd, clearWhenEmpty: false});
@@ -301,14 +304,14 @@ UnderlineWidget.prototype.setValue = function(val) {
 
 // t.change($.proxy(this, 'updateText')); ???????? on the stuff...
 
-
 export function ImageWidget(cm, optRange) {
+    this.injectImage(cm, null);
+}
+ImageWidget.prototype = Object.create(Widget.prototype)
+ImageWidget.prototype.injectImage = function(cm, optRange) {
     this.node = $(".widget-templates .image-widget").clone();
-
     this.domNode = this.node[0];
     Widget.apply(this, arguments);
-    // this.node[0].textContent = this.value;
-
     // parse the obj
     var list = this.value.split(" ");
     var imgobj = {};
@@ -326,31 +329,64 @@ export function ImageWidget(cm, optRange) {
         }
     }
     console.log(JSON.stringify(imgobj));
-
-    // cm.replaceSelection(" #img " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {readOnly: true, replacedWith: this.domNode, clearWhenEmpty: false});
+    var from;
+    var to;
+    if(optRange) {
+        console.log("optRange is set in new Inject Image");
+        from = optRange.from;
+        console.log("from: ");
+        console.log(from);
+        to = optRange.to;
+        console.log("to: ");
+        console.log(to);
+    } else {
+        from = cm.getCursor("from");
+        console.log("from");
+        console.log(from);
+        to = cm.getCursor("to");
+        console.log("to");
+        console.log(to);
+    }
+    this.mark = cm.markText(from, to, {readOnly: false, replacedWith: this.domNode, clearWhenEmpty: false});
 
     //"<img id='$ref' src='$src' height='$height' width='$width' alt='$value'>",
-    // #img @id "docs/test.png" test @src "kk" @height "20px" @width "40px" testhei #
-    console.log(this.node);
+    // #img @id "testpng" test @src "docs/test.png" @height "20px" @width "40px" testhei #
     var image = this.node.find('.image-frame');
-    console.log(image);
     // what if null ?
-    console.log(imgobj["src"]);
     image[0].attributes[1].nodeValue = imgobj["height"];
     image[0].attributes[2].nodeValue = imgobj["src"];
     image[0].attributes[3].nodeValue = imgobj["width"];
-
-    image[0].src = imgobj["src"];
-
     var text = this.node.find('.image-text');
-    console.log(text);
     text[0].textContent = imgobj["text"];
 
+    this.textrangeFrom = from;
+    this.textrangeTo = to;
+    this.textrangeTo.ch -= 1;
+
+    this.node[0].addEventListener("click", () => {
+        console.log("click");
+        var newSpan = $(".widget-templates .image-edit").clone();
+        newSpan[0].textContent = this.value;
+        this.node[0].parentNode.removeChild(this.node[0]);
+        cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo);
+        // true clear when empty ??
+        this.mark = cm.markText(this.textrangeFrom, this.textrangeTo, {replacedWith: newSpan[0], clearWhenEmpty: false});
+        newSpan[0].focus();
+        // listener for the new span
+        newSpan[0].addEventListener("blur", () => {
+            console.log("blur");
+            this.value = newSpan[0].textContent;
+            // remove this span
+            newSpan[0].parentNode.removeChild(newSpan[0]);
+            // this needs to triger a change and send to others on websoket.. origin??
+            // ???? TODO:: fix
+            cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo);
+            this.injectImage(cm, {from: this.textrangeFrom, to: this.textrangeTo});
+            // cm.replaceRange()
+        }, false);
+        // what does false do here??
+    }, false);
 
     cm.setCursor(to);
     cm.refresh();
 }
-ImageWidget.prototype = Object.create(Widget.prototype)
