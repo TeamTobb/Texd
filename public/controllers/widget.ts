@@ -304,6 +304,9 @@ UnderlineWidget.prototype.setValue = function(val) {
 
 // t.change($.proxy(this, 'updateText')); ???????? on the stuff...
 
+
+// TODO: BUG: FIX: When marking the entire line and placing imagewidget, it will eat up the coming lines for each time you change the value of the image (click & blur)
+// TODO:: need to replace the range after changing the content of the #img ... #, click -> input -> change range -> blur
 export function ImageWidget(cm, optRange) {
     this.injectImage(cm, null);
 }
@@ -361,7 +364,7 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
 
     this.textrangeFrom = from;
     this.textrangeTo = to;
-    this.textrangeTo.ch -= 1;
+    // this.textrangeTo.ch -= 1;
 
     this.node[0].addEventListener("click", () => {
         console.log("click");
@@ -369,6 +372,7 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
         newSpan[0].textContent = this.value;
         this.node[0].parentNode.removeChild(this.node[0]);
         cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo);
+        // cm.replaceRange("" + this.value + "", {line: this.textrangeFrom.line, ch: this.textrangeFrom.ch+1}, {line: this.textrangeTo.line, ch: this.textrangeTo.ch-1});
         // true clear when empty ??
         this.mark = cm.markText(this.textrangeFrom, this.textrangeTo, {replacedWith: newSpan[0], clearWhenEmpty: false});
         newSpan[0].focus();
@@ -376,11 +380,20 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
         newSpan[0].addEventListener("blur", () => {
             console.log("blur");
             this.value = newSpan[0].textContent;
+            console.log("value:::::");
+            console.log(this.value);
             // remove this span
             newSpan[0].parentNode.removeChild(newSpan[0]);
             // this needs to triger a change and send to others on websoket.. origin??
             // ???? TODO:: fix
-            cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo);
+
+            // this.textrangeFrom =
+            cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo, "+input");
+            // cm.replaceRange("" + this.value + "", {line: this.textrangeFrom.line, ch: this.textrangeFrom.ch+1}, {line: this.textrangeTo.line, ch: this.textrangeTo.ch-1});
+
+            // set new text ranges ??
+            // this.textrangeFrom =
+
             this.injectImage(cm, {from: this.textrangeFrom, to: this.textrangeTo});
             // cm.replaceRange()
         }, false);
