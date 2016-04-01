@@ -134,7 +134,7 @@ export function updateDocumentText(diff, callback){
                     console.log(error);
                 } else{
                     if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch){
-                        var lines = document[0]["_chapters"][0]["_lines"];
+                        var lines = document[0]["_chapters"][0]["_lines"];                       
                         var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
                         var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch); 
                         var line = new lineModel({_raw: raw, metadata: []})
@@ -152,10 +152,41 @@ export function updateDocumentText(diff, callback){
                             }
                         })
                             
+                    } else if (diff.removed[0] !== "" && diff.text[0] !== ""){
+                        console.log("Tekst erstattet med bokstaver")
+                        var lines = document[0]["_chapters"][0]["_lines"];
+                        var fromLine = diff.from.line;
+                        var fromCh = diff.from.ch; 
+                        var toLine = diff.to.line;
+                        var toCh = diff.to.ch; 
+                        
+                            
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        
+                        if(fromLine == toLine){
+                            var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw; 
+                        } else if (fromLine != toLine) {
+                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
+                            var lastRow = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRow + lastRow;
+                            lines.splice(fromLine+1, diff.removed.length-1); 
+                        }
+                        query["_chapters.0._lines"] = lines
+                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
+                            if(error){
+                                console.log(error);
+                            } else {
+                                console.log("successfully deleted from line");
+                            }
+                        })
+                            
                     } else {
                         var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
                         var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
                         var newLine = {_raw: newraw, _metadata: []};
+
                         query.$set[paragraphset] = newLine;
                         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                             if(error){
@@ -167,7 +198,7 @@ export function updateDocumentText(diff, callback){
                     }            
                 }
             })
-        } else if (diff.origin == '+delete'){ 
+        } else if (diff.origin == '+delete' || diff.origin == 'cut'){ 
             var fromLine = diff.from.line;
             var fromCh = diff.from.ch; 
             var toLine = diff.to.line;
@@ -210,9 +241,55 @@ export function updateDocumentText(diff, callback){
                 }
             })
             
-        } else if (diff.origin == 'cut'){
-            
         } else if (diff.origin == 'paste'){
+             var fromLine = diff.from.line;
+            var fromCh = diff.from.ch; 
+            var toLine = diff.to.line;
+            var toCh = diff.to.ch; 
+            
+            var query = {$set: {}};
+            var paragraphset = "_chapters.0._lines." + fromLine;
+            
+            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
+                if(error){
+                    console.log(error);
+                } else{
+                    var lines = document[0]["_chapters"][0]["_lines"];
+                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == ""){
+                        var endraw = lines[diff.to.line]._raw.slice(0); 
+                        lines[diff.from.line]._raw += endraw; 
+                        lines.splice(diff.to.line, 1)
+                    } else if (diff.text.length>1) {
+                        console.log("diff.text.length>1 = True")
+                        
+                        
+                        
+                    }
+                    else {
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        if(fromLine == toLine){
+                            var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw; 
+                        } else if (fromLine != toLine) {
+                            var firstRaw = firstLine.slice(0, fromCh);
+                            var lastRaw = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
+                            lines.splice(fromLine+1, diff.removed.length-1); 
+                        }
+                    }
+                    var query = {$set: {}};
+                    query["_chapters.0._lines"] = lines
+                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
+                        if(error){
+                            console.log(error);
+                        } else {
+                            console.log("successfully deleted from line");
+                        }
+                    })
+                }
+            })
+          
             
         }
     }
