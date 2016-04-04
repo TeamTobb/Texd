@@ -45,12 +45,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
         }
-        // parse widgets
-        if (this.editor != undefined) {
-            // parse widgets
-            console.log("what?");
-            // this.parseWidgets(this.editor);
-        }
     }
 
     ngAfterViewInit() {
@@ -65,11 +59,40 @@ export class CmComponent implements AfterViewInit, OnChanges {
         this.editor.on("change", (cm, change) => {
             // console.log("Change: " + JSON.stringify(change, null, 2))
             console.log(change)
-            if (typeof (change.origin) !== 'undefined') {
+            // check if "#" :: if present -> remove all widg"ets and parse ?
+            console.log(change.origin);
+            if(change.origin != "setValue") {
+                // remove widgets with set value
+                // this.editor.setValue(this.editor.getValue());
+                console.log("Has origin");
+                for(var r in change.removed) {
+                    if(change.removed[r].indexOf("#") != -1){
+                        console.log("Removed a #");
+                        this.editor.setValue(this.editor.getValue());
+                        this.parseWidgets(this.editor);
+                        // need to set cursor back now
+                    }
+                }
+                for(var r in change.text) {
+                    if(change.text[r].indexOf("#") != -1){
+                        console.log("added a #");
+                        this.editor.setValue(this.editor.getValue());
+                        this.parseWidgets(this.editor);
+                        // need to set cursor back now
+                    }
+                }
+            } else {
+                console.log("has no origin !! :!: :!: !: :!: :! ! ");
+            }
+            if (typeof (change.origin) !== 'undefined' && typeof (change.origin) !== 'setValue') {
                 console.log("We hav eorigin")
-                this.documentService.sendDiff(change, this.chapterId)
+                this.documentService.sendDiff(change, this.chapterId);
             }
         });
+
+        console.log("setting value");
+        // this.editor.setValue(this.editor.getValue());
+        // this.editor.setValue(this.editor.getValue());
 
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
@@ -115,6 +138,10 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     parseWidgets(cm) {
+        // remove all widgets first ?
+        // this.editor.setValue(this.editor.getValue());
+        // return null;
+        // parse
         var lines: string[] = [];
         for (var i = 0; i < cm.lineCount(); i++) {
             var text: string = cm.getLine(i);
@@ -122,7 +149,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
         var widgetMap = [];
         widgetMap["#b"] = true;
+        widgetMap["#img"] = true;
         WidgetParser.searchForWidgets(widgetMap, lines, (type, range) => {
+            console.log("inserting:: " + type);
             this.insertWidget(type, range);
         });
     }
@@ -132,6 +161,11 @@ export class CmComponent implements AfterViewInit, OnChanges {
         console.log("inserting widget type : " + type + ", range: " + JSON.stringify(range));
         if (type == "#b") {
             new BoldWidget(this.editor, range);
+            // this.editor.markText(range.from, range.to, {className: 'bold-widget'});
+        }
+        else if (type == "#img") {
+            console.log("Range is:: " + JSON.stringify(range));
+            new ImageWidget(this.editor, range);
             // this.editor.markText(range.from, range.to, {className: 'bold-widget'});
         }
     }

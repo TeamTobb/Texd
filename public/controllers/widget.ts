@@ -17,23 +17,6 @@ function moveCaret(win, charCount) {
     }
 }
 
-// From http://stackoverflow.com/a/2897510/1200039
-// function getCursorPosition() {
-//     var input = this.get(0);
-//     if (!input) return; // No (input) element found
-//     if ('selectionStart' in input) {
-//         // Standard-compliant browsers
-//         return input.selectionStart;
-//     } else if (document.selection) {
-//         // IE
-//         input.focus();
-//         var sel = document.selection.createRange();
-//         var selLen = document.selection.createRange().text.length;
-//         sel.moveStart('character', -input.value.length);
-//         return sel.text.length - selLen;
-//     }
-// }
-
 // helper function to get caret position - from http://stackoverflow.com/questions/3972014/get-caret-position-in-contenteditable-div
 function getCaretPosition(editableDiv) {
   var caretPos = 0,
@@ -60,31 +43,30 @@ function getCaretPosition(editableDiv) {
   return caretPos;
 }
 
-// function setCursorPosition(pos) {
-//     if ($(this).get(0).setSelectionRange) {
-//         $(this).get(0).setSelectionRange(pos, pos);
-//     } else if ($(this).get(0).createTextRange) {
-//         var range = $(this).get(0).createTextRange();
-//         range.collapse(true);
-//         range.moveEnd('character', pos);
-//         range.moveStart('character', pos);
-//         range.select();
-//     }
-// }
-
 function posEq(a, b) {return a.line == b.line && a.ch == b.ch;}
+
+// When opening the document , each parsed widget will fire a new diff.
+// Have a “parsing” true option?
+// have another “origin” on replace when parsing == true
 
 export function Widget(cm, optRange) {
     this.cm = cm;
+    var from = null;
+    var to = null;
     if (optRange != null) {
+        console.log("optRange is set!! widget");
         this.value = this.cm.getRange(optRange.from, optRange.to).trim();
+        from = optRange.from;
+        to = optRange.to;
     } else {
         this.value = cm.getSelection();
+        from = cm.getCursor("from");
+        to = cm.getCursor("to");
     }
 
-    // need to do something else on parsing.... (?)
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
+    console.log("what is this...");
+    console.log(optRange);
+
     // this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
     this.mark = cm.markText(from, to);
 
@@ -92,6 +74,8 @@ export function Widget(cm, optRange) {
         console.log("yayayay");
         CodeMirror.on(this.mark, "beforeCursorEnter", (e) => {
             console.log("wtf");
+
+
             // register the enter function
             // the actual movement happens if the cursor movement was a plain navigation
             // but not if it was a backspace or selection extension, etc.
@@ -147,7 +131,16 @@ export function BoldWidget(cm, optRange) {
         // cm.replaceRange("", {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
         // cm.replaceRange(cm.getRange(optRange.from, optRange.to), {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
 
-        this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch - 3}, {line: optRange.to.line, ch : optRange.to.ch + 2}, {replacedWith: this.domNode, clearWhenEmpty: false});
+        this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch}, {line: optRange.to.line, ch : optRange.to.ch}, {className: 'bold-widget'});
+
+        // cm.markText(optRange.from, {line: optRange.from.line, ch: optRange.from.ch+4}, {replacedWith: this.domNode, clearWhenEmpty: false});
+        cm.markText({line: optRange.to.line, ch: optRange.to.ch-2}, optRange.to, {replacedWith: this.domNodeEnd, clearWhenEmpty: false});
+        cm.markText(optRange.from, {line: optRange.from.line, ch: optRange.from.ch+3}, {replacedWith: this.domNode, clearWhenEmpty: false});
+
+
+
+
+        // this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch - 3}, {line: optRange.to.line, ch : optRange.to.ch + 2}, {replacedWith: this.domNode, clearWhenEmpty: false});
     } else {
         cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
         var from = cm.getCursor("from");
@@ -166,6 +159,7 @@ export function BoldWidget(cm, optRange) {
     }
     cm.refresh();
 
+    // not currently working because u are never "inside" widget. just using style css.
     this.node.keydown('left', (event) => {
         if (getCaretPosition(this.node[0])===0) {
             console.log("left");
@@ -189,6 +183,7 @@ BoldWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 BoldWidget.prototype.exit = function(direction) {
+    console.log("exit function.. :O oo ");
     var range = this.mark.find();
     this.cm.focus();
     if (direction==='left') {
@@ -199,15 +194,16 @@ BoldWidget.prototype.exit = function(direction) {
 }
 BoldWidget.prototype.enter = function(direction) {
     // wrong?
-    var t = this.node[0];
-    t.focus();
-    if (direction==='left') {
-        // setCursorPosition(0);
-        moveCaret(window, 0);
-    } else {
-        moveCaret(window, this.value.length);
-        // setCursorPosition(t.val().length)
-    }
+    console.log("enter function... :O oo oo oO O o");
+    // var t = this.node[0];
+    // t.focus();
+    // if (direction==='left') {
+    //     // setCursorPosition(0);
+    //     moveCaret(window, 0);
+    // } else {
+    //     moveCaret(window, this.value.length);
+    //     // setCursorPosition(t.val().length)
+    // }
 }
 
 export function HeaderWidget(cm, optRange) {
@@ -308,15 +304,18 @@ UnderlineWidget.prototype.setValue = function(val) {
 // TODO: BUG: FIX: When marking the entire line and placing imagewidget, it will eat up the coming lines for each time you change the value of the image (click & blur)
 // TODO:: need to replace the range after changing the content of the #img ... #, click -> input -> change range -> blur
 export function ImageWidget(cm, optRange) {
-    this.injectImage(cm, null);
+    this.injectImage(cm, optRange);
 }
 ImageWidget.prototype = Object.create(Widget.prototype)
 ImageWidget.prototype.injectImage = function(cm, optRange) {
+    console.log("inside imageidget inject:: + optRange" + optRange);
+    console.log(optRange);
     this.node = $(".widget-templates .image-widget").clone();
     this.domNode = this.node[0];
     Widget.apply(this, arguments);
     // parse the obj
     var list = this.value.split(" ");
+    console.log(list);
     var imgobj = {};
     imgobj["text"] = "";
     // 1 to -1 since #img and # is not to be added
@@ -328,7 +327,9 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
             imgobj[name] = list[i].slice(1,list[i].length-1);
         }
         else {
-            imgobj["text"] += list[i] + " ";
+            if(list[i].trim() != "") {
+                imgobj["text"] += list[i].trim() + " ";
+            }
         }
     }
     console.log(JSON.stringify(imgobj));
