@@ -104,6 +104,7 @@ export function update(req: express.Request, res: express.Response) {
     	
 export function updateDocumentText(diff, callback){ 
     console.log("updateDocumentText: " + JSON.stringify(diff, null, 2));
+        
     if(diff.newchapter){
         var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _lines: [{_raw: "...", _metadata: []}]});
         repository.update(
@@ -147,8 +148,10 @@ export function updateDocumentText(diff, callback){
                         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query2, (error, document2) => {
                             if(error){
                                 console.log(error)
+                                callback()
                             } else{
                                 console.log("successfully spliced array")
+                                callback()
                             }
                         })
                             
@@ -177,8 +180,10 @@ export function updateDocumentText(diff, callback){
                         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                             if(error){
                                 console.log(error);
+                                callback()
                             } else {
                                 console.log("successfully deleted from line");
+                                callback()
                             }
                         })
                             
@@ -191,11 +196,13 @@ export function updateDocumentText(diff, callback){
                         repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                             if(error){
                                 console.log(error);
+                                callback()
                             } else{
                                 console.log("successfully updated line");
+                                callback()
                             }
                         })       
-                    }            
+                    }                    
                 }
             })
         } else if (diff.origin == '+delete' || diff.origin == 'cut'){ 
@@ -234,8 +241,10 @@ export function updateDocumentText(diff, callback){
                     repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                         if(error){
                             console.log(error);
+                            callback()
                         } else {
                             console.log("successfully deleted from line");
+                            callback()
                         }
                     })
                 }
@@ -283,8 +292,10 @@ export function updateDocumentText(diff, callback){
                     repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
                         if(error){
                             console.log(error);
+                            callback()
                         } else {
                             console.log("successfully deleted from line");
+                            callback()
                         }
                     })
                 }
@@ -292,5 +303,6 @@ export function updateDocumentText(diff, callback){
           
             
         }
-    }
+    }     
+    
 }

@@ -23,23 +23,34 @@ checkArgs();
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
 
+var wrapFunction = function(fn, context, params) {
+    return function() {
+        fn.apply(context, params);
+    };
+}
+
+var funqueue = [];
+var kanFortsette = true;
+
 server.on('connection', ws => {
     ws.on('message', message => {
         console.log("recived socket message on server");
-        documentRoutes.updateDocumentText(JSON.parse(message), () => {})
-        // try {
-        //     var obj = JSON.parse(message);
-        //     if (obj.newDiff) {
-        //         var diff: Diff = new Diff([], [], [], [], [], [], [], [], obj.newDiff);
-        //         documentRoutes.updateDocumentText(diff, (elementId) => {
-        //             broadcast(JSON.stringify({ senderId: obj.senderId, elementId: elementId, newDiff: diff }));
-        //         });
-        //     } else {
-        //         broadcast(message);
-        //     }
-        // } catch (e) {
-        //     console.error(e.message);
-        // }
+
+        var sayStuff = function(message) {
+            documentRoutes.updateDocumentText(JSON.parse(message), () => {
+                //Done, alt OK
+                kanFortsette = true
+            })
+        }
+
+        //documentRoutes.updateDocumentText(JSON.parse(message), () => {})
+        var fun1 = wrapFunction(sayStuff, this, [message]);
+        funqueue.push(fun1);
+
+        while (funqueue.length > 0 && kanFortsette==true) {
+            kanFortsette = false;
+            (funqueue.shift())();
+        }
         broadcast(message)
     });
 });
