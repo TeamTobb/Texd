@@ -25,7 +25,7 @@ import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
     directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES]
 })
 
-export class EditorController {
+export class EditorController implements AfterViewInit {
     private document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter: number = 0;
     public current_paragraph: number = 0;
@@ -52,9 +52,40 @@ export class EditorController {
             var snappets: any[] = [];
             this.snappetParser = new SnappetParser(this.element, res);
         });
+
     }
 
+    ngAfterViewInit() {
+        var off = $("#buttonsContainer").offset().top;
+        $(window).scroll(function () {
+            $("#buttonsContainer").css("top", Math.max(0, off - $(this).scrollTop()));
+        });
 
+        var isResizing = false,
+            lastDownX = 0;
+
+        var container = $('#containerForEditor'),
+            left = $('#leftInContainerForEditor'),
+            right = $('#rightInContainerForEditor'),
+            handle = $('#handle2');
+
+        handle.on('mousedown', function (e) {
+            isResizing = true;
+            lastDownX = e.clientX;
+        });
+
+        $(document).on('mousemove', function (e) {
+            // we don't want to do anything if we aren't resizing.
+            if (!isResizing)
+                return;
+            var offsetRight = container.width() - (e.clientX - container.offset().left);
+            left.css('right', offsetRight);
+            right.css('width', offsetRight);
+        }).on('mouseup', function (e) {
+            // stop resizing
+            isResizing = false;
+        });
+    }
 
     //TODO implement this, to be deleted in DB
     public deleteChapterFromDB(value: string) {

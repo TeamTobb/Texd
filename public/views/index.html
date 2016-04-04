@@ -18,14 +18,18 @@
     <!-- use internal instead of external router.dev.js -->
     <script src="https://code.angularjs.org/2.0.0-beta.3/router.dev.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
-    
+
+    <!-- JQuery UI -->
+    <script src="lib/jquery-ui-1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="lib/jquery-ui-1.11.4/jquery-ui.css">
+
     <!-- CodeMirror -->
     <link rel="stylesheet" href="lib/codemirror/codemirror/lib/codemirror.css">
     <script src="lib/codemirror/codemirror/lib/codemirror.js"></script>
-    
+
     <script src="lib/codemirror/codemirror/addon/hint/show-hint.js"></script>
-        
-    <script src="lib/codemirror/codemirror/mode/javascript/javascript.js"></script>     
+
+    <script src="lib/codemirror/codemirror/mode/javascript/javascript.js"></script>
     <!-- Tern JS -->
     <script src="lib/codemirror/ternjs/acorn/dist/acorn.js"></script>
     <script src="lib/codemirror/ternjs/acorn/dist/acorn_loose.js"></script>
@@ -35,18 +39,18 @@
     <script src="lib/codemirror/ternjs/tern/lib/infer.js"></script>
 
     <!-- Official CodeMirror Tern addon -->
-    <script src="lib/codemirror/codemirror/addon/tern/tern.js"></script>   
+    <script src="lib/codemirror/codemirror/addon/tern/tern.js"></script>
     <!-- Extension of CodeMirror Tern addon -->
     <script src="lib/codemirror/codemirror-javascript/addon/hint/tern/tern-extension.js"></script>
-        
-    <!-- CodeMirror Extension -->  
+
+    <!-- CodeMirror Extension -->
     <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/show-hint-eclipse.css">
     <script src="lib/codemirror/codemirror-extension/addon/hint/show-context-info.js"></script>
     <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/show-context-info.css">
-    
+
     <link rel="stylesheet" href="lib/codemirror/codemirror-extension/addon/hint/templates-hint.css">
     <script src="lib/codemirror/codemirror-extension/addon/hint/templates-hint.js"></script>
-    
+
     <!-- CodeMirror Javascript -->
     <script src="lib/codemirror/codemirror-hashscript/addon/hint/hashscript/hashscript-templates.js"></script>
     <!--keeping JS templates for testing purposes-->
@@ -58,22 +62,15 @@
 
     <script>
         System.config({
-        transpiler: 'typescript',
-        typescriptOptions: { emitDecoratorMetadata: true },
-        packages: {'controllers': {defaultExtension: 'ts'}},
-        map: {
-            moment: 'moment/moment.js'
-    }
+            transpiler: 'typescript',
+            typescriptOptions: { emitDecoratorMetadata: true },
+            packages: {'controllers': {defaultExtension: 'ts'}},
+            map: {
+                moment: 'moment/moment.js'
+            }
       });
       System.import('controllers/index')
             .then(null, console.error.bind(console));
-    </script>
-
-    <!-- TODO remove -->
-    <script>     
-      $(window).scroll(function () {
-          $("#buttonsContainer").css("top", Math.max(0, 250 - $(this).scrollTop()));
-      });
     </script>
 
 </head>

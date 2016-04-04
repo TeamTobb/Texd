@@ -51,6 +51,7 @@ export class WidgetParser {
             if (widgetInc) {
                 if(newBuffer == "#") {
                     toCh = index+1; // -1 ?
+                    // not +1 on new line ?
                     toLine = lineIndex;
                     // insert widget and reset
                     var newWidgetToInsert = {};
