@@ -49,12 +49,16 @@ function posEq(a, b) {return a.line == b.line && a.ch == b.ch;}
 // Have a “parsing” true option?
 // have another “origin” on replace when parsing == true
 
-export function Widget(cm, optRange) {
+export function Widget(cm, optRange, onParse) {
+    this.parsing = false;
+    if(onParse) {
+        this.parsing = true;
+    }
+    console.log("WIDGEEEEET");
     this.cm = cm;
     var from = null;
     var to = null;
     if (optRange != null) {
-        console.log("optRange is set!! widget");
         this.value = this.cm.getRange(optRange.from, optRange.to).trim();
         from = optRange.from;
         to = optRange.to;
@@ -64,18 +68,12 @@ export function Widget(cm, optRange) {
         to = cm.getCursor("to");
     }
 
-    console.log("what is this...");
-    console.log(optRange);
-
     // this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
     this.mark = cm.markText(from, to);
 
     if (this.enter) {
-        console.log("yayayay");
         CodeMirror.on(this.mark, "beforeCursorEnter", (e) => {
-            console.log("wtf");
-
-
+            console.log("wtf -- beforeCursorEnter function (inside widget)");
             // register the enter function
             // the actual movement happens if the cursor movement was a plain navigation
             // but not if it was a backspace or selection extension, etc.
@@ -107,7 +105,7 @@ Widget.prototype.enterIfDefined = function(direction) {
     }
 }
 
-export function BoldWidget(cm, optRange) {
+export function BoldWidget(cm, optRange, onParse) {
     this.node = $(".widget-templates .bold-widget").clone();
     this.nodeEnd = $(".widget-templates .bold-widget").clone();
 
@@ -173,12 +171,13 @@ export function BoldWidget(cm, optRange) {
             this.exit('right');
         }
     });
+
+    this.parsing = false;
 }
 BoldWidget.prototype = Object.create(Widget.prototype)
 BoldWidget.prototype.setValue = function(val) {
     this.value = val;
     var pos = getCaretPosition(this.node[0]);
-    console.log(pos);
     this.setText("#b " + this.value.toString() + " #");
     moveCaret(window, pos);
 }
@@ -206,7 +205,7 @@ BoldWidget.prototype.enter = function(direction) {
     // }
 }
 
-export function HeaderWidget(cm, optRange) {
+export function HeaderWidget(cm, optRange, onParse) {
     this.node = $(".widget-templates .header-widget").clone();
 
     // adding listener to change event
@@ -225,6 +224,8 @@ export function HeaderWidget(cm, optRange) {
 
     cm.setCursor(to);
     cm.refresh();
+
+    this.parsing = false;
 }
 HeaderWidget.prototype = Object.create(Widget.prototype)
 HeaderWidget.prototype.setValue = function(val) {
@@ -234,7 +235,7 @@ HeaderWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 
-export function ItalicWidget(cm, optRange) {
+export function ItalicWidget(cm, optRange, onParse) {
     this.node = $(".widget-templates .italic-widget").clone();
 
     // adding listener to change event
@@ -253,6 +254,8 @@ export function ItalicWidget(cm, optRange) {
 
     cm.setCursor(to);
     cm.refresh();
+
+    this.parsing = false;
 }
 ItalicWidget.prototype = Object.create(Widget.prototype)
 ItalicWidget.prototype.setValue = function(val) {
@@ -262,7 +265,7 @@ ItalicWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 
-export function UnderlineWidget(cm, optRange) {
+export function UnderlineWidget(cm, optRange, onParse) {
     this.node = $(".widget-templates .underline-widget").clone();
 
     // adding listener to change event
@@ -281,6 +284,8 @@ export function UnderlineWidget(cm, optRange) {
 
     cm.setCursor(to);
     cm.refresh();
+
+    this.parsing = false;
 }
 UnderlineWidget.prototype = Object.create(Widget.prototype)
 UnderlineWidget.prototype.setValue = function(val) {
@@ -303,25 +308,26 @@ UnderlineWidget.prototype.setValue = function(val) {
 
 // TODO: BUG: FIX: When marking the entire line and placing imagewidget, it will eat up the coming lines for each time you change the value of the image (click & blur)
 // TODO:: need to replace the range after changing the content of the #img ... #, click -> input -> change range -> blur
-export function ImageWidget(cm, optRange) {
+export function ImageWidget(cm, optRange, onParse) {
     this.injectImage(cm, optRange);
+    this.parsing = false;
 }
 ImageWidget.prototype = Object.create(Widget.prototype)
 ImageWidget.prototype.injectImage = function(cm, optRange) {
-    console.log("inside imageidget inject:: + optRange" + optRange);
+    console.log("inside imageidget inject:: + optRange");
     console.log(optRange);
     this.node = $(".widget-templates .image-widget").clone();
     this.domNode = this.node[0];
     Widget.apply(this, arguments);
     // parse the obj
     var list = this.value.split(" ");
+    console.log("image list:: ");
     console.log(list);
     var imgobj = {};
     imgobj["text"] = "";
     // 1 to -1 since #img and # is not to be added
     for (var i = 1; i < list.length-1; i++) {
         if (list[i].startsWith("@")) {
-            console.log(list[i]);
             var name = list[i].slice(1,list[i].length);
             i++;
             imgobj[name] = list[i].slice(1,list[i].length-1);
@@ -332,24 +338,22 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
             }
         }
     }
-    console.log(JSON.stringify(imgobj));
     var from;
     var to;
     if(optRange) {
-        console.log("optRange is set in new Inject Image");
         from = optRange.from;
-        console.log("from: ");
-        console.log(from);
+        // console.log("from: ");
+        // console.log(from);
         to = optRange.to;
-        console.log("to: ");
-        console.log(to);
+        // console.log("to: ");
+        // console.log(to);
     } else {
         from = cm.getCursor("from");
-        console.log("from");
-        console.log(from);
+        // console.log("from");
+        // console.log(from);
         to = cm.getCursor("to");
-        console.log("to");
-        console.log(to);
+        // console.log("to");
+        // console.log(to);
     }
     this.mark = cm.markText(from, to, {readOnly: false, replacedWith: this.domNode, clearWhenEmpty: false});
 
@@ -372,7 +376,8 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
         var newSpan = $(".widget-templates .image-edit").clone();
         newSpan[0].textContent = this.value;
         this.node[0].parentNode.removeChild(this.node[0]);
-        cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo);
+        // should be called something else then onParse??
+        cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo, "+onParse");
         // cm.replaceRange("" + this.value + "", {line: this.textrangeFrom.line, ch: this.textrangeFrom.ch+1}, {line: this.textrangeTo.line, ch: this.textrangeTo.ch-1});
         // true clear when empty ??
         this.mark = cm.markText(this.textrangeFrom, this.textrangeTo, {replacedWith: newSpan[0], clearWhenEmpty: false});
@@ -389,7 +394,11 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
             // ???? TODO:: fix
 
             // this.textrangeFrom =
-            cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo, "+input");
+            if(this.parsing) {
+                cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo, "+onParse");
+            } else {
+                cm.replaceRange("" + this.value + "", this.textrangeFrom, this.textrangeTo, "+input");
+            }
             // cm.replaceRange("" + this.value + "", {line: this.textrangeFrom.line, ch: this.textrangeFrom.ch+1}, {line: this.textrangeTo.line, ch: this.textrangeTo.ch-1});
 
             // set new text ranges ??

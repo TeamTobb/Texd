@@ -37,7 +37,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
             for (var line in this.lines) {
                 arr.push(this.lines[line].raw)
             }
-            console.log("arr: " + JSON.stringify(arr, null, 2))
             this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 })
         }
 
@@ -57,71 +56,62 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
         })
         this.editor.on("change", (cm, change) => {
-            // console.log("Change: " + JSON.stringify(change, null, 2))
-            console.log(change)
-            // check if "#" :: if present -> remove all widg"ets and parse ?
+            console.log("CHANGE:: ");
+            console.log(change);
             console.log(change.origin);
-            if(change.origin != "setValue") {
-                // remove widgets with set value
-                // this.editor.setValue(this.editor.getValue());
-                console.log("Has origin");
+            if(change.origin != "setValue" && change.origin != "+onParse") {
                 for(var r in change.removed) {
                     if(change.removed[r].indexOf("#") != -1){
-                        console.log("Removed a #");
+                        console.log("Removed a # - parsing widgets");
+                        // do this inside the parseWidgets function instead ?
                         this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
                         // need to set cursor back now
+                        break;
                     }
                 }
                 for(var r in change.text) {
                     if(change.text[r].indexOf("#") != -1){
-                        console.log("added a #");
+                        console.log("added a # - parsing widgets");
                         this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
                         // need to set cursor back now
+                        break;
                     }
                 }
-            } else {
-                console.log("has no origin !! :!: :!: !: :!: :! ! ");
             }
-            if (typeof (change.origin) !== 'undefined' && typeof (change.origin) !== 'setValue') {
-                console.log("We hav eorigin")
-                this.documentService.sendDiff(change, this.chapterId);
+            if (typeof (change.origin) !== 'undefined') {
+                if (change.origin != "setValue" && change.origin != "+onParse") {
+                    this.documentService.sendDiff(change, this.chapterId);
+                }
             }
         });
-
-        console.log("setting value");
-        // this.editor.setValue(this.editor.getValue());
-        // this.editor.setValue(this.editor.getValue());
 
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
         });
 
-        // make this outside of this component with a loop
-
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
+            // what to do about the enter function ?
             this.widgetTest = new BoldWidget(this.editor, null);
             this.editor.widgetEnter = $.proxy(this.widgetTest, 'enterIfDefined', 'left');
         });
         $("#insertheader").click(() => {
-            new HeaderWidget(this.editor, null);
+            new HeaderWidget(this.editor, null, false);
         });
         $("#insertitalic").click(() => {
-            new ItalicWidget(this.editor, null);
+            new ItalicWidget(this.editor, null, false);
         });
         $("#insertunderline").click(() => {
-            new UnderlineWidget(this.editor, null);
+            new UnderlineWidget(this.editor, null, false);
         });
         $("#insertimagetest").click(() => {
-            new ImageWidget(this.editor, null);
+            new ImageWidget(this.editor, null, false);
         });
 
         this.editor.on("cursorActivity", function(cm) {
-            console.log("heeere 11");
             if (cm.widgetEnter) {
-                console.log("okkok");
                 // check to see if movement is purely navigational, or if it
                 // doing something like extending selection
                 var cursorHead = cm.getCursor('head');
@@ -132,16 +122,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 cm.widgetEnter = undefined;
             }
         });
-
-        // parse widgets
-        // this.parseWidgets(this.editor, null);
     }
 
     parseWidgets(cm) {
-        // remove all widgets first ?
-        // this.editor.setValue(this.editor.getValue());
-        // return null;
-        // parse
         var lines: string[] = [];
         for (var i = 0; i < cm.lineCount(); i++) {
             var text: string = cm.getLine(i);
@@ -151,7 +134,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
         widgetMap["#b"] = true;
         widgetMap["#img"] = true;
         WidgetParser.searchForWidgets(widgetMap, lines, (type, range) => {
-            console.log("inserting:: " + type);
             this.insertWidget(type, range);
         });
     }
@@ -160,13 +142,10 @@ export class CmComponent implements AfterViewInit, OnChanges {
     insertWidget(type, range) {
         console.log("inserting widget type : " + type + ", range: " + JSON.stringify(range));
         if (type == "#b") {
-            new BoldWidget(this.editor, range);
-            // this.editor.markText(range.from, range.to, {className: 'bold-widget'});
+            new BoldWidget(this.editor, range, true);
         }
         else if (type == "#img") {
-            console.log("Range is:: " + JSON.stringify(range));
-            new ImageWidget(this.editor, range);
-            // this.editor.markText(range.from, range.to, {className: 'bold-widget'});
+            new ImageWidget(this.editor, range, true);
         }
     }
 
@@ -176,7 +155,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log(e);
             if (e.code === "KeyJ") {
                 console.log("test");
-                new BoldWidget(this.editor, null);
+                new BoldWidget(this.editor, null, false);
             }
         }
     }
