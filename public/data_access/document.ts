@@ -197,11 +197,11 @@ export class DocumentService {
             console.log(JSON.stringify(documents, null, 2));
         });
     }
-    
+
     public getSnappets(callback: (snappets: any) => void) {
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
             console.log("we got snappets: " + JSON.stringify(res, null, 2))
             callback(res);
-        }) 
+        })
     }
 }

@@ -1,6 +1,6 @@
-<div id="wrapper">
-    <div id="body">
-        <br>
+<!-- editor and topbar frame -->
+<div class="editorContainerBox">
+    <div class="beforeEditorContainer">
         <div class="btn-group" dropdown keyboardNav="true">
             <button id="simple-btn-keyboard-nav" type="button" class="btn btn-primary" dropdownToggle>
                 Choose chapter <span class="caret"></span>
@@ -17,19 +17,18 @@
         <div id="title">
             <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
         </div>
-        <div id="container">
-            <!-- <div class="roundedBorder" id="center"> -->
-            <div id="buttonsContainer">
-                <button id="insertbold" style="font-weight: bold">bold</button>
-                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
-                <button id="insertitalic" style="font-style: italic">italic</button>
-                <button id="insertunderline" style="text-decoration: underline;">underline</button>
-                <button id="insertheader" style="font-style: bold">header</button>
-                <!-- <button id="insertimagetest" style="font-style: bold">imagetest</button> -->
-            </div>
-            <cmcomponent id="cmcomponent" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
-            [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
+        <div id="buttonsContainer">
+            <button id="insertbold" style="font-weight: bold">bold</button>
+            <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
+            <button id="insertitalic" style="font-style: italic">italic</button>
+            <button id="insertunderline" style="text-decoration: underline;">underline</button>
+            <button id="insertheader" style="font-style: bold">header</button>
+            <!-- <button id="insertimagetest" style="font-style: bold">imagetest</button> -->
         </div>
+    </div>
+    <div class="editorContainer">
+        <cmcomponent id="cmcomponent" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+        [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
     </div>
 </div>
 
@@ -42,17 +41,11 @@
     <h1 contenteditable="true" class="header-widget"></h1>
 
     <div class="image-widget" style="background-color: #EEE">
-		<!-- <center> -->
-			<img class="image-frame" src="test.jpg" height="100px" width="100px">
-			<br>
-			<span class="image-text">This is some text</span>
-		<!-- </center> -->
+		<img class="image-frame" src="test.jpg" height="100px" width="100px">
+		<br>
+		<span class="image-text">This is some text</span>
 	</div>
 
-    <!-- <div class="parent">
-        hai22
-        <div class="child">hai33</div>
-    </div> -->
 </div>
 
 <section *ngIf="showUploadDiv">

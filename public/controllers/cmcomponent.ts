@@ -106,9 +106,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         $("#insertunderline").click(() => {
             new UnderlineWidget(this.editor, null, false);
         });
-        $("#insertimagetest").click(() => {
-            new ImageWidget(this.editor, null, false);
-        });
+        // $("#insertimagetest").click(() => {
+        //     new ImageWidget(this.editor, null, false);
+        // });
 
         this.editor.on("cursorActivity", function(cm) {
             if (cm.widgetEnter) {

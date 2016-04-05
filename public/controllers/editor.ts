@@ -49,10 +49,10 @@ export class EditorController implements AfterViewInit {
     }
 
     ngAfterViewInit() {
-        var off = $("#buttonsContainer").offset().top;
-        $(window).scroll(function () {
-            $("#buttonsContainer").css("top", Math.max(0, off - $(this).scrollTop()));
-        });
+        // var off = $("#buttonsContainer").offset().top;
+        // $(window).scroll(function () {
+        //     $("#buttonsContainer").css("top", Math.max(0, off - $(this).scrollTop()));
+        // });
 
         var isResizing = false,
             lastDownX = 0;

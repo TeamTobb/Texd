@@ -1,27 +1,36 @@
-#wrapper {
-  display: block;
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
-textarea {
-    border: none;
-    resize: none;
-    overflow: hidden;
-    display: block;
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
+}
+
+.box .row {
+  /*flex: 0 1 30px;*/
+}
+
+.box .row.header {
+  flex: 0 1 auto;
+  /*background-color: pink;*/
+}
+
+.box .row.content {
+  flex: 1 1 auto;
+  height: 100%;
+  position: relative;
 }
 
 #title {
   color: black;
   text-align: center;
-}
-
-#body {
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  font-size: 16px;
-}
-
-#documentName {
 }
 
 #changeDocumentName {
@@ -48,17 +57,25 @@ textarea {
     background-color: #ccc
 }
 
-#container {
-    height: 1200px;
-    /*height: auto;*/
+#editorContainer {
+    background-color: yellow;
+    position: relative;
+    height: 100%;
     width: 100%;
 }
 
-#containerForEditor {
-    top: 40px;
-    position: relative;
-    /*width: 100%;*/
+#cmcomponent {
+    position: absolute;
     height: 100%;
+    width: 100%;
+    /*background-color: black;*/
+}
+
+#containerForEditor {
+    position: relative;
+    /*background-color: red;*/
+    height: 100%;
+    width: 100%;
     /* Disable selection so it doesn't get annoying */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -70,6 +87,7 @@ textarea {
 
 #containerForEditor #leftInContainerForEditor {
     position: absolute;
+    height: 100%;
     left: 0;
     top: 0;
     bottom: 0;
@@ -79,11 +97,17 @@ textarea {
 
 #containerForEditor #rightInContainerForEditor {
     position: absolute;
+    height: 100%;
+    /*left: 20px;*/
+    /*margin-left: 20px;*/
+    /*margin-right: 20px;*/
     right: 0;
     top: 0;
     bottom: 0;
     width: 40%;
-    background: white;
+    overflow-x: auto;
+    overflow-y: auto;
+    /*background: blue;*/
 }
 
 #containerForEditor #handle2 {
@@ -91,7 +115,7 @@ textarea {
     left: -8px;
     top: 0;
     bottom: 0;
-    width: 8px;
+    width: 16px;
     background-color: black;
     cursor: w-resize;
     z-index: 11;
@@ -99,11 +123,12 @@ textarea {
 
 .roundedBorder {
     border: 2px solid black;
-      padding: 50px;
-      outline: black solid 5px;
-      outline-offset: 5px;
-      height: 800px;
-  }
+    padding: 50px;
+    outline: black solid 5px;
+    outline-offset: 5px;
+    height: 800px;
+}
+
 .widget-templates {display:none}
 
 .bold-widget {
@@ -122,17 +147,46 @@ textarea {
 
 }
 
+#router-outlet-test {
+    /*height: 100%;*/
+}
+
+.editorContainerBox {
+    display: flex;
+    flex-flow: column;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    /*background-color: blue;*/
+}
+
+.beforeEditorContainer {
+    flex: 0 1 auto;
+    position: relative;
+    /*height: 100%;*/
+    /*background-color: orange;*/
+}
+
+.editorContainer {
+    flex: 1 1 auto;
+    position: relative;
+    /*background-color: pink;*/
+    /*height: 100%;*/
+}
+
+#test1 {
+    position: absolute;
+    height: 100%;
+    /*background-color: black;*/
+}
+
 #buttonsContainer {
-    /*width: 84.5%;*/
     height: 40px;
     width: 100%;
     background-color: #ccc;
-    position:fixed;
-    z-index: 99;
-    /*top:250px;*/
     border: 1 px solid black;
-        padding: 5px;
-        border-radius: 3px;
+    padding: 5px;
+    border-radius: 3px;
 }
 
 #previewframe {
