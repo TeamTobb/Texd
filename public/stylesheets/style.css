@@ -11,6 +11,8 @@ body {
   flex-flow: column;
   height: 100%;
   width: 100%;
+  margin-left: 15px;
+  /*margin-right: 30px;*/
 }
 
 .box .row {
@@ -91,6 +93,7 @@ body {
     left: 0;
     top: 0;
     bottom: 0;
+    margin-right: 20px;
     right: 40%;
     /*background: red;*/
 }
@@ -99,9 +102,9 @@ body {
     position: absolute;
     height: 100%;
     /*left: 20px;*/
-    /*margin-left: 20px;*/
+    /*margin-left: 100px;*/
     /*margin-right: 20px;*/
-    right: 0;
+    right: 20px;
     top: 0;
     bottom: 0;
     width: 40%;
@@ -112,6 +115,7 @@ body {
 
 #containerForEditor #handle2 {
     position: absolute;
+    height: 100%;
     left: -8px;
     top: 0;
     bottom: 0;
@@ -147,10 +151,6 @@ body {
 
 }
 
-#router-outlet-test {
-    /*height: 100%;*/
-}
-
 .editorContainerBox {
     display: flex;
     flex-flow: column;
@@ -174,14 +174,8 @@ body {
     /*height: 100%;*/
 }
 
-#test1 {
-    position: absolute;
-    height: 100%;
-    /*background-color: black;*/
-}
-
 #buttonsContainer {
-    height: 40px;
+    height: 35px;
     width: 100%;
     background-color: #ccc;
     border: 1 px solid black;
@@ -193,8 +187,14 @@ body {
     height: 100%;
     width: 98%;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    /*margin-left: 10px;*/
+    /*margin-right: 30px;*/
+    /*padding-right: 50px;*/
+    padding-left: 10px;
+
+    overflow: scroll;
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
     /*background-color: #AAFFFF;*/
     word-wrap: break-word;
 }

@@ -18,12 +18,14 @@
             <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
         </div>
         <div id="buttonsContainer">
-            <button id="insertbold" style="font-weight: bold">bold</button>
-            <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
-            <button id="insertitalic" style="font-style: italic">italic</button>
-            <button id="insertunderline" style="text-decoration: underline;">underline</button>
             <button id="insertheader" style="font-style: bold">header</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="insertbold" style="font-weight: bold">b</button>
+            <button id="insertitalic" style="font-style: italic">i</button>
+            <button id="insertunderline" style="text-decoration: underline;">u</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <!-- <button id="insertimagetest" style="font-style: bold">imagetest</button> -->
+            <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
         </div>
     </div>
     <div class="editorContainer">
