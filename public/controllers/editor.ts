@@ -133,6 +133,12 @@ export class EditorController implements AfterViewInit {
         }
         keyMap[80] = () => {
             console.log("ctrl+p");
+            this.documentService.parseChapter(this.current_chapter, (parsedHTML) => {
+                // console.log(parsedHTML);
+                console.log("done parsing.. inserting!");
+                document.getElementById('previewframe').innerHTML = parsedHTML;
+            })
+            // this.documentService.parseChapter()
         }
         keyMap[67] = () => {
             console.log("ctrl+c");

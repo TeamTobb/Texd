@@ -29,7 +29,8 @@ export class WidgetParser {
                             newBuffer = "";
                         }
                     } else {
-                        newBuffer += lines[lineIndex][index];
+                        // + ?
+                        newBuffer = lines[lineIndex][index];
                     }
                 } else {
                     if(lines[lineIndex][index] == " ") {
@@ -65,11 +66,14 @@ export class WidgetParser {
                 } else {
                     newBuffer = "";
                 }
-        }
-        // insert widgets
-        // console.log(widgetsToInsert.length);
-        for (var i = widgetsToInsert.length - 1; i >= 0; i--) {
-            insertWidget(widgetsToInsert[i]["buffer"], widgetsToInsert[i]["range"]);
+            } else {
+                buffer = "";
+            }
+            // insert widgets
+            // console.log(widgetsToInsert.length);
+            for (var i = widgetsToInsert.length - 1; i >= 0; i--) {
+                insertWidget(widgetsToInsert[i]["buffer"], widgetsToInsert[i]["range"]);
+            }
         }
     }
 }

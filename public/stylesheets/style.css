@@ -7,18 +7,10 @@ textarea {
     resize: none;
     overflow: hidden;
     display: block;
-    /*outline: none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;*/
 }
 
-/*#previewFrame {
-    height: 600px;
-}*/
-
 #title {
-  color: orange;
+  color: black;
   text-align: center;
 }
 
@@ -44,60 +36,22 @@ textarea {
   outline: none;
 }
 
-#textAreaWrapper {
-  display: flex;
-}
-
-/* testing */
-
-
-#center {
-    float: left;
-    background-color: #eee;
-    width: 100%;
-}
-
-
 #chapterLi:hover {
     color: blue;
 }
 
-
 #chapterItem {
     margin-left: 2em;
-
 }
 
 #chapterItem:hover {
     background-color: #ccc
 }
 
-/*#codeframe {
-    float: left;
-    width: 50%;
-}
-
-#previewframe {
-    width: 50%;
-    margin-left: auto;
-}*/
-
-/*body, html {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}*/
-
 #container {
     height: 1200px;
     /*height: auto;*/
     width: 100%;
-}
-
-#cmcomponent {
-    /*height: 800px;*/
-    /*top: 50px;*/
 }
 
 #containerForEditor {
@@ -113,51 +67,34 @@ textarea {
     -ms-user-select: none;
     user-select: none;
 }
+
 #containerForEditor #leftInContainerForEditor {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    right: 100px;
+    right: 40%;
     /*background: red;*/
 }
+
 #containerForEditor #rightInContainerForEditor {
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
-    width: 200px;
-    background: blue;
+    width: 40%;
+    background: white;
 }
+
 #containerForEditor #handle2 {
     position: absolute;
-    left: -4px;
+    left: -8px;
     top: 0;
     bottom: 0;
-    width: 15px;
-    background-color: red;
+    width: 8px;
+    background-color: black;
     cursor: w-resize;
     z-index: 11;
-}
-
-#test112 {
-    float: left;
-}
-
-.parent {
-    position: relative;
-    width: 400px;
-    height: 200px;
-    background: #F00;
-}
-.child {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 200px;
-    height: 100%;
-    outline: 1px solid #ccc;
-    background: #ccc;
 }
 
 .roundedBorder {
@@ -198,6 +135,16 @@ textarea {
         border-radius: 3px;
 }
 
+#previewframe {
+    height: 100%;
+    width: 98%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /*background-color: #AAFFFF;*/
+    word-wrap: break-word;
+}
+
 #uploadDiv{
     background-color: greenyellow;
     width: 50%;
@@ -207,7 +154,6 @@ textarea {
     margin-right: auto;
     left: 0;
     right: 0;
-
 }
 
 .image-widget {
@@ -215,12 +161,20 @@ textarea {
     background-color:#f4f4f4;
     box-shadow:2px 2px 2px #DEDEDE;
     width:96%;
-    margin:0 auto;
-    text-align:center
+    text-align: center;
+    margin: 0 auto;
+}
+.image-frame {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /*margin:0 auto;*/
+    /*text-align:center;*/
 }
 .image-text {
+    display: inline-block;
     padding:3px 0 4px;
     font-size:small;
     margin:0 auto;
-    text-align:center
+    /*text-align:center;*/
 }

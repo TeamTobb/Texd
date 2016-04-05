@@ -14,11 +14,9 @@
                 <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
             </ul>
         </div>
-        <br>
-        <br>
         <div id="title">
-            <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1></div>
-        <br>
+            <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
+        </div>
         <div id="container">
             <!-- <div class="roundedBorder" id="center"> -->
             <div id="buttonsContainer">
@@ -27,7 +25,7 @@
                 <button id="insertitalic" style="font-style: italic">italic</button>
                 <button id="insertunderline" style="text-decoration: underline;">underline</button>
                 <button id="insertheader" style="font-style: bold">header</button>
-                <button id="insertimagetest" style="font-style: bold">imagetest</button>
+                <!-- <button id="insertimagetest" style="font-style: bold">imagetest</button> -->
             </div>
             <cmcomponent id="cmcomponent" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
             [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
@@ -45,7 +43,7 @@
 
     <div class="image-widget" style="background-color: #EEE">
 		<!-- <center> -->
-			<img class="image-frame" src="test.jpg" height="250px" width="250px">
+			<img class="image-frame" src="test.jpg" height="100px" width="100px">
 			<br>
 			<span class="image-text">This is some text</span>
 		<!-- </center> -->

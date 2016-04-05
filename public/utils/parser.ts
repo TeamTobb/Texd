@@ -1,13 +1,13 @@
-import {Document, Paragraph, Chapter} from '../domain/document.ts';
+import {Document, Line, Chapter} from '../domain/document.ts';
 
 export class Parser {
     private hashMap: { [id: string]: Plugin } = {};
 
     constructor(hashMap: any) {
-        this.hashMap = hashMap; 
+        this.hashMap = hashMap;
     }
 
-    public getParsedJSON(inputText: Paragraph[]): string {
+    public getParsedJSON(inputText: Line[]): string {
 
         var mergedParas = "";
         for (var para in inputText) {
@@ -18,11 +18,11 @@ export class Parser {
         var list = this.parseString(mergedParas);
         for (var i = 0; i < list.length; i++) list[i] += " ";
 
-        
+
         return this.parseText(this.hashMap, list);
     }
-    
-     public getParsedJSONSingle(inputText: Paragraph): string {
+
+     public getParsedJSONSingle(inputText: Line): string {
         var list = this.parseString(inputText.raw);
         for (var i = 0; i < list.length; i++) list[i] += " ";
         return this.parseText(this.hashMap, list);
@@ -34,13 +34,13 @@ export class Parser {
         while (arr = re.exec(str)) { res.push(arr[1] ? arr[1] : arr[0]); }
         return res;
     }
-    
+
     public parseText(hashMap: any, inputText: any[]): string {
-        
+
          var outputJSON: any = {};
-        
+
         var list = inputText;
-        
+
         var refStack: any = [];
         var tempText: string = "";
         var attributeList: any[] = [];
