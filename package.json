@@ -26,6 +26,8 @@
     "mongodb": ">= 1.4.29",
     "mongoose": "latest",
     "ng2-bootstrap": "^1.0.3",
+    "ng2-file-upload": "^0.46.0",
+    "ng2-uploader": "^0.5.0",
     "reflect-metadata": "latest",
     "rxjs": "latest",
     "systemjs": "0.19.6",

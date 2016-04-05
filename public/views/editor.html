@@ -23,7 +23,7 @@
             <!-- <div class="roundedBorder" id="center"> -->
             <div id="buttonsContainer">
                 <button id="insertbold" style="font-weight: bold">bold</button>
-                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
+                <button (click)="showUploadDivToggle(true)" id="uploadImageButton">upload Image</button>
                 <button id="insertitalic" style="font-style: italic">italic</button>
                 <button id="insertunderline" style="text-decoration: underline;">underline</button>
                 <button id="insertheader" style="font-style: bold">header</button>
@@ -44,12 +44,12 @@
     <h1 contenteditable="true" class="header-widget"></h1>
 
     <div class="image-widget" style="background-color: #EEE">
-		<!-- <center> -->
-			<img class="image-frame" src="test.jpg" height="250px" width="250px">
-			<br>
-			<span class="image-text">This is some text</span>
-		<!-- </center> -->
-	</div>
+        <!-- <center> -->
+        <img class="image-frame" src="test.jpg" height="250px" width="250px">
+        <br>
+        <span class="image-text">This is some text</span>
+        <!-- </center> -->
+    </div>
 
     <!-- <div class="parent">
         hai22
@@ -60,5 +60,10 @@
 <section *ngIf="showUploadDiv">
     <div id="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
+       
+       <fileuploader>
+           
+       </fileuploader>
+       
     </div>
 </section>
