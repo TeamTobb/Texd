@@ -11,6 +11,7 @@ import WebSocket = require('ws');
 import Diff = require('./server/domain/diff');
 import pluginsRoutes = require('./server/resources/plugins');
 import snappetRoutes = require('./server/resources/snappets');
+import uploadRoutes = require('./server/resources/upload');
 import routes = require('./server/resources/index');
 import documentRoutes = require('./server/resources/document');
 
@@ -69,6 +70,7 @@ if (mongoose.connect('mongodb://' + databaseUrl + '/dbTexd')) {
 }
 
 var app = express();
+
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/node_modules')));
 app.use(express.static(path.join(__dirname, '/typings')));
@@ -77,13 +79,49 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+/*
+var router = express.Router();
+
+
+// define the about route
+router.post('/upload', function(req, res) {
+  res.send('About birds');
+});
+
+module.exports = router;
+
+*/
+
+
+app.post('/uploadFile', uploadRoutes.upload);
+
 app.get('/plugins', pluginsRoutes.read);
 app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 app.get('/documents', documentRoutes.getDocuments);
 app.post('/document/:id', documentRoutes.update);
 app.get('/*', routes.index);
+    
 
+
+/* function(req, res) {
+	var sampleFile;
+ 
+	if (!req.files) {
+		res.send('No files were uploaded.');
+		return;
+	}
+ 
+	sampleFile = req.files.sampleFile;
+	sampleFile.mv('/', function(err) {
+		if (err) {
+			res.status(500).send(err);
+		}
+		else {
+			res.send('File uploaded!');
+		}
+	});
+*/
 app.listen(httpPort, function() {
     console.log("Demo Express server listening on port %d", httpPort);
 });
