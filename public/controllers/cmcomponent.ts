@@ -8,7 +8,7 @@ import {EventEmitter} from "angular2/src/facade/async";
 import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
 
-function posEq(a, b) {return a.line == b.line && a.ch == b.ch;}
+function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 
 @Component({
     selector: 'cmcomponent',
@@ -48,7 +48,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
-            mode: "none",
+            mode: "hashscript",
             lineNumbers: true,
             lineWrapping: true,
             extraKeys: {
@@ -59,9 +59,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log("CHANGE:: ");
             console.log(change);
             console.log(change.origin);
-            if(change.origin != "setValue" && change.origin != "+onParse") {
-                for(var r in change.removed) {
-                    if(change.removed[r].indexOf("#") != -1){
+            if (change.origin != "setValue" && change.origin != "+onParse") {
+                for (var r in change.removed) {
+                    if (change.removed[r].indexOf("#") != -1) {
                         console.log("Removed a # - parsing widgets");
                         // do this inside the parseWidgets function instead ?
                         this.editor.setValue(this.editor.getValue());
@@ -70,8 +70,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
                         break;
                     }
                 }
-                for(var r in change.text) {
-                    if(change.text[r].indexOf("#") != -1){
+                for (var r in change.text) {
+                    if (change.text[r].indexOf("#") != -1) {
                         console.log("added a # - parsing widgets");
                         this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
@@ -161,11 +161,18 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     private setupCMAutocomplete() {
-        CodeMirror.commands.autocomplete = function(cm) {
-            CodeMirror.showHint(cm, function(cm) {
-                return CodeMirror.showHint(cm, CodeMirror.ternHint, { async: true });
-            });
-        }
+        this.documentService.getSnappets((snappets) => {
+            var templates = {
+                "name": "hashscript",
+                "context": "hashscript",
+                "templates": snappets
+            }
+            CodeMirror.templatesHint.addTemplates(templates);
+            CodeMirror.commands.autocomplete = function(cm) {
+                CodeMirror.showHint(cm, function(cm) {
+                    return CodeMirror.showHint(cm, CodeMirror.ternHint, { async: true });
+                });
+            }
+        })
     }
-
 }

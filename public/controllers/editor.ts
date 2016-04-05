@@ -46,13 +46,6 @@ export class EditorController implements AfterViewInit {
                 this.document = document2;
             })
         }
-        //TODO integrate with codemirror
-        this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
-            console.log(JSON.stringify(res, null, 2));
-            var snappets: any[] = [];
-            this.snappetParser = new SnappetParser(this.element, res);
-        });
-
     }
 
     ngAfterViewInit() {
