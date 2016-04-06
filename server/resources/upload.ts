@@ -1,12 +1,13 @@
+//TODO change this file to handle uploads/photo and /upload/json
+
 export function upload(req, res) {
     console.log("[trying to] UPLOAD FILE ")
     var sampleFile;
-    console.log("req:"+ req)
+    
+    console.log(req);
     console.log("Body: "+ req.body);
     console.log("Files: "+req.files);
     
-
-
     
 	if (!req.files) {
         console.log("!req.files")
@@ -27,3 +28,4 @@ export function upload(req, res) {
 		}
 	});
 }
+

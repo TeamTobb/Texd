@@ -88,10 +88,20 @@ router.post('/upload', function(req, res) {
   res.send('About birds');
 });
 
-module.exports = router;
+var upload = multer({ storage : storage}).single('photo');
 
-*/
 
+//TODO Change to app.use() Create one upload, with different paths for photo, JSON...
+app.post('/upload/photo',function(req,res){
+    console.log(req)
+    console.log("POST POST POST ")
+    upload(req,res,function(err) {
+        if(err) {
+            return res.end("Error uploading file.");
+        }
+        res.end("File is uploaded");
+    });
+});
 
 app.post('/uploadFile', uploadRoutes.upload);
 
@@ -101,27 +111,7 @@ app.get('/document/:id', documentRoutes.read);
 app.get('/documents', documentRoutes.getDocuments);
 app.post('/document/:id', documentRoutes.update);
 app.get('/*', routes.index);
-    
 
-
-/* function(req, res) {
-	var sampleFile;
- 
-	if (!req.files) {
-		res.send('No files were uploaded.');
-		return;
-	}
- 
-	sampleFile = req.files.sampleFile;
-	sampleFile.mv('/', function(err) {
-		if (err) {
-			res.status(500).send(err);
-		}
-		else {
-			res.send('File uploaded!');
-		}
-	});
-*/
 app.listen(httpPort, function() {
     console.log("Demo Express server listening on port %d", httpPort);
 });

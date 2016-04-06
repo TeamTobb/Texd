@@ -1,9 +1,6 @@
 import {Component, NgZone} from 'angular2/core';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
-import {Ng2Uploader} from './src/services/ng2-uploader';
-import {NgFileSelect} from './src/directives/ng-file-select';
-import {NgFileDrop} from './src/directives/ng-file-drop';
-
+//import {UPLOAD_DIRECTIVES} from '../utils/ng2-uploader/ng2-uploader.ts';
 
 @Component({
     selector: 'fileuploader',
@@ -14,9 +11,8 @@ import {NgFileDrop} from './src/directives/ng-file-drop';
 })
 export class FileUploaderClass {
     zone: NgZone;
-    options: Object = {
-        //url: 'https://posttestserver.com/post.php'     
-        url: './uploadFile'   
+    options: Object = {  
+        url: './upload/photo'   
     };
     basicProgress: number = 0;
     basicResp: Object;
