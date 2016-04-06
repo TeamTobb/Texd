@@ -50,20 +50,13 @@ export class EditorController implements AfterViewInit {
                 this.document = document2;
             })
         }
-        //TODO integrate with codemirror
-        this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
-            console.log(JSON.stringify(res, null, 2));
-            var snappets: any[] = [];
-            this.snappetParser = new SnappetParser(this.element, res);
-        });
-
     }
 
     ngAfterViewInit() {
-        var off = $("#buttonsContainer").offset().top;
-        $(window).scroll(function () {
-            $("#buttonsContainer").css("top", Math.max(0, off - $(this).scrollTop()));
-        });
+        // var off = $("#buttonsContainer").offset().top;
+        // $(window).scroll(function () {
+        //     $("#buttonsContainer").css("top", Math.max(0, off - $(this).scrollTop()));
+        // });
 
         var isResizing = false,
             lastDownX = 0;
@@ -144,6 +137,12 @@ export class EditorController implements AfterViewInit {
         }
         keyMap[80] = () => {
             console.log("ctrl+p");
+            this.documentService.parseChapter(this.current_chapter, (parsedHTML) => {
+                // console.log(parsedHTML);
+                console.log("done parsing.. inserting!");
+                document.getElementById('previewframe').innerHTML = parsedHTML;
+            })
+            // this.documentService.parseChapter()
         }
         keyMap[67] = () => {
             console.log("ctrl+c");

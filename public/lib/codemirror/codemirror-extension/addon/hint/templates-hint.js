@@ -272,7 +272,8 @@
     var from = data.from;
     var to = data.to;
     var startLine = from.line;
-    cm.replaceRange(content, from, to);
+    // Changed from undefined origin to +snappet
+    cm.replaceRange(content, from, to, '+snappet');
 
     for ( var i = 0; i < markers.length; i++) {
       var marker = markers[i], from = marker.from, to = marker.to;

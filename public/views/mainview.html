@@ -1,8 +1,11 @@
-<div id="wrapper">
-    <tabset>
-        <tab heading="Dashboard" (select)="goToDashboard()"></tab>
-        <tab heading="Settings" (select)="goToSettings()"></tab>
-    </tabset>
-    <router-outlet></router-outlet>
+<div class="box">
+    <div class="row header">
+        <tabset>
+            <tab heading="Dashboard" (select)="goToDashboard()"></tab>
+            <tab heading="Settings" (select)="goToSettings()"></tab>
+        </tabset>
+    </div>
+    <div class="row content">
+        <router-outlet id="router-outlet-test"></router-outlet>
+    </div>
 </div>
-

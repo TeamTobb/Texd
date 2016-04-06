@@ -5,7 +5,7 @@ import {Component, ViewChild, Input, Output, Renderer, ElementRef} from 'angular
 
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
-import {Document, Chapter, Paragraph} from "../domain/document.ts"
+import {Document, Chapter, Line} from "../domain/document.ts"
 import {Diff} from "../domain/diff.ts";
 import {ParseMap} from "../utils/parseMap.ts";
 import {SnappetParser} from "../utils/snappetParser.ts";
@@ -18,12 +18,12 @@ export class DocumentService {
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
 
     public _senderId: string;
-    private _textParser: Parser;
-    private _jsonParser: jsonToHtml;
+    private _textParser: Parser = null;
+    private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
     public changeOrder: any = {
-        from: {}, 
-        to: {}, 
+        from: {},
+        to: {},
         text: {}
     }
 
@@ -44,8 +44,8 @@ export class DocumentService {
                 this.changeOrder.to = parsed.to
                 this.changeOrder.text = parsed.text
             }
-           
-            
+
+
             // var parsed = JSON.parse(message.data);
             // if (parsed.newDiff) {
             //     var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
@@ -80,9 +80,15 @@ export class DocumentService {
             //     if (parsed.title && parsed.documentId == this.document.id) {
             //         this.document.title = parsed.title;
             //     }
-            }            
+            }
+
+            this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+                this.parseMap.generateParseMap(res);
+                this._textParser = new Parser(this.parseMap.parseMap);
+                this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
+            });
         }
-    
+
     public changeTitle(id: string, newTitle: string) {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -97,7 +103,7 @@ export class DocumentService {
             }
             );
     }
-    
+
     //TODO implement changeChapterName() new URL
     public changeChapterName(documentId: string, newchapterName: string, chapterId: number) {
         console.log(documentId)
@@ -123,31 +129,40 @@ export class DocumentService {
             );
     }
 
-    public parseChapter(currentChapter, callback: (parsedParagraphs: string[]) => void) {
-        //TODO its not suppose to be a GET
-        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
-            this.parseMap.generateParseMap(res);
-            this._textParser = new Parser(this.parseMap.parseMap);
-            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
-
-            var nonParsedParagraphs: Paragraph[] = this.document.chapters[currentChapter].paragraphs;
-            var parsedParagraphs: string[] = [];
-
-            for (var index = 0; index < nonParsedParagraphs.length; index++) {
-                var element: Paragraph = nonParsedParagraphs[index];
-                var parsedElem = this._textParser.getParsedJSONSingle(element)
-                var html = this._jsonParser.getParsedHTML(parsedElem)
-                parsedParagraphs.push(html);
-            }
-            callback(parsedParagraphs);
-        });
+    public parseChapter(currentChapter, callback: (parsedHTML : string) => void) {
+        if(this._textParser != null && this._jsonParser != null) {
+            var lines : Line[] = this.document.chapters[currentChapter].lines;
+            var parsedJSON = this._textParser.getParsedJSON(lines);
+            var parsedHTML : string = this._jsonParser.getParsedHTML(parsedJSON);
+            callback(parsedHTML);
+        }
     }
 
-    public parseSingleParagraph(para: Paragraph): string {
-        var parsedJSON: string = this._textParser.getParsedJSONSingle(para);
-        return this._jsonParser.getParsedHTML(parsedJSON);
-    } 
-    
+    // public parseChapter(currentChapter, callback: (parsedParagraphs: string[]) => void) {
+    //     //TODO its not suppose to be a GET
+    //     this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+    //         this.parseMap.generateParseMap(res);
+    //         this._textParser = new Parser(this.parseMap.parseMap);
+    //         this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
+    //
+    //         var nonParsedParagraphs: Paragraph[] = this.document.chapters[currentChapter].lines;
+    //         var parsedParagraphs: string[] = [];
+    //
+    //         for (var index = 0; index < nonParsedParagraphs.length; index++) {
+    //             var element: Paragraph = nonParsedParagraphs[index];
+    //             var parsedElem = this._textParser.getParsedJSONSingle(element)
+    //             var html = this._jsonParser.getParsedHTML(parsedElem)
+    //             parsedParagraphs.push(html);
+    //         }
+    //         callback(parsedParagraphs);
+    //     });
+    // }
+
+    // public parseSingleParagraph(para: Paragraph): string {
+    //     var parsedJSON: string = this._textParser.getParsedJSONSingle(para);
+    //     return this._jsonParser.getParsedHTML(parsedJSON);
+    // }
+
     public sendDiff(diff: any, chapterId: string) {
         // diff.documentId = this.document.id
         // this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
@@ -181,5 +196,12 @@ export class DocumentService {
             })
             console.log(JSON.stringify(documents, null, 2));
         });
+    }
+
+    public getSnappets(callback: (snappets: any) => void) {
+        this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
+            console.log("we got snappets: " + JSON.stringify(res, null, 2))
+            callback(res);
+        })
     }
 }
