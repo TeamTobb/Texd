@@ -70,19 +70,25 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 for (var r in change.removed) {
                     if (change.removed[r].indexOf("#") != -1) {
                         console.log("Removed a # - parsing widgets");
+                        // fetch cursor
+                        var cursorPos = this.editor.getCursor();
                         // do this inside the parseWidgets function instead ?
                         this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
                         // need to set cursor back now
+                        this.editor.setCursor(cursorPos);
                         break;
                     }
                 }
                 for (var r in change.text) {
                     if (change.text[r].indexOf("#") != -1) {
                         console.log("added a # - parsing widgets");
+                        // fetch cursor
+                        var cursorPos = this.editor.getCursor();
                         this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
                         // need to set cursor back now
+                        this.editor.setCursor(cursorPos);
                         break;
                     }
                 }
