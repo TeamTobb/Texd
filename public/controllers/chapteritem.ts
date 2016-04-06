@@ -10,37 +10,41 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 @Component({
   selector: 'chapteritem',
   templateUrl: 'views/components/chapteritem.html'
-  
+
 })
 export class ChapterItem implements OnChanges {
   @Input() chapterName: string;
-  @Input() chapterId: string; 
-  @Input() documentId: string; 
+  @Input() chapterId: string;
+  @Input() documentId: string;
   @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
-  
-  
+
+
   constructor(private documentService: DocumentService) {
-      
+
   }
-    // TODO Make alert, sure you want to delete this chapter? 
-  delete(value: any){
+    // TODO Make alert, sure you want to delete this chapter?
+  delete(event, value: any){
+    console.log("Event:: ");
+    console.log(event);
+    event.stopPropagation();
+    // event.preventDefault();
     console.log("Delete()")
-    this.toBeDeleted.emit(value)    
+    this.toBeDeleted.emit(value)
   }
-  
-    rename($event, chapterId, documentId){       
+
+    rename($event, chapterId, documentId){
         var newName: string = $event.target.innerHTML
         this.documentService.changeChapterName(documentId, newName, chapterId);
         $event.target.setAttribute("contenteditable", "false");
     }
 
     ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-     //console.log("Something has Changed in chapterItem") 
+     //console.log("Something has Changed in chapterItem")
 
     }
 
     ondblclickChapter($event){
-        console.log("ondblclickChapter")  
+        console.log("ondblclickChapter")
         $event.target.setAttribute("contenteditable", "true");
     }
 }

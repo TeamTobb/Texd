@@ -1,7 +1,7 @@
 <!-- editor and topbar frame -->
 <div class="editorContainerBox">
     <div class="beforeEditorContainer">
-        <div class="btn-group" dropdown keyboardNav="true">
+        <!-- <div class="btn-group" dropdown keyboardNav="true">
             <button id="simple-btn-keyboard-nav" type="button" class="btn btn-primary" dropdownToggle>
                 Choose chapter <span class="caret"></span>
             </button>
@@ -13,7 +13,8 @@
                 <li class="divider dropdown-divider"></li>
                 <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
             </ul>
-        </div>
+        </div> -->
+        <!-- change the position, so it doesnt take additional space -->
         <div id="title">
             <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
         </div>
@@ -39,7 +40,7 @@
         </div>
     </div>
     <div class="editorContainer">
-        <cmcomponent id="cmcomponent" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+        <cmcomponent id="cmcomponent" [document]=document [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
         [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
     </div>
 </div>

@@ -1,3 +1,4 @@
+import {ChapterItem} from "./chapteritem";
 import {Component, OnInit, Input, Output, AfterViewInit, ElementRef, OnChanges, SimpleChange} from 'angular2/core';
 import {NgIf} from 'angular2/common';
 import {Router} from 'angular2/router';
@@ -12,10 +13,12 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 
 @Component({
     selector: 'cmcomponent',
-    templateUrl: 'views/components/cmcomponent.html'
+    templateUrl: 'views/components/cmcomponent.html',
+    directives: [ChapterItem]
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
+    @Input() document : Document;
     @Input() chapterId: string;
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
@@ -132,6 +135,38 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 cm.widgetEnter = undefined;
             }
         });
+    }
+
+    // test
+    public deleteChapterFromDB(value: string) {
+        // event.stopPropagation();
+        // console.log(event);
+        console.log("deleteChapterFromDB(" + value + ")");
+    }
+
+    // test 2
+    public changeChapter(event, chapter_number: number) {
+        console.log(event);
+        // if($event.target != this) {
+        //     console.log("NOT THIS TARGET");
+        //     return;
+        // }
+        console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
+        // this.documentService.currentChapter = chapter_number;
+        // this.current_chapter = chapter_number;
+    }
+
+    // move all these into the chapterItem component? // need to inject document etc.
+    public createChapter() {
+        // var p = new Paragraph("Text", []);
+        // this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [p]));
+        // var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
+        // this.documentService.sendDiff(diff);
+        // this.current_chapter += 1;
+        console.log("new chapter::");
+        var l = new Line("Text", []);
+        var current_chapter = this.documentService.currentChapter;
+        this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter", [l]));
     }
 
     parseWidgets(cm) {

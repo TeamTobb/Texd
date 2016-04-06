@@ -35,6 +35,11 @@ body {
   text-align: center;
 }
 
+#title h2 {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
 #changeDocumentName {
   margin-left: auto;
   margin-right: auto;
@@ -51,12 +56,82 @@ body {
     color: blue;
 }
 
+/*.box .row.header {*/
+  /*flex: 0 1 auto;*/
+  /*background-color: pink;*/
+/*}*/
+
+/*.box .row.content {
+  flex: 1 1 auto;
+  height: 100%;
+  position: relative;
+}*/
+
 #chapterItem {
-    margin-left: 2em;
+    /*margin-left: 2em;*/
+    width: 100%;
+    height: 40px;
+    background-color: yellow;
+    border: 2px solid #73AD21;
+}
+
+#chapter_bar {
+    position: relative;
+    flex: 0 1 auto;
+    float: left;
+    width: 200px;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+#editor_div {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    flex: 1 1 auto;
+    /*left: 200px;*/
+    /*float: right;*/
+}
+
+#chaptersContainer {
+    flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+#chaptersContainerScrollBox {
+    position: absolute;
+    height: 100%;
+    /*height: 200px;*/
+    width: 100%;
+    background-color: blue;
+    /*position: relative;*/
+    /*display: block;*/
+    /*overflow-y: auto;*/
+    /*overflow-y: scroll;*/
+    overflow: auto;
+    overflow-y: scroll;
+}
+
+#newchapter {
+    /*position: absolute;*/
+    /*flex: 0 1 auto;*/
+    width: 100%;
+    height: 40px;
+    /*bottom: 0;*/
+    font-size: 30px;
+    text-align: center;
+    background-color: red;
+}
+
+#newchapter:hover {
+    background-color: #ddd;
 }
 
 #chapterItem:hover {
-    background-color: #ccc
+    background-color: #ccc;
 }
 
 #editorContainer {
@@ -64,6 +139,7 @@ body {
     position: relative;
     height: 100%;
     width: 100%;
+    /*left: 200px;*/
 }
 
 #cmcomponent {
@@ -95,6 +171,8 @@ body {
     bottom: 0;
     margin-right: 20px;
     right: 40%;
+    display: flex;
+    flex-flow: row;
     /*background: red;*/
 }
 

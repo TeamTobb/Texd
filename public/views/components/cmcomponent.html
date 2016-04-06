@@ -1,6 +1,24 @@
 <div id="containerForEditor">
     <div id="leftInContainerForEditor">
-        <textarea id="linesEditor"></textarea>
+        <div id="chapter_bar">
+            <!-- <ul> -->
+                <div id="chaptersContainer">
+                    <div id="chaptersContainerScrollBox">
+                        <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
+                        *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter($event, i)"></chapteritem>
+                        <!-- <br><br><br><br>1qweqwe<br><br><br><br><br>2qweqwe<br><br><br><br><br>3qweqwe<br><br><br><br><br>4qweqwe<br> -->
+                        <!-- <br><br><br><br>5qweqwe<br><br><br><br><br>6qweqwe<br><br><br><br><br>7qweqwe<br><br><br><br><br>8qweqwe<br> -->
+                    </div>
+                </div>
+                <!-- <hr> -->
+                <div id="newchapter" (click)="createChapter()">
+                    +
+                </div>
+            <!-- </ul> -->
+        </div>
+        <div id="editor_div">
+            <textarea id="linesEditor"></textarea>
+        </div>
     </div>
     <div id="rightInContainerForEditor">
         <!-- Actual resize handle -->

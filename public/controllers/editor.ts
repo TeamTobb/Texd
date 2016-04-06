@@ -30,7 +30,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 })
 
 export class EditorController implements AfterViewInit {
-    private document: Document = new Document([], [], [], [], [{}, {}, {}]);
+    public document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter: number = 0;
     public current_paragraph: number = 0;
     public element: ElementRef;
@@ -87,37 +87,41 @@ export class EditorController implements AfterViewInit {
     }
 
     //TODO implement this, to be deleted in DB
-    public deleteChapterFromDB(value: string) {
-        console.log("deleteChapterFromDB(" + value + ")");
+    // public deleteChapterFromDB(value: string) {
+    //     console.log("deleteChapterFromDB(" + value + ")");
+    //
+    //     var chapters: Chapter[] = this.documentService.document.chapters;
+    //
+    //     for (var index = 0; index < chapters.length; index++) {
+    //         var element = chapters[index];
+    //         if (element.id == value) {
+    //             chapters.splice(index, 1);
+    //             break;
+    //         }
+    //     }
+    //
+    // }
 
-        var chapters: Chapter[] = this.documentService.document.chapters;
-
-        for (var index = 0; index < chapters.length; index++) {
-            var element = chapters[index];
-            if (element.id == value) {
-                chapters.splice(index, 1);
-                break;
-            }
-        }
-
-    }
-
+    // remove ??
     // TODO:: FIX.. paragraph doesnt exist anymore
-    public createChapter() {
+    // public createChapter() {
         // var p = new Paragraph("Text", []);
         // this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [p]));
         // var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
         // this.documentService.sendDiff(diff);
         // this.current_chapter += 1;
-    }
+    //     console.log("new chapter::");
+    //     var l = new Line("Text", []);
+    //     this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [l]));
+    // }
 
-    public gotoChapter($event, text) {
-        if ($event.which === 13) {
-            if (this.document.chapters[text]) {
-                this.current_chapter = parseInt(text);
-            }
-        }
-    }
+    // public gotoChapter($event, text) {
+    //     if ($event.which === 13) {
+    //         if (this.document.chapters[text]) {
+    //             this.current_chapter = parseInt(text);
+    //         }
+    //     }
+    // }
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
@@ -125,11 +129,11 @@ export class EditorController implements AfterViewInit {
         }
     }
 
-    public changeChapter(chapter_number: number) {
-        console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
-        this.documentService.currentChapter = chapter_number;
-        this.current_chapter = chapter_number;
-    }
+    // public changeChapter(chapter_number: number) {
+    //     console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
+    //     this.documentService.currentChapter = chapter_number;
+    //     // this.current_chapter = chapter_number;
+    // }
 
     public globalKeyEvent($event) {
         var keyMap = {};
@@ -144,7 +148,7 @@ export class EditorController implements AfterViewInit {
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
-            this.createChapter();
+            // this.createChapter();
         }
 
         if ($event.ctrlKey) {
