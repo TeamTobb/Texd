@@ -34,7 +34,7 @@ export class WidgetParser {
                     }
                 } else {
                     if(lines[lineIndex][index] == " ") {
-                        if(widgetMap[buffer]) {
+                        if(widgetMap[buffer.trim()]) {
                             // console.log("Found widget start: " + buffer);
                             widgetInc = true;
                             fromCh = index-buffer.length; // remove - buffer.length ?
