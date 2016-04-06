@@ -11,18 +11,22 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
+import {FileUploaderClass} from './fileUpLoader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 
 import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
+//Upload file
+import {NgZone} from 'angular2/core';
+import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 
 @Component({
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass]
 })
 
 export class EditorController implements AfterViewInit {
@@ -155,6 +159,5 @@ export class EditorController implements AfterViewInit {
 
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
-
     }
 }
