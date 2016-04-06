@@ -2,17 +2,24 @@
 
 var express = require('express')
 var bodyParser = require('body-parser')
-
-import http = require('http');
-import path = require('path');
-import mongoose = require('mongoose');
-import WebSocket = require('ws');
+var cookieParser = require('cookie-parser');
+var jwt = require('jwt-simple')
+var passport = require('passport');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var http = require('http');
+var WebSocket = require('ws');
 
 import Diff = require('./server/domain/diff');
-import pluginsRoutes = require('./server/resources/plugins');
-import snappetRoutes = require('./server/resources/snappets');
-import routes = require('./server/resources/index');
-import documentRoutes = require('./server/resources/document');
+var pluginsRoutes = require('./server/resources/plugins');
+var snappetRoutes = require('./server/resources/snappets');
+var loginroutes = require('./server/resources/login');
+var documentRoutes = require('./server/resources/document');
+var indexroutes = require('./server/resources/index')
 
 var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
@@ -23,40 +30,18 @@ checkArgs();
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
 
-var wrapFunction = function(fn, context, params) {
-    return function() {
-        fn.apply(context, params);
-    };
-}
-
-var funqueue = [];
-var kanFortsette = true;
 
 server.on('connection', ws => {
     ws.on('message', message => {
         console.log("recived socket message on server");
-
-        var sayStuff = function(message) {
-            documentRoutes.updateDocumentText(JSON.parse(message), () => {
-                //Done, alt OK
-                kanFortsette = true
-            })
-        }
-
-        //documentRoutes.updateDocumentText(JSON.parse(message), () => {})
-        var fun1 = wrapFunction(sayStuff, this, [message]);
-        funqueue.push(fun1);
-
-        while (funqueue.length > 0 && kanFortsette==true) {
-            kanFortsette = false;
-            (funqueue.shift())();
-        }
+        documentRoutes.updateDocumentText(JSON.parse(message), () => {      
+                
+        })
         broadcast(message)
     });
 });
 
 function broadcast(data: string): void {
-
     server.clients.forEach(client => {
         client.send(data);
     });
@@ -69,20 +54,26 @@ if (mongoose.connect('mongodb://' + databaseUrl + '/dbTexd')) {
 }
 
 var app = express();
+
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/node_modules')));
 app.use(express.static(path.join(__dirname, '/typings')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
 
+//Parsers + passport
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+
+//Routes
+app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
 app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
-app.get('/documents', documentRoutes.getDocuments);
+app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.post('/document/:id', documentRoutes.update);
-app.get('/*', routes.index);
+app.get('/*', indexroutes.index);
 
 app.listen(httpPort, function() {
     console.log("Demo Express server listening on port %d", httpPort);
