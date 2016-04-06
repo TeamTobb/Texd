@@ -68,6 +68,7 @@ export class Ng2Uploader {
   authTokenPrefix: string = "Bearer";
   authToken: string = undefined;
   fieldName: string = "photo";
+  orginalName: string = "";
 
   _queue: any[] = [];
   _emitter: EventEmitter<any> = new EventEmitter(true);
@@ -86,7 +87,8 @@ export class Ng2Uploader {
     this.multipart = options && options.multipart || this.multipart;
     this.method = options && options.method || this.method;
     this.debug = options && options.debug || this.debug;
-    this.customHeaders = options && options.customHeaders || this.customHeaders;
+    this.addCustomHeaders(options);
+    this.customHeaders = options && options.customHeaders || this.customHeaders; 
     this.encodeHeaders = options && options.encodeHeaders || this.encodeHeaders;
     this.authTokenPrefix = options && options.authTokenPrefix || this.authTokenPrefix;
     this.authToken = options && options.authToken || this.authToken;
@@ -108,7 +110,7 @@ export class Ng2Uploader {
     let xhr = new XMLHttpRequest();
     let form = new FormData();
     form.append(this.fieldName, file, file.name);
-
+    this.customHeaders = {originalName: file.name}
     let uploadingFile = new UploadedFile(
         this.generateRandomIndex(),
         file.name,
@@ -210,6 +212,10 @@ export class Ng2Uploader {
 
   generateRandomIndex(): string {
     return Math.random().toString(36).substring(7);
+  }
+  
+  addCustomHeaders(): void {
+    this.customHeaders = {orginalName: this.orginalName, test: "oName123"}
   }
 
 }

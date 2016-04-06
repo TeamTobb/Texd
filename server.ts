@@ -87,7 +87,15 @@ var storage =   multer.diskStorage({
     callback(null, './public/uploads');
   },
   filename: function (req, file, callback) {
-    callback(null, file.fieldname + '-' + Date.now() + req.originalName);
+      console.log(req.rawHeaders)
+      var originalName: string = ""
+      for (var index = 0; index < req.rawHeaders.length; index++) {
+          var element = req.rawHeaders[index];
+          if (element == "originalName"){
+              originalName = req.rawHeaders[index+1];
+          } 
+      }
+    callback(null,  originalName);
   }
 });
 
