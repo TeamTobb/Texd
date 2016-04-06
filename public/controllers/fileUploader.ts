@@ -5,6 +5,7 @@ import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 @Component({
     selector: 'fileuploader',
     templateUrl: 'views/fileUploader.html',
+    styleUrls: ['stylesheets/style.css'],
     providers: [],
     directives: [UPLOAD_DIRECTIVES],
     pipes: []

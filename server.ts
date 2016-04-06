@@ -48,7 +48,7 @@ server.on('connection', ws => {
         var fun1 = wrapFunction(sayStuff, this, [message]);
         funqueue.push(fun1);
 
-        while (funqueue.length > 0 && kanFortsette==true) {
+        while (funqueue.length > 0 && kanFortsette == true) {
             kanFortsette = false;
             (funqueue.shift())();
         }
@@ -80,34 +80,50 @@ app.use(bodyParser.urlencoded({
 }));
 
 //Setting up the uploader "Multer"
-var multer  = require('multer')
+var multer = require('multer')
 
-var storage =   multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, './public/uploads');
-  },
-  filename: function (req, file, callback) {
-      console.log(req.rawHeaders)
-      var originalName: string = ""
-      for (var index = 0; index < req.rawHeaders.length; index++) {
-          var element = req.rawHeaders[index];
-          if (element == "originalName"){
-              originalName = req.rawHeaders[index+1];
-          } 
-      }
-    callback(null,  originalName);
-  }
+var storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        var documentID: string = ""
+        for (var index = 0; index < req.rawHeaders.length; index++) {
+            var element = req.rawHeaders[index];
+            if (element == "Referer") {
+                documentID = req.rawHeaders[index + 1].slice(req.rawHeaders[index + 1].length - 24, req.rawHeaders[index + 1].length);
+                console.log("Doc ID: " + documentID)
+
+            }
+        }
+        var documentDir = './public/uploads/document/'+ documentID.trim()// '/photos'
+        var photoDirForDocId = documentDir + '/photos'
+        var fs = require('fs');
+        if (!fs.existsSync(documentDir)) {
+            fs.mkdirSync(documentDir);
+            fs.mkdirSync(photoDirForDocId);           
+        }
+        callback(null, photoDirForDocId);
+    },
+    filename: function(req, file, callback) {
+        console.log(req.rawHeaders)
+        var originalName: string = ""
+        for (var index = 0; index < req.rawHeaders.length; index++) {
+            var element = req.rawHeaders[index];
+            if (element == "originalName") {
+                originalName = req.rawHeaders[index + 1];
+            }
+        }
+        callback(null, originalName);
+    }
 });
 
-var upload = multer({ storage : storage}).single('photo');
+var upload = multer({ storage: storage }).single('photo');
 
 
 //TODO Change to app.use() Create one upload, with different paths for photo, JSON...
-app.post('/upload/photo',function(req,res){
+app.post('/upload/photo', function(req, res) {
     console.log(req)
     console.log("POST POST POST ")
-    upload(req,res,function(err) {
-        if(err) {
+    upload(req, res, function(err) {
+        if (err) {
             return res.end("Error uploading file.");
         }
         res.end("File is uploaded");

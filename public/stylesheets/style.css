@@ -198,16 +198,34 @@ body {
     /*background-color: #AAFFFF;*/
     word-wrap: break-word;
 }
-
-#uploadDiv{
-    background-color: greenyellow;
-    width: 50%;
-    height: 50%;
+.uploadDiv{
+    z-index: 999;
+    background-color: lightsteelblue;
+    width: 80%;    
+    height: 80%;
     position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: auto;
     margin-right: auto;
     left: 0;
     right: 0;
+    background: rgb(170, 187, 97); /* Fallback */
+    background: rgba(170, 187, 97, 0.5);
+}
+
+.columns {
+    margin: 10%;
+   
+}
+
+.is-4{
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: lightgreen;
+    margin: 10%;
+
+   
 }
 
 .image-widget {
