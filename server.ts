@@ -79,13 +79,16 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-/*
-var router = express.Router();
+//Setting up the uploader "Multer"
+var multer  = require('multer')
 
-
-// define the about route
-router.post('/upload', function(req, res) {
-  res.send('About birds');
+var storage =   multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/uploads');
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.fieldname + '-' + Date.now() + req.originalName);
+  }
 });
 
 var upload = multer({ storage : storage}).single('photo');
