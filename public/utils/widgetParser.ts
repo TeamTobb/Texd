@@ -69,11 +69,10 @@ export class WidgetParser {
             } else {
                 buffer = "";
             }
-            // insert widgets
-            // console.log(widgetsToInsert.length);
-            for (var i = widgetsToInsert.length - 1; i >= 0; i--) {
-                insertWidget(widgetsToInsert[i]["buffer"], widgetsToInsert[i]["range"]);
-            }
+        }
+        // insert widgets
+        for (var i = widgetsToInsert.length - 1; i >= 0; i--) {
+            insertWidget(widgetsToInsert[i]["buffer"], widgetsToInsert[i]["range"]);
         }
     }
 }

@@ -16,7 +16,7 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
-    @Input() chapterId: string
+    @Input() chapterId: string;
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
@@ -25,6 +25,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public widgetTest;
 
+    public isInitialized = false;
+
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
         console.log("chapterid: " + this.chapterId);
@@ -32,14 +34,16 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if (changes["lines"] && this.editor !== undefined) {
-            var arr = [];
-            for (var line in this.lines) {
-                arr.push(this.lines[line].raw)
+        if(!this.isInitialized) {
+            if (changes["lines"] && this.editor !== undefined) {
+                var arr = [];
+                for (var line in this.lines) {
+                    arr.push(this.lines[line].raw);
+                }
+                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 });
+                this.isInitialized = true;
             }
-            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 })
         }
-
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
@@ -55,6 +59,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 "Ctrl-Space": "autocomplete"
             }
         })
+
+        this.documentService.cm = this.editor;
+
         this.editor.on("change", (cm, change) => {
             console.log("CHANGE:: ");
             console.log(change);
@@ -106,9 +113,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
         $("#insertunderline").click(() => {
             new UnderlineWidget(this.editor, null, false);
         });
-        // $("#insertimagetest").click(() => {
-        //     new ImageWidget(this.editor, null, false);
-        // });
 
         this.editor.on("cursorActivity", function(cm) {
             if (cm.widgetEnter) {
@@ -125,15 +129,15 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     parseWidgets(cm) {
-        var lines: string[] = [];
+        var parseLines: string[] = [];
         for (var i = 0; i < cm.lineCount(); i++) {
             var text: string = cm.getLine(i);
-            lines.push(text);
+            parseLines.push(text);
         }
         var widgetMap = [];
         widgetMap["#b"] = true;
         widgetMap["#img"] = true;
-        WidgetParser.searchForWidgets(widgetMap, lines, (type, range) => {
+        WidgetParser.searchForWidgets(widgetMap, parseLines, (type, range) => {
             this.insertWidget(type, range);
         });
     }
@@ -151,6 +155,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     // Ctrl + J = BOLD
     public onKeyPressEvent(cm, e) {
+        console.log("keypress");
+        console.log(e);
         if (e.ctrlKey) {
             console.log(e);
             if (e.code === "KeyJ") {

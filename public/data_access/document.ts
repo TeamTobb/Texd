@@ -15,12 +15,16 @@ export class DocumentService {
     private _socket;
     public parseMap: ParseMap = new ParseMap();
 
+    public cm = null;
+
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
 
     public _senderId: string;
     private _textParser: Parser = null;
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
+    public currentChapter : number;
+
     public changeOrder: any = {
         from: {},
         to: {},
@@ -104,6 +108,21 @@ export class DocumentService {
             );
     }
 
+    public updateLines() {
+        console.log("updating lines");
+        if (this.cm == null) return;
+        var tempLines: string[] = [];
+        for (var i = 0; i < this.cm.lineCount(); i++) {
+            var text: string = this.cm.getLine(i);
+            tempLines.push(text);
+        }
+        this._document.chapters[this.currentChapter].lines = [];
+        for (var l in tempLines) {
+            this._document.chapters[this.currentChapter].lines.push(new Line(tempLines[l], []));
+        }
+        console.log("done updating lines");
+    }
+
     //TODO implement changeChapterName() new URL
     public changeChapterName(documentId: string, newchapterName: string, chapterId: number) {
         console.log(documentId)
@@ -129,9 +148,9 @@ export class DocumentService {
             );
     }
 
-    public parseChapter(currentChapter, callback: (parsedHTML : string) => void) {
+    public parseChapter(callback: (parsedHTML : string) => void) {
         if(this._textParser != null && this._jsonParser != null) {
-            var lines : Line[] = this.document.chapters[currentChapter].lines;
+            var lines : Line[] = this.document.chapters[this.currentChapter].lines;
             var parsedJSON = this._textParser.getParsedJSON(lines);
             var parsedHTML : string = this._jsonParser.getParsedHTML(parsedJSON);
             callback(parsedHTML);
