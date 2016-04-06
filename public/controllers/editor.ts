@@ -3,8 +3,6 @@ import {Component, ElementRef, Renderer, Input, AfterViewInit, OnChanges, Simple
 import {Http, HTTP_BINDINGS, Response} from 'angular2/http';
 import {Injectable, } from 'angular2/core';
 import {RouteParams} from 'angular2/router';
-import {AuthHttp, AuthConfig} from 'angular2-jwt';
-
 import 'rxjs/Rx';
 
 import {Parser} from '../utils/parser.ts';
@@ -48,13 +46,6 @@ export class EditorController implements AfterViewInit {
                 this.document = document2;
             })
         }
-        
-        this.http.get('./login').map((res: Response) => res.json()).subscribe(res => {
-            console.log(JSON.stringify(res, null, 2)); 
-        }); 
-
-        
-        // this.http.post('')
     }
 
     ngAfterViewInit() {
