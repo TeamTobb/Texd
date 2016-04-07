@@ -12,7 +12,6 @@ body {
   height: 100%;
   width: 100%;
   margin-left: 15px;
-  /*margin-right: 30px;*/
 }
 
 .box .row {
@@ -21,7 +20,6 @@ body {
 
 .box .row.header {
   flex: 0 1 auto;
-  /*background-color: pink;*/
 }
 
 .box .row.content {
@@ -56,29 +54,25 @@ body {
     color: blue;
 }
 
-/*.box .row.header {*/
-  /*flex: 0 1 auto;*/
-  /*background-color: pink;*/
-/*}*/
-
-/*.box .row.content {
-  flex: 1 1 auto;
-  height: 100%;
-  position: relative;
-}*/
-
 #chapterItem {
-    /*margin-left: 2em;*/
     width: 100%;
     height: 40px;
-    background-color: yellow;
-    border: 2px solid #73AD21;
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#cmcomponentwrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: row;
 }
 
 #chapter_bar {
     position: relative;
     flex: 0 1 auto;
-    float: left;
     width: 200px;
     height: 100%;
     display: flex;
@@ -90,8 +84,6 @@ body {
     height: 100%;
     width: 100%;
     flex: 1 1 auto;
-    /*left: 200px;*/
-    /*float: right;*/
 }
 
 #chaptersContainer {
@@ -104,26 +96,18 @@ body {
 #chaptersContainerScrollBox {
     position: absolute;
     height: 100%;
-    /*height: 200px;*/
     width: 100%;
-    background-color: blue;
-    /*position: relative;*/
-    /*display: block;*/
-    /*overflow-y: auto;*/
-    /*overflow-y: scroll;*/
     overflow: auto;
     overflow-y: scroll;
 }
 
 #newchapter {
-    /*position: absolute;*/
-    /*flex: 0 1 auto;*/
     width: 100%;
     height: 40px;
-    /*bottom: 0;*/
     font-size: 30px;
     text-align: center;
-    background-color: red;
+    border-top: 2px solid black;
+    background-color: #EEEEEE;
 }
 
 #newchapter:hover {
@@ -139,19 +123,17 @@ body {
     position: relative;
     height: 100%;
     width: 100%;
-    /*left: 200px;*/
 }
 
 #cmcomponent {
     position: absolute;
     height: 100%;
     width: 100%;
-    /*background-color: black;*/
 }
 
 #containerForEditor {
     position: relative;
-    /*background-color: red;*/
+    flex: 1 1 auto;
     height: 100%;
     width: 100%;
     /* Disable selection so it doesn't get annoying */
@@ -171,24 +153,17 @@ body {
     bottom: 0;
     margin-right: 20px;
     right: 40%;
-    display: flex;
-    flex-flow: row;
-    /*background: red;*/
 }
 
 #containerForEditor #rightInContainerForEditor {
     position: absolute;
     height: 100%;
-    /*left: 20px;*/
-    /*margin-left: 100px;*/
-    /*margin-right: 20px;*/
     right: 20px;
     top: 0;
     bottom: 0;
     width: 40%;
     overflow-x: auto;
     overflow-y: auto;
-    /*background: blue;*/
 }
 
 #containerForEditor #handle2 {
@@ -201,6 +176,22 @@ body {
     background-color: black;
     cursor: w-resize;
     z-index: 11;
+}
+
+#sidebarbutton {
+    /*font-size: 16px;*/
+}
+
+#deleteChapterButton {
+    width: 30px;
+    height: 100%;
+    flex: 0 1 auto;
+}
+
+#chapterItemText {
+    font-size: 13px;
+    margin-left: 5px;
+    flex: 1 1 auto;
 }
 
 .roundedBorder {
@@ -235,21 +226,16 @@ body {
     position: absolute;
     height: 100%;
     width: 100%;
-    /*background-color: blue;*/
 }
 
 .beforeEditorContainer {
     flex: 0 1 auto;
     position: relative;
-    /*height: 100%;*/
-    /*background-color: orange;*/
 }
 
 .editorContainer {
     flex: 1 1 auto;
     position: relative;
-    /*background-color: pink;*/
-    /*height: 100%;*/
 }
 
 #buttonsContainer {
@@ -265,21 +251,14 @@ body {
     height: 100%;
     width: 98%;
     display: block;
-    /*margin-left: 10px;*/
-    /*margin-right: 30px;*/
-    /*padding-right: 50px;*/
     padding-left: 10px;
-
     overflow: scroll;
-    /*margin-left: auto;*/
-    /*margin-right: auto;*/
-    /*background-color: #AAFFFF;*/
     word-wrap: break-word;
 }
 .uploadDiv{
     z-index: 999;
     background-color: lightsteelblue;
-    width: 80%;    
+    width: 80%;
     height: 80%;
     position: absolute;
     margin-top: auto;
@@ -294,7 +273,7 @@ body {
 
 .columns {
     margin: 10%;
-   
+
 }
 
 .is-4{
@@ -303,7 +282,7 @@ body {
     background-color: lightgreen;
     margin: 10%;
 
-   
+
 }
 
 .image-widget {

@@ -84,44 +84,61 @@ export class EditorController implements AfterViewInit {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
             })
         });
+
+        var sidebarHidden = false;
+        var previewHidden = false;
+        var editorHidden = false;
+
+        $("#sidebarbutton").click(() => {
+            console.log("clicked sidebarbutton");
+            if(sidebarHidden) {
+                console.log("show");
+                $("#chapter_bar").show(650);
+                sidebarHidden = false;
+            }
+            else {
+                console.log("hide");
+                $("#chapter_bar").hide(650);
+                sidebarHidden = true;
+            }
+        });
+
+        // hide handle too ?
+
+        $("#hidePreview").click(() => {
+            console.log("clicked sidebarbutton");
+            if(previewHidden) {
+                console.log("show");
+                $("#rightInContainerForEditor").show(650);
+                previewHidden = false;
+            }
+            else {
+                console.log("hide");
+                $("#rightInContainerForEditor").hide(650);
+                previewHidden = true;
+            }
+        });
+
+        // use some kind of tracker here?
+        var lastPreviewSize = 0;
+
+        $("#hideEditor").click(() => {
+            console.log("clicked sidebarbutton");
+            if(editorHidden) {
+                console.log("show");
+                $("#leftInContainerForEditor").show(650);
+                // need to adjust reset the previous positions of preview etc.
+                editorHidden = false;
+            }
+            else {
+                console.log("hide");
+                $("#leftInContainerForEditor").hide(650);
+                // need to adjust preview to fit screen now.
+                editorHidden = true;
+            }
+        });
+
     }
-
-    //TODO implement this, to be deleted in DB
-    // public deleteChapterFromDB(value: string) {
-    //     console.log("deleteChapterFromDB(" + value + ")");
-    //
-    //     var chapters: Chapter[] = this.documentService.document.chapters;
-    //
-    //     for (var index = 0; index < chapters.length; index++) {
-    //         var element = chapters[index];
-    //         if (element.id == value) {
-    //             chapters.splice(index, 1);
-    //             break;
-    //         }
-    //     }
-    //
-    // }
-
-    // remove ??
-    // TODO:: FIX.. paragraph doesnt exist anymore
-    // public createChapter() {
-        // var p = new Paragraph("Text", []);
-        // this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [p]));
-        // var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
-        // this.documentService.sendDiff(diff);
-        // this.current_chapter += 1;
-    //     console.log("new chapter::");
-    //     var l = new Line("Text", []);
-    //     this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [l]));
-    // }
-
-    // public gotoChapter($event, text) {
-    //     if ($event.which === 13) {
-    //         if (this.document.chapters[text]) {
-    //             this.current_chapter = parseInt(text);
-    //         }
-    //     }
-    // }
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
@@ -129,15 +146,8 @@ export class EditorController implements AfterViewInit {
         }
     }
 
-    // public changeChapter(chapter_number: number) {
-    //     console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
-    //     this.documentService.currentChapter = chapter_number;
-    //     // this.current_chapter = chapter_number;
-    // }
-
     public globalKeyEvent($event) {
         var keyMap = {};
-        // doing it in cmcomponent for now
         keyMap[80] = () => {
             console.log("ctrl+p");
             this.documentService.updateLines();

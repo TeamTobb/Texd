@@ -4,7 +4,7 @@ import {OnInit} from 'angular2/core';
 import {EventEmitter} from "angular2/src/facade/async";
 import {isPropertyUpdated} from "angular2/src/common/forms/directives/shared";
 import {DocumentService} from '../data_access/document.ts';
-import {Document, Paragraph, Chapter} from '../domain/document.ts';
+import {Document, Line, Chapter} from '../domain/document.ts';
 
 
 @Component({
@@ -13,24 +13,18 @@ import {Document, Paragraph, Chapter} from '../domain/document.ts';
 
 })
 export class ChapterItem implements OnChanges {
-  @Input() chapterName: string;
-  @Input() chapterId: string;
-  @Input() documentId: string;
-  @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
+    @Input() chapterName: string;
+    @Input() chapterId: string;
+    @Input() documentId: string;
+    @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
 
+    constructor(private documentService: DocumentService) {}
 
-  constructor(private documentService: DocumentService) {
-
-  }
     // TODO Make alert, sure you want to delete this chapter?
-  delete(event, value: any){
-    console.log("Event:: ");
-    console.log(event);
-    event.stopPropagation();
-    // event.preventDefault();
-    console.log("Delete()")
-    this.toBeDeleted.emit(value)
-  }
+    delete(event, value: any){
+        event.stopPropagation();
+        this.toBeDeleted.emit(value)
+    }
 
     rename($event, chapterId, documentId){
         var newName: string = $event.target.innerHTML
@@ -39,8 +33,7 @@ export class ChapterItem implements OnChanges {
     }
 
     ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-     //console.log("Something has Changed in chapterItem")
-
+        console.log("Something has Changed in chapterItem")
     }
 
     ondblclickChapter($event){
