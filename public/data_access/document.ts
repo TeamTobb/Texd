@@ -1,5 +1,6 @@
 //Singleton (eager initialization) - achieved through @Component-providers in app.js
 import {Http, Headers, Response, RequestOptions} from 'angular2/http';
+import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt"; //I am stating it twice
 import {Injectable, bind} from 'angular2/core';
 import {Component, ViewChild, Input, Output, Renderer, ElementRef} from 'angular2/core';
 
@@ -31,7 +32,7 @@ export class DocumentService {
         text: {}
     }
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private authHttp: AuthHttp) {
         this._senderId = "" + Math.random();
 
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {

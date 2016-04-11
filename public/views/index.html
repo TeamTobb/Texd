@@ -67,9 +67,15 @@
         System.config({
             transpiler: 'typescript',
             typescriptOptions: { emitDecoratorMetadata: true },
-            packages: {'controllers': {defaultExtension: 'ts'}},
+            packages: {
+                'controllers': {defaultExtension: 'ts'},
+                 "angular2-jwt": {
+                    "defaultExtension": "js"
+                }
+            },
             map: {
-                moment: 'moment/moment.js'
+                "moment": 'moment/moment.js', 
+                "angular2-jwt": "angular2-jwt"
             }
       });
       System.import('controllers/index')
