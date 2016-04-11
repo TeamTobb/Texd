@@ -12,8 +12,8 @@ import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 })
 export class FileUploaderClass {
     zone: NgZone;
-    options: Object = {  
-        url: './upload/photo'   
+    options: Object = {
+        url: './upload/photo'
     };
     basicProgress: number = 0;
     basicResp: Object;
@@ -21,22 +21,32 @@ export class FileUploaderClass {
     multipleResp: any[] = [];
     dropProgress: number = 0;
     dropResp: any[] = [];
+    selectedFileIsUploading = false;
+    dragedFileIsUploading = false;
+    selectedFileIsUploaded = false;
+    dragedFileIsUploaded = false;
 
     constructor() {
         this.zone = new NgZone({ enableLongStackTrace: false });
+
     }
 
-    handleBasicUpload(data): void {
+
+    /*handleBasicUpload(data): void {
         console.log(data)
         this.basicResp = data;
         this.zone.run(() => {
             this.basicProgress = data.progress.percent;
         });
-    }
+    }*/
 
     handleMultipleUpload(data): void {
+        this.selectedFileIsUploading = true;
         let index = this.multipleResp.findIndex(x => x.id === data.id);
         if (index === -1) {
+            if (!data.error) {
+                this.selectedFileIsUploaded = true;
+            }
             this.multipleResp.push(data);
         }
         else {
@@ -52,12 +62,19 @@ export class FileUploaderClass {
         });
 
         this.multipleProgress = Math.floor(uploaded / (total / 100));
+
+
+
     }
 
     handleDropUpload(data): void {
+        this.dragedFileIsUploading = true;
         let index = this.dropResp.findIndex(x => x.id === data.id);
         if (index === -1) {
             this.dropResp.push(data);
+            if (!data.error) {
+                this.dragedFileIsUploaded = true;
+            }
         }
         else {
             this.zone.run(() => {
@@ -73,5 +90,7 @@ export class FileUploaderClass {
 
         this.dropProgress = Math.floor(uploaded / (total / 100));
     }
+    
+    
 
 }

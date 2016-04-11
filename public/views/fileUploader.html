@@ -1,64 +1,76 @@
-
 <div class="columns">
-  <div class="column is-4">
-    <div class="message is-danger">
-      <div class="message-header">Basic Example</div>
-      <div class="message-body">
-        <div class="content">
-          <label class="tag btn is-danger">
-            <i class="fa fa-upload icon is-small"></i> Choose file
-            <input type="file" [ng-file-select]="options" (onUpload)="handleBasicUpload($event)">
-          </label>
-          <div class="progress">
-            <div class="progress-bar" [style.width]="basicProgress + '%'"></div>
-            <span class="percent">{{ basicProgress }}%</span>
-          </div>
+    <h1 class="headerForUpload"> Upload Image </h1>
+
+    <div id="dragBox" class="column is-4" [ng-file-drop]="options" (onUpload)="handleDropUpload($event)">
+        <div class="message is-success">
+
+            <div class="message-header">Drag file inside this box</div>
+
+            <section *ngIf="dragedFileIsUploading">
+                <div class="progress">
+                    <div class="progress-bar" [style.width]="dropProgress + '%'"></div>
+                    <span class="percent">{{ dropProgress }}%</span> {{ basicResp | json }}
+                </div>
+            </section>
         </div>
-      </div>
     </div>
-  </div>
-  <div class="column is-4">
-    <div class="message is-success">
-      <div class="message-header">Multiple Example</div>
-      <div class="message-body">
-        <label class="tag btn is-success">
-          <i class="fa fa-upload icon is-small"></i> Choose files
-          <input type="file" multiple [ng-file-select]="options" (onUpload)="handleMultipleUpload($event)">
-        </label>
-        <div class="progress">
-          <div class="progress-bar" [style.width]="multipleProgress + '%'"></div>
-          <span class="percent">{{ multipleProgress }}%</span>
+
+    <div class="column is-4">
+        <div class="message is-success">
+
+            <div class="message-header">Press the button and select files </div>
+            <br>
+            <br>
+
+            <div class="message-body">
+                <label class="tag btn is-success">
+                    <input type="file" multiple [ng-file-select]="options" (onUpload)="handleMultipleUpload($event)">
+                </label>
+
+                <section *ngIf="selectedFileIsUploading">
+
+                    <div class="progress">
+                        <div class="progress-bar" [style.width]="multipleProgress + '%'"></div>
+                        <span class="percent">{{ multipleProgress }}%</span>
+                    </div>
+                </section>
+
+            </div>
         </div>
-      </div>
+    </div><br>
+    <div class="message resp">
+        <div class="message-header"></div>
+        <div class="message-body">
+            <p>
+                {{ basicResp | json }}
+            </p>
+            <h2 *ngIf="selectedFileIsUploaded">
+                Filen ble lastet opp
+            </h2>
+            <h2 *ngIf="dragedFileIsUploaded">
+               Filen ble lastet opp
+            </h2>
+        </div>
     </div>
-  </div>
-  <div class="column is-4">
-    <div class="message is-info">
-      <div class="message-header">Drag & Drop Example</div>
-      <div class="message-body">
-        <div class="tag btn is-info" [ng-file-drop]="options" (onUpload)="handleDropUpload($event)">
-          <i class="fa fa-hand-grab-o icon is-small"></i> Drop files here
-        </div>
-        <div class="progress">
-          <div class="progress-bar" [style.width]="dropProgress + '%'"></div>
-          <span class="percent">{{ dropProgress }}%</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
-<!--
-<div class="message resp">
-  <div class="message-header">Response</div>
-  <div class="message-body">
-    <p>
-      {{ basicResp | json }}
-    </p>
-    <p *ngIf="multipleResp.length">
-      {{ multipleResp | json }}
-    </p>
-    <p *ngIf="dropResp.length">
-      {{ dropResp | json }}
-    </p>
-  </div>
-</div>-->
+
+
+<script>
+    
+var drop = document.getElementById("dragBox");
+drop.addEventListener("dragenter", change, false);
+drop.addEventListener("dragleave",change_back,false);
+
+function change() {
+    alert("I am an alert box!");
+  drop.style.backgroundColor = '#EFF2AA';
+  window.alert("sometext");
+
+};
+
+function change_back() {
+  drop.style.backgroundColor = 'transparent';
+};
+
+
+</script>

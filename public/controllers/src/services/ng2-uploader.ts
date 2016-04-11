@@ -215,7 +215,7 @@ export class Ng2Uploader {
   }
   
   addCustomHeaders(): void {
-    this.customHeaders = {orginalName: this.orginalName, test: "oName123"}
+    this.customHeaders = {orginalName: this.orginalName}
   }
 
 }

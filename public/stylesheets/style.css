@@ -288,22 +288,38 @@ body {
     margin-right: auto;
     left: 0;
     right: 0;
-    background: rgb(170, 187, 97); /* Fallback */
-    background: rgba(170, 187, 97, 0.5);
+    background: lightgray; 
 }
 
-.columns {
+
+.columns{
     margin: 10%;
+    height: 80%;
+    width: 80%;
    
+}
+
+.headerForUpload{
+    text-align: center;
 }
 
 .is-4{
+    width: 35%;
+    height: 30%;
+    float: left;
     border: 2px solid black;
     border-radius: 10px;
     background-color: lightgreen;
-    margin: 10%;
+    margin: 7%;
+    
+}
 
-   
+.message-header{
+    text-align: center;
+}
+
+.message-body{
+    text-align: center;
 }
 
 .image-widget {
