@@ -16,11 +16,8 @@ var WebSocket = require('ws');
 
 import Diff = require('./server/domain/diff');
 
-import pluginsRoutes = require('./server/resources/plugins');
-import snappetRoutes = require('./server/resources/snappets');
 import uploadRoutes = require('./server/resources/upload');
 import routes = require('./server/resources/index');
-import documentRoutes = require('./server/resources/document');
 var pluginsRoutes = require('./server/resources/plugins');
 var snappetRoutes = require('./server/resources/snappets');
 var loginroutes = require('./server/resources/login');

@@ -30,7 +30,6 @@
         "./server/domain/diff.ts",
         "./server/domain/document.ts",
         "./server/domain/line.ts",
-        "./server/resources/auth.ts",
         "./server/resources/document.ts",
         "./server/resources/index.ts",
         "./server/resources/login.ts",
