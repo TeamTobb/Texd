@@ -74,4 +74,4 @@ function findUser(username, callback) {
     })
 }
 
-module.exports = router; 
+module.exports = router;

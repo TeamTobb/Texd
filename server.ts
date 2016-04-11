@@ -36,14 +36,19 @@ checkArgs();
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
 
+import DocumentService = require('./server/services/documentService');
+
+var documentService = new DocumentService.DocumentService();
+
 
 server.on('connection', ws => {
     ws.on('message', message => {
         console.log("recived socket message on server");
-
-        documentRoutes.updateDocumentText(JSON.parse(message), () => {      
+        
+        documentService.updateDocument(message);
+        /*documentRoutes.updateDocumentText(JSON.parse(message), () => {      
                 
-        })
+        })*/
         broadcast(message)
     });
 });
