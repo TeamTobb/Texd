@@ -35,6 +35,7 @@
         "./server/resources/login.ts",
         "./server/resources/plugins.ts",
         "./server/resources/snappets.ts",
-        "./server/resources/upload.ts"
+        "./server/resources/upload.ts",
+        "./server/services/documentService.ts"
     ]
 }
