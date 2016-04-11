@@ -25,14 +25,14 @@
     "files": [
         "./server.ts",
         "./server/dao/documentModel.ts",
-        "./server/dao/messageModel.ts",
         "./server/domain/chapter.ts",
         "./server/domain/diff.ts",
         "./server/domain/document.ts",
-        "./server/domain/paragraph.ts",
+        "./server/domain/line.ts",
         "./server/resources/document.ts",
         "./server/resources/index.ts",
         "./server/resources/plugins.ts",
-        "./server/resources/snappets.ts"
+        "./server/resources/snappets.ts",
+        "./server/resources/upload.ts"
     ]
 }
