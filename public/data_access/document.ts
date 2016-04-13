@@ -72,7 +72,7 @@ export class DocumentService {
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
 
-        this._socket = new WebSocket('ws://158.38.186.232:3001');
+        this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
             if (parsed.senderId != this._senderId) {
