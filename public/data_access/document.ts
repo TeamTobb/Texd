@@ -24,7 +24,7 @@ export class DocumentService {
     private _textParser: Parser = null;
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
-    public currentChapter : number;
+    public currentChapter: number;
 
     public changeOrder: any = {
         from: {},
@@ -44,7 +44,7 @@ export class DocumentService {
         this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
-            if(parsed.senderId != this._senderId){
+            if (parsed.senderId != this._senderId && (parsed.documentId == this.document.id)) {
                 this.changeOrder.from = parsed.from
                 this.changeOrder.to = parsed.to
                 this.changeOrder.text = parsed.text
@@ -105,11 +105,11 @@ export class DocumentService {
             );
     }
 
-    public parseChapter(callback: (parsedHTML : string) => void) {
-        if(this._textParser != null && this._jsonParser != null) {
-            var lines : Line[] = this.document.chapters[this.currentChapter].lines;
+    public parseChapter(callback: (parsedHTML: string) => void) {
+        if (this._textParser != null && this._jsonParser != null) {
+            var lines: Line[] = this.document.chapters[this.currentChapter].lines;
             var parsedJSON = this._textParser.getParsedJSON(lines);
-            var parsedHTML : string = this._jsonParser.getParsedHTML(parsedJSON);
+            var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
             callback(parsedHTML);
         }
     }

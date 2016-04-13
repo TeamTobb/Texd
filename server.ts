@@ -16,11 +16,8 @@ var WebSocket = require('ws');
 
 import Diff = require('./server/domain/diff');
 
-import pluginsRoutes = require('./server/resources/plugins');
-import snappetRoutes = require('./server/resources/snappets');
 import uploadRoutes = require('./server/resources/upload');
 import routes = require('./server/resources/index');
-import documentRoutes = require('./server/resources/document');
 var pluginsRoutes = require('./server/resources/plugins');
 var snappetRoutes = require('./server/resources/snappets');
 var loginroutes = require('./server/resources/login');
@@ -36,14 +33,19 @@ checkArgs();
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
 
+import DocumentService = require('./server/services/documentService');
+
+var documentService = new DocumentService.DocumentService();
+
 
 server.on('connection', ws => {
     ws.on('message', message => {
         console.log("recived socket message on server");
-
-        documentRoutes.updateDocumentText(JSON.parse(message), () => {      
+        
+        documentService.updateDocument(message);
+        /*documentRoutes.updateDocumentText(JSON.parse(message), () => {      
                 
-        })
+        })*/
         broadcast(message)
     });
 });
