@@ -27,6 +27,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() cursorActivityCh: any;
     @Input() cursorColor: any;
     @Input() diffSenderId: string;
+    @Input() selectionRangeAnchor: any;
+    @Input() selectionRangeHead: any;
 
     public editor;
 
@@ -35,6 +37,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public isInitialized = false;
 
     public cursorwidgets = {};
+    public selections = {}
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -63,7 +66,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
         if (changes["cursorActivityLine"] || changes["cursorActivityCh"] || changes["cursorColor"] || changes["diffSenderId"]) {
             try {
-                console.log("sender id diff: " + this.diffSenderId)
                 if (this.cursorwidgets[this.diffSenderId] != undefined) {
                     this.cursorwidgets[this.diffSenderId].clear()
                 }
@@ -83,6 +85,38 @@ export class CmComponent implements AfterViewInit, OnChanges {
             element.innerHTML = this.diffSenderId
             element.style.color = this.cursorColor
             document.getElementById('buttonsContainer').appendChild(element)
+
+            // TODO: Put this in its own change detector if, for some reason it doesnt fire. 
+            var from = {
+                line: this.selectionRangeAnchor.line,
+                ch: this.selectionRangeAnchor.ch
+            }
+
+            var to = {
+                line: this.selectionRangeHead.line,
+                ch: this.selectionRangeHead.ch
+            }
+            
+            if(from.line>to.line || (from.line == to.line && from.ch > to.ch)){
+                //  Oneliner to swap variables
+                to = [from, from = to][0];
+            }
+               
+            if (this.selections[this.diffSenderId]) {
+                this.selections[this.diffSenderId].clear()
+            }
+            
+            var css = ".selectionRange { background-color: " + this.cursorColor + ";}";
+            var htmlDiv = document.createElement('div');
+            htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
+            document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
+            try {
+                this.selections[this.diffSenderId] = this.editor.markText(from, to, {
+                    className: "selectionRange"
+                })
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
 
@@ -145,6 +179,43 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 cursorActivity: this.editor.getCursor(),
             }, this.chapterId)
         })
+
+
+        this.editor.on("beforeSelectionChange", (cm, obj) => {
+            console.log(JSON.stringify(obj, null, 2));
+
+            this.documentService.sendDiff(obj, this.chapterId)
+
+
+
+
+
+            // var from = {
+            //     line: obj.ranges.anchor.line,
+            //     ch: obj.ranges.anchor.ch
+            // }
+
+            // var to = {
+            //     line: obj.ranges.head.line,
+            //     ch: obj.ranges.head.ch
+            // }
+
+            // var style = document.createElement('style');
+            // style.type = 'text/css';
+            // style.innerHTML = '.markText { color: ' + this.cursorColor + '; }';
+
+
+            // this.editor.markText(from, to, {
+            //     className: "markText"
+            // })
+
+
+
+
+            // doc.markText(from: {line, ch}, to: {line, ch}
+        })
+        // "beforeSelectionChange" (instance: CodeMirror, obj: {ranges, origin, update})
+
 
         // should probably be defined somewhere else
         $("#insertbold").click(() => {

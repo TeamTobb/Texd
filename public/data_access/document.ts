@@ -45,6 +45,15 @@ export class DocumentService {
         },
         color: {}
     }
+    
+    public selectionRangeAnchor: any = {
+        line: "", 
+        ch: ""
+    }
+    public selectionRangeHead: any = {
+        line: {}, 
+        ch: {}
+    }
 
     constructor(private http: Http, private authHttp: AuthHttp) {
 
@@ -63,7 +72,7 @@ export class DocumentService {
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
 
-        this._socket = new WebSocket('ws://localhost:3001');
+        this._socket = new WebSocket('ws://158.38.186.232:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
             if (parsed.senderId != this._senderId) {
@@ -77,6 +86,14 @@ export class DocumentService {
                         this.cursorActivity.cursorActivity.line = parsed.cursorActivity.line;
                         this.cursorActivity.cursorActivity.ch = parsed.cursorActivity.ch;
                         this.cursorActivity.color = parsed.color;
+                    }
+                    
+                    if(parsed.ranges){
+                        this.diffSenderId.id = parsed.senderId
+                        this.selectionRangeAnchor.line = parsed.ranges[0].anchor.line;
+                        this.selectionRangeAnchor.ch = parsed.ranges[0].anchor.ch; 
+                        this.selectionRangeHead.line = parsed.ranges[0].head.line;
+                        this.selectionRangeHead.ch = parsed.ranges[0].head.ch;
                     }
                 }
             }
