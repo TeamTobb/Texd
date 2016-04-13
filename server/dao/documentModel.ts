@@ -1,6 +1,8 @@
 import mongoose = require("mongoose");
 import document = require('../../public/domain/document');
 
+
+
 var lineSchema = new mongoose.Schema({
     _raw: String,
     _metadata: []
@@ -16,7 +18,8 @@ var documentSchema = new mongoose.Schema({
     _title: String,
     _documentname: String,
     _authors: [],
-    _chapters: [chapterSchema]
+    _chapters: [chapterSchema],
+    _style: mongoose.Schema.Types.Mixed
 })
 export var lineModel = mongoose.model("line", lineSchema);
 export var chapterModel = mongoose.model("chapter", chapterSchema);

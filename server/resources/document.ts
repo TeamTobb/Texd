@@ -20,7 +20,7 @@ export function read(req: express.Request, res: express.Response) {
         if(error){
             res.send(error);
         } else {
-            res.jsonp(document);
+            res.jsonp(document);            
         }
     });
 }
@@ -62,6 +62,11 @@ export function getDocuments(req: express.Request, res: express.Response){
     var document5 = new Document(5, "Title 5", "Name 5", ["Bjon", "Borgar"], chapters5);
     var document6 = new Document(6, "Title 6", "Name 6", ["Bjon", "Borgar"], chapters6);
     var document7 = new Document(7, "Title 7", "Name 7", ["Bjon", "Borgar"], chapters7);
+    
+    var style1 = {}
+    style1["testKey"] = "testValue"
+
+    document1.style = style1;
 
     var documentArray = [];
     documentArray.push(document1, document2, document3, document4, document5, document6, document7);
@@ -85,6 +90,9 @@ export function getDocuments(req: express.Request, res: express.Response){
        }
     });
 }
+
+
+
 
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
@@ -114,6 +122,18 @@ export function update(req: express.Request, res: express.Response) {
         });
 
     }
+    
+    if(req.body.documentStyle != null){
+        console.log("got style on server")
+        repository.update({_id: req.params.id}, {_style: req.body.documentStyle}, (error, document) => {
+            if(error){
+                res.send(error);
+            } else {
+                res.jsonp(document);
+            }
+    	});
+    }
+    
 }
 
 export function saveDocument(document, callback){

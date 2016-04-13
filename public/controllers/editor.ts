@@ -62,18 +62,18 @@ export class EditorController implements AfterViewInit {
             left = $('#leftInContainerForEditor'),
             right = $('#rightInContainerForEditor'),
             handle = $('#handle2');
-        handle.on('mousedown', function (e) {
+        handle.on('mousedown', function(e) {
             isResizing = true;
             lastDownX = e.clientX;
         });
-        $(document).on('mousemove', function (e) {
+        $(document).on('mousemove', function(e) {
             // we don't want to do anything if we aren't resizing.
             if (!isResizing)
                 return;
             offsetRight = container.width() - (e.clientX - container.offset().left);
             left.css('right', offsetRight);
             right.css('width', offsetRight);
-        }).on('mouseup', function (e) {
+        }).on('mouseup', function(e) {
             // stop resizing
             isResizing = false;
         });
@@ -90,7 +90,7 @@ export class EditorController implements AfterViewInit {
         var previewHidden = false;
 
         $("#sidebarbutton").click(() => {
-            if(sidebarHidden) {
+            if (sidebarHidden) {
                 $("#chapter_bar").show(650);
                 sidebarHidden = false;
             }
@@ -101,13 +101,13 @@ export class EditorController implements AfterViewInit {
         });
 
         $("#hidePreview").click(() => {
-            if(previewHidden) {
+            if (previewHidden) {
                 $("#rightInContainerForEditor").show(650);
-                $("#leftInContainerForEditor").animate({"right":offsetRight}, "slow");
+                $("#leftInContainerForEditor").animate({ "right": offsetRight }, "slow");
                 previewHidden = false;
             }
             else {
-                $("#leftInContainerForEditor").animate({"right":"20px"}, "slow");
+                $("#leftInContainerForEditor").animate({ "right": "20px" }, "slow");
                 $("#rightInContainerForEditor").hide(650);
                 previewHidden = true;
             }
@@ -128,6 +128,26 @@ export class EditorController implements AfterViewInit {
             this.documentService.parseChapter((parsedHTML) => {
                 console.log("done parsing.. inserting!");
                 document.getElementById('previewframe').innerHTML = parsedHTML;
+
+                //TODOHOX insert style here
+                console.log("TESTING HER STYLE")
+                console.log(this.document.style)
+
+
+                for (var key in this.document.style) {
+                    var value = this.document.style[key];
+                    document.getElementById('previewframe').style[key] = value;
+
+                    //document.getElementById('previewframe').setAttribute(key, value);
+                    //document.getElementById('previewframe').style[key] = value;
+
+                }
+                //document.getElementById('previewframe').setAttribute("color", "grey;");
+                //document.getElementById('previewframe').setAttribute("font-size", "40px;");
+
+
+                var key = "fintSize";
+                document.getElementById('previewframe').style[key] = "50px";
             })
         }
         keyMap[67] = () => {

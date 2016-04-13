@@ -69,6 +69,21 @@ export class DocumentService {
             }
         });
     }
+    
+    public changeStyle(id: string, newStyle: any) {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        this.http.post('./document/' + id, JSON.stringify({ documentStyle: newStyle }), { headers: headers }).subscribe(res => {
+            // Only actually change the title and send socket messages if status==OK
+            if (res.status == 200) {
+                /*this._socket.send(JSON.stringify({ name: 'name', documentId: id, title: newTitle, senderId: "hello" }));
+                this.document.title = newTitle;*/
+                console.log("Style saved successfully ")
+            }
+        });
+    }
+    
+    
 
     public updateLines() {
         if (this.cm == null) return;
@@ -107,9 +122,11 @@ export class DocumentService {
 
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
+            
             var lines: Line[] = this.document.chapters[this.currentChapter].lines;
             var parsedJSON = this._textParser.getParsedJSON(lines);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+            this.document.style
             callback(parsedHTML);
         }
     }

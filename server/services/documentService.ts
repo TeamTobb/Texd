@@ -34,10 +34,7 @@ export class DocumentService {
                             console.log("just updated doc: " + updatedDocumentId + " to Databse")
                             this.documentIsUpdated[updatedDocumentId] = false;
                         }
-
                     })
-
-
                 }
             }
         }, 5000);
