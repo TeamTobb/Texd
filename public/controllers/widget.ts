@@ -361,11 +361,13 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
     // #img @id "testpng" test @src "docs/test.png" @height "20px" @width "40px" testhei #
     var image = this.node.find('.image-frame');
     // what if null ?
-    image[0].attributes[1].nodeValue = imgobj["height"];
-    image[0].attributes[2].nodeValue = imgobj["src"];
-    image[0].attributes[3].nodeValue = imgobj["width"];
+    image[0].src = imgobj["src"];
+    image[0].style.height = imgobj["height"];
+    image[0].style.width = imgobj["width"];
+
     var text = this.node.find('.image-text');
     text[0].textContent = imgobj["text"];
+
 
     this.textrangeFrom = from;
     this.textrangeTo = to;
