@@ -19,7 +19,6 @@ export class ChapterItem implements OnChanges {
     @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
 
     constructor(private documentService: DocumentService) {}
-
     // TODO Make alert, sure you want to delete this chapter?
     delete(event, value: any){
         event.stopPropagation();

@@ -7,7 +7,7 @@ class Document {
     private _title: string;
     private _documentname: string;
     private _authors: string[];
-    private _chapters: Chapter[];
+    private _chapters: Chapter[];   
 
     constructor(idTest?, title?, documentname?, authors?, chapters?) {
         if (idTest && title && documentname && authors && chapters) {
