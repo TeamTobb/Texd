@@ -45,9 +45,20 @@ export class DocumentService {
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
             if (parsed.senderId != this._senderId && (parsed.documentId == this.document.id)) {
-                this.changeOrder.from = parsed.from
-                this.changeOrder.to = parsed.to
-                this.changeOrder.text = parsed.text
+                if (parsed.from && parsed.to && parsed.text) {
+                    this.changeOrder.from = parsed.from
+                    this.changeOrder.to = parsed.to
+                    this.changeOrder.text = parsed.text
+                }
+                
+                if (parsed.chapterName) {
+                    for (var chapter of this.document.chapters) {
+                        if (chapter.id == parsed.chapterId) {
+                            chapter.header = parsed.chapterName;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -97,12 +108,11 @@ export class DocumentService {
                 console.log(res)
                 //TODO send out socket change to everyone
                 // Only actually change the title and send socket messages if status==OK
-                /* if(res.status==200){
-                     this._socket.send(JSON.stringify({chapterHeader: 'name', chapterId: chapterId, documentId: documentId, message: newchapterName, senderId: "hello" }));
-                     this.document.chapters[chapterId].header = newchapterName;
-                 }*/
+                if (res.status == 200) {
+                    this._socket.send(JSON.stringify({ documentId: documentId, chapterId: chapterId, chapterName: newchapterName, senderId: this._senderId }));
+                }
             }
-            );
+        );
     }
 
     public parseChapter(callback: (parsedHTML: string) => void) {
@@ -122,7 +132,7 @@ export class DocumentService {
         this._socket.send(JSON.stringify(diff));
     }
 
-    public sendDiffNewChapter(diff: any, chapterId: string, chapterIndex : number) {
+    public sendDiffNewChapter(diff: any, chapterId: string, chapterIndex: number) {
         diff.senderId = this._senderId;
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
@@ -132,8 +142,8 @@ export class DocumentService {
         this._socket.send(JSON.stringify(diff));
     }
 
-    public sendDiffDeleteChapter(chapterId: string, chapterIndex : number) {
-        var diff : any = {};
+    public sendDiffDeleteChapter(chapterId: string, chapterIndex: number) {
+        var diff: any = {};
         diff.senderId = this._senderId;
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;

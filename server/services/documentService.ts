@@ -67,6 +67,7 @@ export class DocumentService {
             for (var chapter of document._chapters) {
                 if (chapter._id == diff.chapterId) {
                     lines = chapter._lines;
+                    break;
                 }
             }
 
@@ -137,58 +138,26 @@ export class DocumentService {
                 var toLine = diff.to.line;
                 var toCh = diff.to.ch;
 
-                var query = { $set: {} };
-                var paragraphset = "_chapters.0._lines." + fromLine;
-
-                repository.find({ _id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId) }, (error, document) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        var lines = document[0]["_chapters"][0]["_lines"];
-                        if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                            var endraw = lines[diff.to.line]._raw.slice(0);
-                            lines[diff.from.line]._raw += endraw;
-                            lines.splice(diff.to.line, 1)
-                        } else if (diff.text.length > 1) {
-                            console.log("diff.text.length>1 = True")
-
-
-
-                        }
-                        else {
-                            var firstLine: String = lines[fromLine]._raw;
-                            var lastLine: String = lines[toLine]._raw;
-                            if (fromLine == toLine) {
-                                var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                                lines[fromLine]._raw = newraw;
-                            } else if (fromLine != toLine) {
-                                var firstRaw = firstLine.slice(0, fromCh);
-                                var lastRaw = lastLine.slice(toCh);
-                                lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                                lines.splice(fromLine + 1, diff.removed.length - 1);
-                            }
-                        }
-                        var query = { $set: {} };
-                        query["_chapters.0._lines"] = lines
-                        repository.update({ _id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId) }, query, (error, document2) => {
-                            if (error) {
-                                console.log(error);
-                                callback()
-                            } else {
-                                console.log("successfully deleted from line");
-                                callback()
-                            }
-                        })
+                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
+                    var endraw = lines[diff.to.line]._raw.slice(0);
+                    lines[diff.from.line]._raw += endraw;
+                    lines.splice(diff.to.line, 1)
+                } else if (diff.text.length > 1) {
+                    console.log("diff.text.length>1 = True")
+                } else {
+                    var firstLine: String = lines[fromLine]._raw;
+                    var lastLine: String = lines[toLine]._raw;
+                    if (fromLine == toLine) {
+                        var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
+                        lines[fromLine]._raw = newraw;
+                    } else if (fromLine != toLine) {
+                        var firstRaw: any = firstLine.slice(0, fromCh);
+                        var lastRaw = lastLine.slice(toCh);
+                        lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
+                        lines.splice(fromLine + 1, diff.removed.length - 1);
                     }
-                })
-
-
+                }
             }
         }
-
-
-
-
     }
-
 }
