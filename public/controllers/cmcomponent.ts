@@ -183,40 +183,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
         this.editor.on("beforeSelectionChange", (cm, obj) => {
             console.log(JSON.stringify(obj, null, 2));
-
             this.documentService.sendDiff(obj, this.chapterId)
-
-
-
-
-
-            // var from = {
-            //     line: obj.ranges.anchor.line,
-            //     ch: obj.ranges.anchor.ch
-            // }
-
-            // var to = {
-            //     line: obj.ranges.head.line,
-            //     ch: obj.ranges.head.ch
-            // }
-
-            // var style = document.createElement('style');
-            // style.type = 'text/css';
-            // style.innerHTML = '.markText { color: ' + this.cursorColor + '; }';
-
-
-            // this.editor.markText(from, to, {
-            //     className: "markText"
-            // })
-
-
-
-
-            // doc.markText(from: {line, ch}, to: {line, ch}
         })
-        // "beforeSelectionChange" (instance: CodeMirror, obj: {ranges, origin, update})
-
-
+        
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             // what to do about the enter function ?
