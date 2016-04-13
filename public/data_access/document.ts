@@ -21,9 +21,13 @@ export class DocumentService {
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
 
     public _senderId: string;
+    public diffSenderId = {
+        id: ""
+    }
     private _textParser: Parser = null;
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
+    private jwthelper; 
     public currentChapter: number;
 
     public changeOrder: any = {
@@ -32,9 +36,27 @@ export class DocumentService {
         text: {}
     }
 
-    constructor(private http: Http, private authHttp: AuthHttp) {
-        this._senderId = "" + Math.random();
+    public cursorActivity: any = {
+        cursorActivity: {
+            "line": 0,
+            "ch": 0,
+            "xRel": 0,
+            "outside": true
+        },
+        color: {}
+    }
 
+    constructor(private http: Http, private authHttp: AuthHttp) {
+
+        this.jwthelper = new JwtHelper()
+        var token = localStorage.getItem('id_token')
+
+        if (token != null && typeof (token) != 'undefined') {
+            var decoded = this.jwthelper.decodeToken(token)
+            this._senderId = decoded.username
+        } else {
+            this._senderId = "" + Math.random();
+        }
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
@@ -44,10 +66,19 @@ export class DocumentService {
         this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
-            if (parsed.senderId != this._senderId && (parsed.documentId == this.document.id)) {
-                this.changeOrder.from = parsed.from
-                this.changeOrder.to = parsed.to
-                this.changeOrder.text = parsed.text
+            if (parsed.senderId != this._senderId) {
+                if (parsed.documentId == this.document.id) {
+                    this.changeOrder.from = parsed.from
+                    this.changeOrder.to = parsed.to
+                    this.changeOrder.text = parsed.text
+
+                    if (parsed.cursorActivity) {
+                        this.diffSenderId.id = parsed.senderId
+                        this.cursorActivity.cursorActivity.line = parsed.cursorActivity.line;
+                        this.cursorActivity.cursorActivity.ch = parsed.cursorActivity.ch;
+                        this.cursorActivity.color = parsed.color;
+                    }
+                }
             }
         }
 
@@ -115,7 +146,13 @@ export class DocumentService {
     }
 
     public sendDiff(diff: any, chapterId: string) {
-        diff.senderId = this._senderId;
+        var color = localStorage.getItem('id_color')
+        if (color != null) {
+            diff.color = color;
+        } else {
+            diff.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+        }
+        diff.senderId = this._senderId
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
         this._socket.send(JSON.stringify(diff))

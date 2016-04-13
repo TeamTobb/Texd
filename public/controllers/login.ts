@@ -29,6 +29,8 @@ export class LoginController{
         this.http.post('./login', JSON.stringify({username: this.user.username, password: this.user.password}), {headers: headers}).map((res: Response) => res.json()).subscribe(res => {
             if(res.token){
                 localStorage.setItem('id_token', res.token);
+                var color =  '#'+Math.floor(Math.random()*16777215).toString(16)
+                localStorage.setItem('id_color', color);
             }
         })
     }

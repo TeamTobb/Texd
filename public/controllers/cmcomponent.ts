@@ -6,7 +6,7 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget} from "./widget.ts";
+import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget, CursorWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
 
 function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
@@ -18,17 +18,23 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
-    @Input() document : Document;
+    @Input() document: Document;
     @Input() chapterId: string;
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
+    @Input() cursorActivityLine: any;
+    @Input() cursorActivityCh: any;
+    @Input() cursorColor: any;
+    @Input() diffSenderId: string;
 
     public editor;
 
     public widgetTest;
 
     public isInitialized = false;
+
+    public cursorwidgets = {};
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -37,7 +43,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if(!this.isInitialized) {
+        if (!this.isInitialized) {
             if (changes["lines"] && this.editor !== undefined) {
                 var arr = [];
                 for (var line in this.lines) {
@@ -48,8 +54,35 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
         }
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
-            console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
-            this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+            try {
+                this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        if (changes["cursorActivityLine"] || changes["cursorActivityCh"] || changes["cursorColor"] || changes["diffSenderId"]) {
+            try {
+                console.log("sender id diff: " + this.diffSenderId)
+                if (this.cursorwidgets[this.diffSenderId] != undefined) {
+                    this.cursorwidgets[this.diffSenderId].clear()
+                }
+                this.cursorwidgets[this.diffSenderId] = CursorWidget(this.editor, null, false, this.cursorActivityLine, this.cursorActivityCh, this.cursorColor)
+            } catch (error) {
+                console.log(error)
+            }
+
+            var element;
+            if (document.getElementById('user' + this.diffSenderId)) {
+                element = document.getElementById('user' + this.diffSenderId)
+            } else {
+                element = document.createElement('span');
+            }
+
+            element.id = "user" + this.diffSenderId
+            element.innerHTML = this.diffSenderId
+            element.style.color = this.cursorColor
+            document.getElementById('buttonsContainer').appendChild(element)
         }
     }
 
@@ -106,6 +139,12 @@ export class CmComponent implements AfterViewInit, OnChanges {
         this.editor.on("keypress", (cm, e) => {
             this.onKeyPressEvent(cm, e);
         });
+
+        this.editor.on("cursorActivity", (cm, change) => {
+            this.documentService.sendDiff({
+                cursorActivity: this.editor.getCursor(),
+            }, this.chapterId)
+        })
 
         // should probably be defined somewhere else
         $("#insertbold").click(() => {

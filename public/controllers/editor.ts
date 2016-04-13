@@ -38,9 +38,13 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
+    public cursorActivity: any; 
+    public diffSenderId: any; 
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
-        this.changeOrder = this.documentService.changeOrder
+        this.changeOrder = this.documentService.changeOrder;
+        this.cursorActivity = this.documentService.cursorActivity;
+        this.diffSenderId = this.documentService.diffSenderId;
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);

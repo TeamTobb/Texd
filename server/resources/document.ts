@@ -11,9 +11,6 @@ import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
 import lineModel = documentModel.lineModel;
 
-
-
-
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     repository.findOne({_id: req.params.id}, (error, document) => {
@@ -25,7 +22,6 @@ export function read(req: express.Request, res: express.Response) {
     });
 }
 
-
 export function getAllDocuments(callback){
     repository.find({}, (error, document)=>{
         if (error){
@@ -35,7 +31,6 @@ export function getAllDocuments(callback){
         }
     })  
 }
-
 
 export function getDocuments(req: express.Request, res: express.Response){
     console.log("getDocuments()");

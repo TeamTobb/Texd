@@ -216,6 +216,11 @@ body {
     text-decoration: underline;
 }
 
+.cursor-widget {
+    width: 20px;
+    height: 20px; 
+}
+
 .header-widget {
 
 }
