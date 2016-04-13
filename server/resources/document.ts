@@ -33,7 +33,7 @@ export function getAllDocuments(callback){
         } else {
             callback(document);
         }
-    })  
+    })
 }
 
 
@@ -88,6 +88,7 @@ export function getDocuments(req: express.Request, res: express.Response){
 
 export function update(req: express.Request, res: express.Response) {
     console.log("documentController.updateDocument()");
+    // need to update the document model here! 
     if(req.body.documentTitle != null){
         repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
             if(error){
@@ -120,7 +121,7 @@ export function saveDocument(document, callback){
     repository.update({_id: document._id}, document, (error, document2) => {
                 if (error){
                     console.log(error);
-                    callback(error, document._id)                    
+                    callback(error, document._id)
                 } else {
                     callback(null, document._id);
                 }

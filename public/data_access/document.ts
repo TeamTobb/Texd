@@ -118,7 +118,29 @@ export class DocumentService {
         diff.senderId = this._senderId;
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
-        this._socket.send(JSON.stringify(diff))
+        console.log(diff);
+        this._socket.send(JSON.stringify(diff));
+    }
+
+    public sendDiffNewChapter(diff: any, chapterId: string, chapterIndex : number) {
+        diff.senderId = this._senderId;
+        diff.documentId = this.document.id;
+        diff.chapterId = chapterId;
+        diff.chapterIndex = chapterIndex;
+        diff.newchapter = true;
+        console.log(diff);
+        this._socket.send(JSON.stringify(diff));
+    }
+
+    public sendDiffDeleteChapter(chapterId: string, chapterIndex : number) {
+        var diff : any = {};
+        diff.senderId = this._senderId;
+        diff.documentId = this.document.id;
+        diff.chapterId = chapterId;
+        diff.chapterIndex = chapterIndex;
+        diff.deleteChapter = true;
+        console.log(diff);
+        this._socket.send(JSON.stringify(diff));
     }
 
     public getDocument(documentId: string, callback: (document: Document) => any) {

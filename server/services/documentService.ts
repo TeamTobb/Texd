@@ -49,9 +49,16 @@ export class DocumentService {
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
+        console.log("WTJWEUIRH WIUEHRUI WEHRIU WEHRU WEHRI UWEHRIU HWERIUH WEIUR ");
+
         if (diff.newchapter) {
+            console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
+        }
+        else if (diff.deleteChapter) {
+            console.log("deleting chapter");
+            document._chapters.splice(diff.chapterIndex, 1);
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
@@ -93,7 +100,7 @@ export class DocumentService {
                         lines[fromLine]._raw = firstRow + lastRow;
                         lines.splice(fromLine + 1, diff.removed.length - 1);
                     }
-                } else {  //ny bokstav                              
+                } else {  //ny bokstav
                     var raw: any = lines[diff.from.line]["_raw"];
                     lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
                 }
@@ -185,5 +192,3 @@ export class DocumentService {
     }
 
 }
-
-
