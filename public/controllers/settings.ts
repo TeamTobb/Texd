@@ -27,7 +27,7 @@ export class SettingsComponent {
 
         switch (settingType) {
             case 0:
-                this._router.navigate(['DocumentStyle', { id: settingType }]);
+                this._router.navigate(['DocumentStyle', { id: 0 }]);
                 break;
             case 1:
                 this._router.navigate(['SettingsPage', { id: settingType }]);

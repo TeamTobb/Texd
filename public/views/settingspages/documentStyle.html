@@ -6,6 +6,7 @@
     
     <ul style="">
         <li id="styleItems" *ngFor="#styleItem of styleItems; #i = index">{{styleItem}}:
+            <tr>
             <input type="text" [(ngModel)]="styleInput[styleItem]" />
             {{styleInput[styleItem]}}
         </li>

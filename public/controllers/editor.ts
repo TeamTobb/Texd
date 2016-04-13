@@ -14,6 +14,8 @@ import {ChapterItem} from './chapteritem.ts'
 import {FileUploaderClass} from './fileUpLoader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
+import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
+
 
 import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
@@ -38,8 +40,9 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
+    private router: Router; 
 
-    constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
+    constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private _router: Router) {
         this.changeOrder = this.documentService.changeOrder
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
@@ -51,6 +54,7 @@ export class EditorController implements AfterViewInit {
             })
             this.documentService.currentChapter = this.current_chapter;
         }
+        this.router = _router; 
     }
 
     ngAfterViewInit() {
@@ -112,6 +116,8 @@ export class EditorController implements AfterViewInit {
                 previewHidden = true;
             }
         });
+        
+        
     }
 
     public changeDocumentTitle($event) {
@@ -127,27 +133,17 @@ export class EditorController implements AfterViewInit {
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 console.log("done parsing.. inserting!");
+                document.getElementById('previewframe').removeAttribute;                
                 document.getElementById('previewframe').innerHTML = parsedHTML;
-
-                //TODOHOX insert style here
-                console.log("TESTING HER STYLE")
+                
+                console.log("STYLE doc:")
                 console.log(this.document.style)
-
 
                 for (var key in this.document.style) {
                     var value = this.document.style[key];
                     document.getElementById('previewframe').style[key] = value;
-
-                    //document.getElementById('previewframe').setAttribute(key, value);
-                    //document.getElementById('previewframe').style[key] = value;
-
                 }
-                //document.getElementById('previewframe').setAttribute("color", "grey;");
-                //document.getElementById('previewframe').setAttribute("font-size", "40px;");
 
-
-                var key = "fintSize";
-                document.getElementById('previewframe').style[key] = "50px";
             })
         }
         keyMap[67] = () => {
@@ -166,4 +162,9 @@ export class EditorController implements AfterViewInit {
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
     }
+    
+    goToSettings(){
+        this.router.navigate(['Settings', 'DocumentStyle', {id: this.document.id} ]);         
+    }
+    
 }

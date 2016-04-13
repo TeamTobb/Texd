@@ -28,18 +28,22 @@ export class DocumentStyle {
         this.documentId = _routeParams.params["id"];
         console.log("documentId: " + this.documentId)
         this.createStyleInput()
+
+        documentService.getDocument(this.documentId, (document) => {
+            this.title = document.title;
+            
+            var newStyleInput = {};
+            for (var key in document.style) {
+                var value = document.style[key];
+                if (value != "") {
+                    newStyleInput[key] = value;
+                }
+            }            
+            this.styleInput = newStyleInput;
+        })
     }
 
     createStyleInput() {
-        /*  this.styleItems.push("fontSize");
-          this.styleItems.push("backgroundColor");
-          this.styleItems.push("alignContent");
-          this.styleItems.push("backgroundImage");
-          this.styleItems.push("backgroundPosition");
-  
-  */
-
-
         this.styleItems.push("alignContent");
         this.styleItems.push("alignItems");
         this.styleItems.push("alignSelf");
@@ -233,13 +237,12 @@ export class DocumentStyle {
         var newStyleInput = {};
         for (var key in this.styleInput) {
             var value = this.styleInput[key];
-            if (value != ""){
+            if (value != "") {
                 newStyleInput[key] = value;
             }
         }
 
         this.documentService.changeStyle(this.documentId, newStyleInput);
-
-
     }
+
 }
