@@ -32,7 +32,6 @@ export function getAllDocuments(callback) {
     })
 }
 
-
 export function getDocuments(req: express.Request, res: express.Response) {
     console.log("getDocuments()");
     var lines1 = [new Line("Doc1 line1", []), new Line("Doc1 line2", []), new Line("Doc1 line3", [])];
@@ -90,5 +89,5 @@ export function saveDocument(document, callback) {
         } else {
             callback(null, document._id);
         }
-    });
+    })
 }

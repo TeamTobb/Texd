@@ -265,6 +265,28 @@ ItalicWidget.prototype.setValue = function(val) {
     moveCaret(window, pos);
 }
 
+export function CursorWidget(cm, optRange, onParse, line, ch, color) {
+    this.node = $(".widget-templates .cursor-widget").clone();    
+    this.domNode = this.node[0];
+    this.domNode.style.backgroundColor = color
+    this.domNode.style.border = '1px solid ' + color
+    
+    if(cm != undefined){
+        var from = {
+            line: line, 
+            ch: ch
+        }
+        
+        var options = {
+            widget: this.domNode
+        }
+        
+        var mark = cm.setBookmark(from, options);
+        cm.refresh();
+        return mark;
+    }
+}
+
 export function UnderlineWidget(cm, optRange, onParse) {
     this.node = $(".widget-templates .underline-widget").clone();
 

@@ -38,9 +38,18 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
-    
+
+    public cursorActivity: any; 
+    public diffSenderId: any;
+    public selectionRangeAnchor: any;  
+    public selectionRangeHead: any; 
+
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
-        this.changeOrder = this.documentService.changeOrder
+        this.changeOrder = this.documentService.changeOrder;
+        this.cursorActivity = this.documentService.cursorActivity;
+        this.diffSenderId = this.documentService.diffSenderId;
+        this.selectionRangeAnchor = this.documentService.selectionRangeAnchor;
+        this.selectionRangeHead = this.documentService.selectionRangeHead;
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);

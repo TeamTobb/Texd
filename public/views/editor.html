@@ -29,7 +29,11 @@
     </div>
     <div class="editorContainer">
         <cmcomponent id="cmcomponent" [document]=document (emitChangeChapter)="changeChapter($event)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
-        [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text [changeOrderChapterId]=changeOrder.chapterId></cmcomponent>
+        [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text [changeOrderChapterId]=changeOrder.chapterId [cursorActivityLine]=cursorActivity.cursorActivity.line [cursorActivityCh]=cursorActivity.cursorActivity.ch [cursorColor]=cursorActivity.color
+        [diffSenderId]=diffSenderId.id [selectionRangeAnchor]=selectionRangeAnchor [selectionRangeHead]=selectionRangeHead></cmcomponent>
+
+        <!--<cmcomponent id="cmcomponent" [document]=document (emitChangeChapter)="changeChapter($event)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+        [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text [changeOrderChapterId]=changeOrder.chapterId></cmcomponent>-->
     </div>
 </div>
 
@@ -39,6 +43,7 @@
     <span contenteditable="true" class="italic-widget"></span>
     <span contenteditable="true" class="underline-widget"></span>
     <span contenteditable="true" class="image-edit"></span>
+    <span contenteditable="false" class="cursor-widget"></span>
     <h1 contenteditable="true" class="header-widget"></h1>
 
     <div class="image-widget" style="background-color: #EEE">

@@ -6,7 +6,7 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget} from "./widget.ts";
+import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget, CursorWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
 
 function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
@@ -23,8 +23,17 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
+
+    @Input() cursorActivityLine: any;
+    @Input() cursorActivityCh: any;
+    @Input() cursorColor: any;
+    @Input() diffSenderId: string;
+    @Input() selectionRangeAnchor: any;
+    @Input() selectionRangeHead: any;
+
     @Input() changeOrderChapterId: any;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
+
 
     public editor;
 
@@ -33,6 +42,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public isInitialized = false;
     private current_chapter;
 
+    public cursorwidgets = {};
+    public selections = {}
+
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
         console.log("chapterid: " + this.chapterId);
@@ -40,6 +52,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+
         if (changes["chapterId"] && this.editor !== undefined) {
             this.documentService.getChapter(this.chapterId, (chapter) => {
                 var arr = [];
@@ -51,12 +64,73 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
 
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
-            console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
-            for (var chapter of this.document.chapters) {
-                if (this.chapterId == this.changeOrderChapterId) {
-                    this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
-                    break;
+
+            try {
+                console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
+                for (var chapter of this.document.chapters) {
+                    if (this.chapterId == this.changeOrderChapterId) {
+                        this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+                        break;
+                    }
                 }
+            } catch(error){
+                console.log(error)
+            }
+          
+        }
+
+        if (changes["cursorActivityLine"] || changes["cursorActivityCh"] || changes["cursorColor"] || changes["diffSenderId"]) {
+            try {
+                if (this.cursorwidgets[this.diffSenderId] != undefined) {
+                    this.cursorwidgets[this.diffSenderId].clear()
+                }
+                this.cursorwidgets[this.diffSenderId] = CursorWidget(this.editor, null, false, this.cursorActivityLine, this.cursorActivityCh, this.cursorColor)
+            } catch (error) {
+                console.log(error)
+            }
+
+            var element;
+            if (document.getElementById('user' + this.diffSenderId)) {
+                element = document.getElementById('user' + this.diffSenderId)
+            } else {
+                element = document.createElement('span');
+            }
+
+            element.id = "user" + this.diffSenderId
+            element.innerHTML = this.diffSenderId
+            element.style.color = this.cursorColor
+            document.getElementById('buttonsContainer').appendChild(element)
+
+            // TODO: Put this in its own change detector if, for some reason it doesnt fire. 
+            var from = {
+                line: this.selectionRangeAnchor.line,
+                ch: this.selectionRangeAnchor.ch
+            }
+
+            var to = {
+                line: this.selectionRangeHead.line,
+                ch: this.selectionRangeHead.ch
+            }
+
+            if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
+                //  Oneliner to swap variables
+                to = [from, from = to][0];
+            }
+
+            if (this.selections[this.diffSenderId]) {
+                this.selections[this.diffSenderId].clear()
+            }
+
+            var css = ".selectionRange { background-color: " + this.cursorColor + ";}";
+            var htmlDiv = document.createElement('div');
+            htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
+            document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
+            try {
+                this.selections[this.diffSenderId] = this.editor.markText(from, to, {
+                    className: "selectionRange"
+                })
+            } catch (error) {
+                console.log(error)
             }
         }
     }
@@ -115,6 +189,18 @@ export class CmComponent implements AfterViewInit, OnChanges {
             this.onKeyPressEvent(cm, e);
         });
 
+        this.editor.on("cursorActivity", (cm, change) => {
+            this.documentService.sendDiff({
+                cursorActivity: this.editor.getCursor(),
+            }, this.chapterId)
+        })
+
+
+        this.editor.on("beforeSelectionChange", (cm, obj) => {
+            console.log(JSON.stringify(obj, null, 2));
+            this.documentService.sendDiff(obj, this.chapterId)
+        })
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             // what to do about the enter function ?
@@ -153,7 +239,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             event.preventDefault();
         });
 
-        document.addEventListener("drop", (event ) => {
+        document.addEventListener("drop", (event) => {
             event.preventDefault();
             var c0 = event.target.className;
             var par = $(event.target).parent();
@@ -164,7 +250,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             var c3 = grandgrandpar[0].className;
             var d = "droptarget";
             var dragged_id = event.dataTransfer.getData("dragData");
-            if ( c0 == d ) this.changeChapterPositions(dragged_id, event.target.id);
+            if (c0 == d) this.changeChapterPositions(dragged_id, event.target.id);
             else if (c1 == d) this.changeChapterPositions(dragged_id, par[0].id);
             else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
             else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
@@ -173,7 +259,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public changeChapterPositions(from, to) {
-        if(from == to) return;
+        if (from == to) return;
         var from_id = from.split("_")[2];
         var to_id = to.split("_")[2];
         this.documentService.changeChapters(from_id, to_id, this.chapterId);
