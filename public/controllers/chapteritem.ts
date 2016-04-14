@@ -14,21 +14,22 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 })
 export class ChapterItem implements OnChanges {
     @Input() chapterName: string;
+    @Input() chapterNr: string;
     @Input() chapterId: string;
     @Input() documentId: string;
     @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
 
     constructor(private documentService: DocumentService) {}
-
     // TODO Make alert, sure you want to delete this chapter?
-    delete(event, value: any){
+    delete(event, nr: any){
         event.stopPropagation();
-        this.toBeDeleted.emit(value)
+        nr = this.chapterNr;
+        this.toBeDeleted.emit(nr)
     }
 
     rename($event, chapterId, documentId){
-        var newName: string = $event.target.innerHTML
-        this.documentService.changeChapterName(documentId, newName, chapterId);
+        var newchapterName: string = $event.target.innerHTML
+        this.documentService.sendDiff({newchapterName}, chapterId)
         $event.target.setAttribute("contenteditable", "false");
     }
 

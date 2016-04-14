@@ -1,0 +1,17 @@
+<div>
+    <h1> Document style</h1>
+
+    <b>{{title}}</b>
+    <ul style="">
+        <li id="styleItems" *ngFor="#styleItem of styleItems; #i = index">{{styleItem}}:
+            <input type="text" [(ngModel)]="styleInput[styleItem]" />
+            {{styleInput[styleItem]}}
+        </li>
+    </ul>
+    
+
+
+     <button type="button" (click)="sendStyleToServer()">Click Me!</button>
+
+
+</div>

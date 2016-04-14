@@ -1,25 +1,44 @@
 import {Component, OnInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {SettingsPage} from './settingspage';
+import {DocumentStyle} from './settingsPages/documentStyle';
 
 @Component({
-  selector: 'settings',
-  templateUrl: 'views/settings.html',
-  directives: [ROUTER_DIRECTIVES]
+    selector: 'settings',
+    templateUrl: 'views/settings.html',
+    directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([
-  {path: '', name: 'Main', component: SettingsPage},
-  {path: '/page/:id', name: 'SettingsPage', component: SettingsPage}
+    { path: '', name: 'Main', component: SettingsPage },
+    { path: '/page/:id', name: 'SettingsPage', component: SettingsPage },
+    { path: '/style/document/:id', name: 'DocumentStyle', component: DocumentStyle }
 ])
 export class SettingsComponent {
-    private chapters : string[] = ["Setting 0", "Setting 1"];
+    private settingTypes: string[] = ["Style", "User", "Keymap"];
 
     constructor(private _router: Router) {
-      this.chapters.push("test");
+
     }
 
-    public changeChapter(chapter : number) {
-      console.log("changing chapter to: " + chapter);
-      this._router.navigate(['SettingsPage', { id: chapter }]);
+    public changeChapter(settingType: number) {
+        console.log("changing settingType to: " + settingType);
+
+        switch (settingType) {
+            case 0:
+                this._router.navigate(['DocumentStyle', { id: settingType }]);
+                break;
+            case 1:
+                this._router.navigate(['SettingsPage', { id: settingType }]);
+                break;
+            case 2:
+                this._router.navigate(['SettingsPage', { id: settingType }]);
+                break;
+
+            default:
+                this._router.navigate(['Main', {  }]);
+                break;
+        }
+
+
     }
 }

@@ -3,8 +3,12 @@
         <!-- <ul> -->
             <div id="chaptersContainer">
                 <div id="chaptersContainerScrollBox">
-                    <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
-                    *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter($event, i)"></chapteritem>
+                    <!-- <ul id="sortable"> -->
+                    <div *ngFor="#chapter of document.chapters; #i = index" id="chapter_item_{{i}}" draggable="true" class="droptarget">
+                        <chapteritem (toBeDeleted)="deleteChapterFromDB(i)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
+                    (click)="changeChapter($event, i)"></chapteritem>
+                    </div>
+                    <!-- </ul> -->
                     <!-- <br><br><br><br>1qweqwe<br><br><br><br><br>2qweqwe<br><br><br><br><br>3qweqwe<br><br><br><br><br>4qweqwe<br> -->
                     <!-- <br><br><br><br>5qweqwe<br><br><br><br><br>6qweqwe<br><br><br><br><br>7qweqwe<br><br><br><br><br>8qweqwe<br> -->
                 </div>

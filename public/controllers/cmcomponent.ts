@@ -23,6 +23,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
+
     @Input() cursorActivityLine: any;
     @Input() cursorActivityCh: any;
     @Input() cursorColor: any;
@@ -30,11 +31,16 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() selectionRangeAnchor: any;
     @Input() selectionRangeHead: any;
 
+    @Input() changeOrderChapterId: any;
+    @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
+
+
     public editor;
 
     public widgetTest;
 
     public isInitialized = false;
+    private current_chapter;
 
     public cursorwidgets = {};
     public selections = {}
@@ -46,22 +52,31 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if (!this.isInitialized) {
-            if (changes["lines"] && this.editor !== undefined) {
+
+        if (changes["chapterId"] && this.editor !== undefined) {
+            this.documentService.getChapter(this.chapterId, (chapter) => {
                 var arr = [];
-                for (var line in this.lines) {
-                    arr.push(this.lines[line].raw);
+                for (var line of chapter._lines) {
+                    arr.push(line._raw)
                 }
-                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 });
-                this.isInitialized = true;
-            }
+                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
+            })
         }
+
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
+
             try {
-                this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
-            } catch (error) {
+                console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
+                for (var chapter of this.document.chapters) {
+                    if (this.chapterId == this.changeOrderChapterId) {
+                        this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+                        break;
+                    }
+                }
+            } catch(error){
                 console.log(error)
             }
+          
         }
 
         if (changes["cursorActivityLine"] || changes["cursorActivityCh"] || changes["cursorColor"] || changes["diffSenderId"]) {
@@ -96,16 +111,16 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 line: this.selectionRangeHead.line,
                 ch: this.selectionRangeHead.ch
             }
-            
-            if(from.line>to.line || (from.line == to.line && from.ch > to.ch)){
+
+            if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
                 //  Oneliner to swap variables
                 to = [from, from = to][0];
             }
-               
+
             if (this.selections[this.diffSenderId]) {
                 this.selections[this.diffSenderId].clear()
             }
-            
+
             var css = ".selectionRange { background-color: " + this.cursorColor + ";}";
             var htmlDiv = document.createElement('div');
             htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
@@ -185,7 +200,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log(JSON.stringify(obj, null, 2));
             this.documentService.sendDiff(obj, this.chapterId)
         })
-        
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             // what to do about the enter function ?
@@ -214,13 +229,49 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 cm.widgetEnter = undefined;
             }
         });
+
+        // drag events for chapters
+        document.addEventListener("dragstart", function(event) {
+            event.dataTransfer.setData("dragData", event.target.id);
+        });
+
+        document.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener("drop", (event) => {
+            event.preventDefault();
+            var c0 = event.target.className;
+            var par = $(event.target).parent();
+            var c1 = par[0].className;
+            var grandpar = $(event.target).parent().parent();
+            var c2 = grandpar[0].className;
+            var grandgrandpar = $(event.target).parent().parent().parent();
+            var c3 = grandgrandpar[0].className;
+            var d = "droptarget";
+            var dragged_id = event.dataTransfer.getData("dragData");
+            if (c0 == d) this.changeChapterPositions(dragged_id, event.target.id);
+            else if (c1 == d) this.changeChapterPositions(dragged_id, par[0].id);
+            else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
+            else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
+        });
+
+    }
+
+    public changeChapterPositions(from, to) {
+        if (from == to) return;
+        var from_id = from.split("_")[2];
+        var to_id = to.split("_")[2];
+        this.documentService.changeChapters(from_id, to_id, this.chapterId);
     }
 
     // test
-    public deleteChapterFromDB(value: string) {
+    public deleteChapterFromDB(nr: number) {
         // event.stopPropagation();
         // console.log(event);
-        console.log("deleteChapterFromDB(" + value + ")");
+        console.log("deleteChapterFromDB(" + nr + ")");
+        this.document.chapters.splice(nr, 1);
+        this.documentService.sendDiff({ deleteChapter: true, chapterIndex: nr }, this.chapterId)
     }
 
     // test 2
@@ -231,21 +282,21 @@ export class CmComponent implements AfterViewInit, OnChanges {
         //     return;
         // }
         console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
+
         // this.documentService.currentChapter = chapter_number;
-        // this.current_chapter = chapter_number;
+        this.current_chapter = chapter_number;
+        console.log("we are emitting: " + chapter_number)
+        this.emitChangeChapter.emit(chapter_number)
+        // this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter " + (current_chapter + 1), [l]));
+        // this.documentService.sendDiffNewChapter({},this.chapterId, current_chapter);
     }
 
     // move all these into the chapterItem component? // need to inject document etc.
     public createChapter() {
-        // var p = new Paragraph("Text", []);
-        // this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New Chapter", [p]));
-        // var diff: Diff = new Diff(this.document.id, this.document.chapters[this.current_chapter].id, this.current_chapter, {}, p, 0, false, true);
-        // this.documentService.sendDiff(diff);
-        // this.current_chapter += 1;
         console.log("new chapter::");
         var l = new Line("Text", []);
-        var current_chapter = this.documentService.currentChapter;
-        this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter", [l]));
+        this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New chapter", [l]));
+        this.documentService.sendDiff({ newchapter: true, chapterIndex: this.current_chapter }, this.chapterId);
     }
 
     parseWidgets(cm) {

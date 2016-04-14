@@ -38,6 +38,7 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
+
     public cursorActivity: any; 
     public diffSenderId: any;
     public selectionRangeAnchor: any;  
@@ -63,6 +64,7 @@ export class EditorController implements AfterViewInit {
 
     ngAfterViewInit() {
         // initialize jquery functions
+        var offsetRight = "40%";
         var isResizing = false,
             lastDownX = 0;
         var container = $('#containerForEditor'),
@@ -77,7 +79,7 @@ export class EditorController implements AfterViewInit {
             // we don't want to do anything if we aren't resizing.
             if (!isResizing)
                 return;
-            var offsetRight = container.width() - (e.clientX - container.offset().left);
+            offsetRight = container.width() - (e.clientX - container.offset().left);
             left.css('right', offsetRight);
             right.css('width', offsetRight);
         }).on('mouseup', function (e) {
@@ -95,58 +97,38 @@ export class EditorController implements AfterViewInit {
 
         var sidebarHidden = false;
         var previewHidden = false;
-        var editorHidden = false;
 
         $("#sidebarbutton").click(() => {
-            console.log("clicked sidebarbutton");
             if(sidebarHidden) {
-                console.log("show");
                 $("#chapter_bar").show(650);
                 sidebarHidden = false;
             }
             else {
-                console.log("hide");
                 $("#chapter_bar").hide(650);
                 sidebarHidden = true;
             }
         });
 
-        // hide handle too ?
-
         $("#hidePreview").click(() => {
-            console.log("clicked sidebarbutton");
             if(previewHidden) {
-                console.log("show");
                 $("#rightInContainerForEditor").show(650);
+                $("#leftInContainerForEditor").animate({"right":offsetRight}, "slow");
                 previewHidden = false;
             }
             else {
-                console.log("hide");
+                $("#leftInContainerForEditor").animate({"right":"20px"}, "slow");
                 $("#rightInContainerForEditor").hide(650);
                 previewHidden = true;
             }
         });
-
-        // use some kind of tracker here?
-        var lastPreviewSize = 0;
-
-        $("#hideEditor").click(() => {
-            console.log("clicked sidebarbutton");
-            if(editorHidden) {
-                console.log("show");
-                $("#leftInContainerForEditor").show(650);
-                // need to adjust reset the previous positions of preview etc.
-                editorHidden = false;
-            }
-            else {
-                console.log("hide");
-                $("#leftInContainerForEditor").hide(650);
-                // need to adjust preview to fit screen now.
-                editorHidden = true;
-            }
-        });
-
     }
+    
+    public changeChapter(i){
+        this.current_chapter = i;  
+    }
+    
+    //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+    //     [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
