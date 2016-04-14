@@ -11,13 +11,10 @@ import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
 import lineModel = documentModel.lineModel;
 
-
-
-
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
-    repository.findOne({_id: req.params.id}, (error, document) => {
-        if(error){
+    repository.findOne({ _id: req.params.id }, (error, document) => {
+        if (error) {
             res.send(error);
         } else {
             res.jsonp(document);
@@ -25,10 +22,9 @@ export function read(req: express.Request, res: express.Response) {
     });
 }
 
-
-export function getAllDocuments(callback){
-    repository.find({}, (error, document)=>{
-        if (error){
+export function getAllDocuments(callback) {
+    repository.find({}, (error, document) => {
+        if (error) {
             console.log(error)
         } else {
             callback(document);
@@ -37,7 +33,7 @@ export function getAllDocuments(callback){
 }
 
 
-export function getDocuments(req: express.Request, res: express.Response){
+export function getDocuments(req: express.Request, res: express.Response) {
     console.log("getDocuments()");
     var lines1 = [new Line("Doc1 line1", []), new Line("Doc1 line2", []), new Line("Doc1 line3", [])];
     var lines2 = [new Line("Doc2 line1", []), new Line("Doc2 line2", []), new Line("Doc2 line3", [])];
@@ -67,268 +63,32 @@ export function getDocuments(req: express.Request, res: express.Response){
     documentArray.push(document1, document2, document3, document4, document5, document6, document7);
 
     repository.find({}, (error, documents) => {
-       if(error){
-           console.log(error);
-           res.jsonp(error);
-       } else if(!documents.length){
-           console.log("No documents found");
+        if (error) {
+            console.log(error);
+            res.jsonp(error);
+        } else if (!documents.length) {
+            console.log("No documents found");
             repository.create((documentArray), (error, document2) => {
-                if(error){
+                if (error) {
                     console.log(error);
-                }else{
+                } else {
                     getDocuments(req, res);
                 }
             });
-       } else{
-           console.log("We found documents");
-           res.jsonp(documents);
-       }
+        } else {
+            console.log("We found documents");
+            res.jsonp(documents);
+        }
     });
 }
 
-export function update(req: express.Request, res: express.Response) {
-    console.log("documentController.updateDocument()");
-    // need to update the document model here! 
-    if(req.body.documentTitle != null){
-        repository.update({_id: req.params.id}, {_title: req.body.documentTitle}, (error, document) => {
-            if(error){
-                res.send(error);
-            } else {
-                res.jsonp(document);
-            }
-    	});
-    }
-
-    if(req.body.newchapterName != null){
-        var query = {$set: {}};
-        query.$set["_chapters.$._header"] = req.body.newchapterName
-
-        repository.update({
-            _id: new mongoose.Types.ObjectId(req.params.id),
-            "_chapters._id": new mongoose.Types.ObjectId(req.body.chapterId)
-        }, query, (error, document) => {
-            if(error){
-                res.send(error);
-            } else {
-                res.jsonp(document);
-            }
-        });
-
-    }
-}
-
-export function saveDocument(document, callback){
-    repository.update({_id: document._id}, document, (error, document2) => {
-                if (error){
-                    console.log(error);
-                    callback(error, document._id)
-                } else {
-                    callback(null, document._id);
-                }
-            });
-}
-
-export function updateDocumentText(diff, callback){
-    console.log("updateDocumentText: " + JSON.stringify(diff, null, 2));
-
-    if(diff.newchapter){
-        var newChapter = new chapterModel({_header: "New Chapter "+(diff.chapterIndex+1), _lines: [{_raw: "...", _metadata: []}]});
-        repository.update(
-            {_id: diff.documentId},
-            { $push:
-                {_chapters:
-                    {
-                        $each: [newChapter],
-                        $position: diff.chapterIndex+1
-                    }
-                }
-            }, (error, document) => {
-                if (error){
-                    console.log(error);
-                } else {
-                    callback(newChapter._id);
-                }
-            });
-    }
-    else if (typeof (diff.from !== 'undefined')){
-        console.log("trying to update: " + JSON.stringify(diff, null, 2));
-        if(diff.origin == '+input'){
-            var query = {$set: {}};
-            var paragraphset = "_chapters.0._lines." + diff.from.line;
-
-            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
-                if(error){
-                    console.log(error);
-                } else{
-                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch){
-                        var lines = document[0]["_chapters"][0]["_lines"];
-                        var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
-                        var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
-                        var line = new lineModel({_raw: raw, metadata: []})
-
-                        lines[diff.from.line]._raw = firstRaw
-
-                        lines.splice(diff.from.line+1, 0, line)
-                        var query2 = {$set: {}};
-                        query2["_chapters.0._lines"] = lines
-                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query2, (error, document2) => {
-                            if(error){
-                                console.log(error)
-                                callback()
-                            } else{
-                                console.log("successfully spliced array")
-                                callback()
-                            }
-                        })
-
-                    } else if (diff.removed[0] !== "" && diff.text[0] !== ""){
-                        console.log("Tekst erstattet med bokstaver")
-                        var lines = document[0]["_chapters"][0]["_lines"];
-                        var fromLine = diff.from.line;
-                        var fromCh = diff.from.ch;
-                        var toLine = diff.to.line;
-                        var toCh = diff.to.ch;
-
-
-                        var firstLine: String = lines[fromLine]._raw;
-                        var lastLine: String = lines[toLine]._raw;
-
-                        if(fromLine == toLine){
-                            var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
-                            lines[fromLine]._raw = newraw;
-                        } else if (fromLine != toLine) {
-                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
-                            var lastRow = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRow + lastRow;
-                            lines.splice(fromLine+1, diff.removed.length-1);
-                        }
-                        query["_chapters.0._lines"] = lines
-                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
-                            if(error){
-                                console.log(error);
-                                callback()
-                            } else {
-                                console.log("successfully deleted from line");
-                                callback()
-                            }
-                        })
-
-                    } else {
-                        var raw: string = document[0]["_chapters"][0]["_lines"][diff.from.line]["_raw"];
-                        var newraw: string = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
-                        var newLine = {_raw: newraw, _metadata: []};
-
-                        query.$set[paragraphset] = newLine;
-                        repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
-                            if(error){
-                                console.log(error);
-                                callback()
-                            } else{
-                                console.log("successfully updated line");
-                                callback()
-                            }
-                        })
-                    }
-                }
-            })
-        } else if (diff.origin == '+delete' || diff.origin == 'cut'){
-            var fromLine = diff.from.line;
-            var fromCh = diff.from.ch;
-            var toLine = diff.to.line;
-            var toCh = diff.to.ch;
-
-            var query = {$set: {}};
-            var paragraphset = "_chapters.0._lines." + fromLine;
-
-            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
-                if(error){
-                    console.log(error);
-                } else{
-                    var lines = document[0]["_chapters"][0]["_lines"];
-                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == ""){
-                        var endraw = lines[diff.to.line]._raw.slice(0);
-                        lines[diff.from.line]._raw += endraw;
-                        lines.splice(diff.to.line, 1)
-                    } else {
-                        var firstLine: String = lines[fromLine]._raw;
-                        var lastLine: String = lines[toLine]._raw;
-                        if(fromLine == toLine){
-                            var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
-                            lines[fromLine]._raw = newraw;
-                        } else if (fromLine != toLine) {
-                            var firstRaw = firstLine.slice(0, fromCh);
-                            var lastRaw = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRaw + lastRaw;
-                            lines.splice(fromLine+1, diff.removed.length-1);
-                        }
-                    }
-                    var query = {$set: {}};
-                    query["_chapters.0._lines"] = lines
-                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
-                        if(error){
-                            console.log(error);
-                            callback()
-                        } else {
-                            console.log("successfully deleted from line");
-                            callback()
-                        }
-                    })
-                }
-            })
-
-        } else if (diff.origin == 'paste'){
-             var fromLine = diff.from.line;
-            var fromCh = diff.from.ch;
-            var toLine = diff.to.line;
-            var toCh = diff.to.ch;
-
-            var query = {$set: {}};
-            var paragraphset = "_chapters.0._lines." + fromLine;
-
-            repository.find({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, (error, document) => {
-                if(error){
-                    console.log(error);
-                } else{
-                    var lines = document[0]["_chapters"][0]["_lines"];
-                    if(diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == ""){
-                        var endraw = lines[diff.to.line]._raw.slice(0);
-                        lines[diff.from.line]._raw += endraw;
-                        lines.splice(diff.to.line, 1)
-                    } else if (diff.text.length>1) {
-                        console.log("diff.text.length>1 = True")
-
-
-
-                    }
-                    else {
-                        var firstLine: String = lines[fromLine]._raw;
-                        var lastLine: String = lines[toLine]._raw;
-                        if(fromLine == toLine){
-                            var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                            lines[fromLine]._raw = newraw;
-                        } else if (fromLine != toLine) {
-                            var firstRaw = firstLine.slice(0, fromCh);
-                            var lastRaw = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                            lines.splice(fromLine+1, diff.removed.length-1);
-                        }
-                    }
-                    var query = {$set: {}};
-                    query["_chapters.0._lines"] = lines
-                    repository.update({_id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId)}, query, (error, document2) => {
-                        if(error){
-                            console.log(error);
-                            callback()
-                        } else {
-                            console.log("successfully deleted from line");
-                            callback()
-                        }
-                    })
-                }
-            })
-
-
+export function saveDocument(document, callback) {
+    repository.update({ _id: document._id }, document, (error, document2) => {
+        if (error) {
+            console.log(error);
+            callback(error, document._id)
+        } else {
+            callback(null, document._id);
         }
-    }
-
+    });
 }

@@ -1,4 +1,5 @@
 var documentRoutes = require('../resources/document');
+import express = require('express')
 import Document = require("../domain/document");
 import Chapter = require('../domain/chapter')
 import Line = require('../domain/line')
@@ -22,7 +23,7 @@ export class DocumentService {
         })
 
         setInterval(() => {
-            console.log("DB tick")
+            // console.log("DB tick")
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
                     console.log(key + "is getting updated...: ");
@@ -36,11 +37,22 @@ export class DocumentService {
                         }
 
                     })
-
-
                 }
             }
         }, 5000);
+    }
+
+    getChapter(req: express.Request, res: express.Response) {
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.documentid;
+            var chapterid: string = req.params.chapterid;
+            for (var chapter of this.documents[documentid]._chapters) {
+                if (chapter._id == chapterid) {
+                    res.jsonp(chapter);
+                    return;
+                }
+            }   
+        }
     }
 
     updateDocument(diff2) {
@@ -59,6 +71,17 @@ export class DocumentService {
         else if (diff.deleteChapter) {
             console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
+        }
+
+        else if (diff.newchapterName) {
+            console.log("Changing chapter name")
+
+            for (var chapter of document._chapters) {
+                if (chapter._id == diff.chapterId) {
+                    chapter._header = diff.newchapterName
+                    break;
+                }
+            }
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
