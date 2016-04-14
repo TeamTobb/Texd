@@ -176,7 +176,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         if(from == to) return;
         var from_id = from.split("_")[2];
         var to_id = to.split("_")[2];
-        this.documentService.changeChapters(from_id, to_id);
+        this.documentService.changeChapters(from_id, to_id, this.chapterId);
     }
 
     // test

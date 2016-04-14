@@ -51,7 +51,7 @@ export class DocumentService {
                     res.jsonp(chapter);
                     return;
                 }
-            }   
+            }
         }
     }
 
@@ -60,8 +60,6 @@ export class DocumentService {
         var diff = JSON.parse(diff2);
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
-
-        console.log("WTJWEUIRH WIUEHRUI WEHRIU WEHRU WEHRI UWEHRIU HWERIUH WEIUR ");
 
         if (diff.newchapter) {
             console.log("NEW CHAPTER...");
@@ -82,6 +80,12 @@ export class DocumentService {
                     break;
                 }
             }
+        }
+        else if(diff.changeChapter) {
+            console.log("changing position on chapters");
+            var fromChapter = document._chapters[diff.fromChapter];
+            document._chapters.splice(diff.fromChapter, 1);
+            document._chapters.splice(diff.toChapter, 0, fromChapter);
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
