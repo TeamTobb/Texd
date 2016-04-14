@@ -29,7 +29,8 @@ export class DocumentService {
     public changeOrder: any = {
         from: {},
         to: {},
-        text: {}
+        text: {}, 
+        chapterId: {}
     }
 
     constructor(private http: Http, private authHttp: AuthHttp) {
@@ -49,6 +50,7 @@ export class DocumentService {
                     this.changeOrder.from = parsed.from
                     this.changeOrder.to = parsed.to
                     this.changeOrder.text = parsed.text
+                    this.changeOrder.chapterId = parsed.chapterId
                 }
                 
                 if (parsed.newchapterName) {
@@ -127,7 +129,14 @@ export class DocumentService {
             callback(this.document);
         })
     }
-
+       
+    public getChapter(chapterId: string, callback: (chapter: any) => any){
+        console.log("get chapter")
+        this.http.get('/documents/' + this.document.id + '/' + chapterId).map((res: Response) => res.json()).subscribe(res => {
+            callback(res);
+        })     
+    }
+    
     get document(): Document {
         return this._document;
     }

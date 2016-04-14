@@ -23,8 +23,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
+    @Input() changeOrderChapterId: any;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
-    
+
     public editor;
 
     public widgetTest;
@@ -39,20 +40,27 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if (changes["lines"] && this.editor !== undefined) {
-            var arr = [];
-            for (var line in this.lines) {
-                arr.push(this.lines[line].raw);
-            }
-            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
+        if (changes["chapterId"] && this.editor !== undefined) {
+            this.documentService.getChapter(this.chapterId, (chapter) => {
+                var arr = [];
+                for (var line of chapter._lines) {
+                    arr.push(line._raw)
+                }
+                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
+            })
         }
-        
+
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
-            this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+            for (var chapter of this.document.chapters) {
+                if (this.chapterId == this.changeOrderChapterId) {
+                    this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
+                    break;
+                }
+            }
         }
     }
-    
+
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "hashscript",

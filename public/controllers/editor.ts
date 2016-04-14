@@ -115,8 +115,7 @@ export class EditorController implements AfterViewInit {
     }
     
     public changeChapter(i){
-        this.current_chapter = i;
-        console.log("URRENT CHAPTER IS NOW " + i)  
+        this.current_chapter = i;  
     }
     
     //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
