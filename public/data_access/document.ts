@@ -114,7 +114,7 @@ export class DocumentService {
 
                     if (parsed.newchapter) {
                         var l = new Line("Text", []);
-                        this.document.chapters.splice(parsed.chapterindex + 1, 0, new Chapter("New chapter", [l]))
+                        this.document.chapters.splice(parsed.chapterIndex + 1, 0, new Chapter("New chapter", [l]))
                     }
 
                     if (parsed.deleteChapter) {
