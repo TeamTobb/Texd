@@ -1,4 +1,5 @@
 var documentRoutes = require('../resources/document');
+import express = require('express')
 import Document = require("../domain/document");
 import Chapter = require('../domain/chapter')
 import Line = require('../domain/line')
@@ -22,7 +23,7 @@ export class DocumentService {
         })
 
         setInterval(() => {
-            console.log("DB tick")
+            // console.log("DB tick")
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
                     console.log(key + "is getting updated...: ");
@@ -40,6 +41,19 @@ export class DocumentService {
         }, 5000);
     }
 
+    getChapter(req: express.Request, res: express.Response) {
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.documentid;
+            var chapterid: string = req.params.chapterid;
+            for (var chapter of this.documents[documentid]._chapters) {
+                if (chapter._id == chapterid) {
+                    res.jsonp(chapter);
+                    return;
+                }
+            }
+        }
+    }
+
     updateDocument(diff2) {
         console.log("updateDocument(diff) START")
         var diff = JSON.parse(diff2);
@@ -47,8 +61,30 @@ export class DocumentService {
         var document = this.documents[diff.documentId + ""];
 
         if (diff.newchapter) {
+            console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
+        }
+        else if (diff.deleteChapter) {
+            console.log("deleting chapter");
+            document._chapters.splice(diff.chapterIndex, 1);
+        }
+
+        else if (diff.newchapterName) {
+            console.log("Changing chapter name")
+
+            for (var chapter of document._chapters) {
+                if (chapter._id == diff.chapterId) {
+                    chapter._header = diff.newchapterName
+                    break;
+                }
+            }
+        }
+        else if(diff.changeChapter) {
+            console.log("changing position on chapters");
+            var fromChapter = document._chapters[diff.fromChapter];
+            document._chapters.splice(diff.fromChapter, 1);
+            document._chapters.splice(diff.toChapter, 0, fromChapter);
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
@@ -57,6 +93,7 @@ export class DocumentService {
             for (var chapter of document._chapters) {
                 if (chapter._id == diff.chapterId) {
                     lines = chapter._lines;
+                    break;
                 }
             }
 
@@ -90,7 +127,7 @@ export class DocumentService {
                         lines[fromLine]._raw = firstRow + lastRow;
                         lines.splice(fromLine + 1, diff.removed.length - 1);
                     }
-                } else {  //ny bokstav                              
+                } else {  //ny bokstav
                     var raw: any = lines[diff.from.line]["_raw"];
                     lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
                 }
@@ -127,60 +164,26 @@ export class DocumentService {
                 var toLine = diff.to.line;
                 var toCh = diff.to.ch;
 
-                var query = { $set: {} };
-                var paragraphset = "_chapters.0._lines." + fromLine;
-
-                repository.find({ _id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId) }, (error, document) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        var lines = document[0]["_chapters"][0]["_lines"];
-                        if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                            var endraw = lines[diff.to.line]._raw.slice(0);
-                            lines[diff.from.line]._raw += endraw;
-                            lines.splice(diff.to.line, 1)
-                        } else if (diff.text.length > 1) {
-                            console.log("diff.text.length>1 = True")
-
-
-
-                        }
-                        else {
-                            var firstLine: String = lines[fromLine]._raw;
-                            var lastLine: String = lines[toLine]._raw;
-                            if (fromLine == toLine) {
-                                var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                                lines[fromLine]._raw = newraw;
-                            } else if (fromLine != toLine) {
-                                var firstRaw = firstLine.slice(0, fromCh);
-                                var lastRaw = lastLine.slice(toCh);
-                                lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                                lines.splice(fromLine + 1, diff.removed.length - 1);
-                            }
-                        }
-                        var query = { $set: {} };
-                        query["_chapters.0._lines"] = lines
-                        repository.update({ _id: new mongoose.Types.ObjectId(diff.documentId), "_chapters._id": new mongoose.Types.ObjectId(diff.chapterId) }, query, (error, document2) => {
-                            if (error) {
-                                console.log(error);
-                                callback()
-                            } else {
-                                console.log("successfully deleted from line");
-                                callback()
-                            }
-                        })
+                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
+                    var endraw = lines[diff.to.line]._raw.slice(0);
+                    lines[diff.from.line]._raw += endraw;
+                    lines.splice(diff.to.line, 1)
+                } else if (diff.text.length > 1) {
+                    console.log("diff.text.length>1 = True")
+                } else {
+                    var firstLine: String = lines[fromLine]._raw;
+                    var lastLine: String = lines[toLine]._raw;
+                    if (fromLine == toLine) {
+                        var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
+                        lines[fromLine]._raw = newraw;
+                    } else if (fromLine != toLine) {
+                        var firstRaw: any = firstLine.slice(0, fromCh);
+                        var lastRaw = lastLine.slice(toCh);
+                        lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
+                        lines.splice(fromLine + 1, diff.removed.length - 1);
                     }
-                })
-
-
+                }
             }
         }
-
-
-
-
     }
-
 }
-
-

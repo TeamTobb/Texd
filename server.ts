@@ -1,6 +1,6 @@
 /// <reference path="./typings/tsd.d.ts"/>​
 
-var express = require('express')
+import express = require('express')
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser');
 var jwt = require('jwt-simple')
@@ -130,13 +130,14 @@ app.post('/uploadFile', uploadRoutes.upload);
 
 //Routes
 app.use('/', loginroutes);
-
 app.get('/plugins', pluginsRoutes.read);
 app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', documentRoutes.getDocuments);
-app.post('/document/:id', documentRoutes.update);
+app.get('/documents/:documentid/:chapterid', (req, res)=>{
+    documentService.getChapter(req, res)
+})
 app.get('/*', indexroutes.index);
 
 app.listen(httpPort, function() {

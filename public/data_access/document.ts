@@ -29,7 +29,8 @@ export class DocumentService {
     public changeOrder: any = {
         from: {},
         to: {},
-        text: {}
+        text: {},
+        chapterId: {}
     }
 
     constructor(private http: Http, private authHttp: AuthHttp) {
@@ -44,10 +45,40 @@ export class DocumentService {
         this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
+            // console.log(parsed);
             if (parsed.senderId != this._senderId && (parsed.documentId == this.document.id)) {
-                this.changeOrder.from = parsed.from
-                this.changeOrder.to = parsed.to
-                this.changeOrder.text = parsed.text
+                if (parsed.from && parsed.to && parsed.text) {
+                    this.changeOrder.from = parsed.from
+                    this.changeOrder.to = parsed.to
+                    this.changeOrder.text = parsed.text
+                    this.changeOrder.chapterId = parsed.chapterId
+                }
+
+                if (parsed.newchapterName) {
+                    for (var chapter of this.document.chapters) {
+                        if (chapter.id == parsed.chapterId) {
+                            chapter.header = parsed.newchapterName;
+                            break;
+                        }
+                    }
+                }
+
+                if(parsed.newchapter){
+                    var l = new Line("Text", []);
+                    this.document.chapters.splice(parsed.chapterindex+1, 0, new Chapter("New chapter", [l]))
+                }
+
+                if(parsed.deleteChapter){
+                    this.document.chapters.splice(parsed.chapterIndex, 1);
+                }
+
+                if(parsed.changeChapter) {
+                    var fromChapter = this.document.chapters[parsed.fromChapter];
+                    this.document.chapters.splice(parsed.fromChapter, 1);
+                    this.document.chapters.splice(parsed.toChapter, 0, fromChapter);
+                    // here is a bug, if you are currently editing one of the moved chapters,
+                    // u will automaticly also change chapter, as the index u are in is now a different chapter
+                }
             }
         }
 
@@ -56,6 +87,15 @@ export class DocumentService {
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
+    }
+
+    public changeChapters(from, to, chapterId) {
+        var fromChapter = this.document.chapters[from];
+        this.document.chapters.splice(from, 1);
+        this.document.chapters.splice(to, 0, fromChapter);
+        this.sendDiff({changeChapter: true, fromChapter: from, toChapter: to}, chapterId);
+        console.log("done changing");
+        // send diff!
     }
 
     public changeTitle(id: string, newTitle: string) {
@@ -98,28 +138,6 @@ export class DocumentService {
         }
     }
 
-    //TODO implement changeChapterName() new URL
-    public changeChapterName(documentId: string, newchapterName: string, chapterId: number) {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + documentId, //add chapter number to the URL
-            JSON.stringify({
-                documentId: documentId,
-                newchapterName: newchapterName,
-                chapterId: chapterId
-            }),
-            { headers: headers }).subscribe(res => {
-                console.log(res)
-                //TODO send out socket change to everyone
-                // Only actually change the title and send socket messages if status==OK
-                /* if(res.status==200){
-                     this._socket.send(JSON.stringify({chapterHeader: 'name', chapterId: chapterId, documentId: documentId, message: newchapterName, senderId: "hello" }));
-                     this.document.chapters[chapterId].header = newchapterName;
-                 }*/
-            }
-            );
-    }
-
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
             
@@ -132,16 +150,25 @@ export class DocumentService {
     }
 
     public sendDiff(diff: any, chapterId: string) {
+
         diff.senderId = this._senderId;
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
-        this._socket.send(JSON.stringify(diff))
+        console.log(diff);
+        this._socket.send(JSON.stringify(diff));
     }
 
     public getDocument(documentId: string, callback: (document: Document) => any) {
         this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
             this.document = new Document([], [], [], [], [], res);
             callback(this.document);
+        })
+    }
+
+    public getChapter(chapterId: string, callback: (chapter: any) => any){
+        console.log("get chapter")
+        this.http.get('/documents/' + this.document.id + '/' + chapterId).map((res: Response) => res.json()).subscribe(res => {
+            callback(res);
         })
     }
 

@@ -53,9 +53,8 @@ export class EditorController implements AfterViewInit {
 
     @Input() fontToBe: any;
 
-
-
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private _router: Router) {
+
         this.changeOrder = this.documentService.changeOrder
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
@@ -141,6 +140,13 @@ export class EditorController implements AfterViewInit {
             console.log(this.choosenSize);
         });
     }
+    
+    public changeChapter(i){
+        this.current_chapter = i;  
+    }
+    
+    //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+    //     [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
