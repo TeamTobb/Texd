@@ -5,6 +5,11 @@ import {Injectable, } from 'angular2/core';
 import {RouteParams} from 'angular2/router';
 import 'rxjs/Rx';
 
+//import {Select} from 'ng2-select';
+
+
+import {ButtonCheckbox} from 'ng2-bootstrap/ng2-bootstrap';
+
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Line, Chapter} from '../domain/document.ts';
@@ -16,7 +21,7 @@ import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
 
-
+import {Select} from 'ng2-select';
 import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 
@@ -28,7 +33,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES]
 })
 
 export class EditorController implements AfterViewInit {
@@ -40,7 +45,15 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
-    private router: Router; 
+    private router: Router;
+    private fontPicker = [];
+    private sizePicker = [];
+    private choosenFont: string;
+    private choosenSize: string;
+
+    @Input() fontToBe: any;
+
+
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private _router: Router) {
         this.changeOrder = this.documentService.changeOrder
@@ -54,7 +67,8 @@ export class EditorController implements AfterViewInit {
             })
             this.documentService.currentChapter = this.current_chapter;
         }
-        this.router = _router; 
+        this.router = _router;
+        this.setFontPickerAndSizePicker();
     }
 
     ngAfterViewInit() {
@@ -116,8 +130,16 @@ export class EditorController implements AfterViewInit {
                 previewHidden = true;
             }
         });
-        
-        
+
+        $('#selectFont').change(() => {
+            this.choosenFont = $('#selectFont').val();
+            console.log(this.choosenFont);
+        });
+
+        $('#selectSize').change(() => {
+            this.choosenSize = $('#selectSize').val();
+            console.log(this.choosenSize);
+        });
     }
 
     public changeDocumentTitle($event) {
@@ -133,17 +155,17 @@ export class EditorController implements AfterViewInit {
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 console.log("done parsing.. inserting!");
-                document.getElementById('previewframe').removeAttribute;                
+                document.getElementById('previewframe').removeAttribute;
                 document.getElementById('previewframe').innerHTML = parsedHTML;
-                
-                console.log("STYLE doc:")
+
+                this.document.style["fontFamily"] = this.choosenFont;
+                this.document.style["fontSize"] = this.choosenSize+"px";
                 console.log(this.document.style)
 
                 for (var key in this.document.style) {
                     var value = this.document.style[key];
                     document.getElementById('previewframe').style[key] = value;
                 }
-
             })
         }
         keyMap[67] = () => {
@@ -162,9 +184,36 @@ export class EditorController implements AfterViewInit {
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
     }
-    
-    goToSettings(){
-        this.router.navigate(['Settings', 'DocumentStyle', {id: this.document.id} ]);         
+
+    goToSettings() {
+        this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
     }
-    
+
+    setFontPickerAndSizePicker() {
+        this.fontPicker.push("Georgia, serif")
+        this.fontPicker.push('Palatino Linotype", "Book Antiqua", Palatino, serif')
+        this.fontPicker.push('"Times New Roman", Times, serif')
+        this.fontPicker.push('Arial, Helvetica, sans-serif')
+        this.fontPicker.push('"Arial Black", Gadget, sans-serif')
+        this.fontPicker.push('"Comic Sans MS", cursive, sans-serif')
+        this.fontPicker.push('Impact, Charcoal, sans-serif')
+        this.fontPicker.push('"Lucida Sans Unicode", "Lucida Grande", sans-serif')
+        this.fontPicker.push('Tahoma, Geneva, sans-serif')
+        this.fontPicker.push('"Trebuchet MS", Helvetica, sans-serif')
+        this.fontPicker.push('Verdana, Geneva, sans-serif')
+        this.fontPicker.push('"Courier New", Courier, monospace')
+        this.fontPicker.push('"Lucida Console", Monaco, monospace')
+
+        for (var index = 6; index < 100; index++) {
+            this.sizePicker.push(index)
+        }
+    }
+
+
+
+    fontSelected(font) {
+        console.log(font)
+        console.log(this.fontToBe)
+    }
+
 }

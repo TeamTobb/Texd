@@ -23,24 +23,40 @@ export class DocumentStyle {
     title: string = "loading";
     styleInput = {};
     styleItems = [];
+    gotDocumentId = false;
+    noDocumentId = true;
+    public docs = [];
 
     constructor(private _router: Router, private _routeParams: RouteParams, builder: FormBuilder, private documentService: DocumentService) {
         this.documentId = _routeParams.params["id"];
-        console.log("documentId: " + this.documentId)
-        this.createStyleInput()
 
-        documentService.getDocument(this.documentId, (document) => {
-            this.title = document.title;
-            
-            var newStyleInput = {};
-            for (var key in document.style) {
-                var value = document.style[key];
-                if (value != "") {
-                    newStyleInput[key] = value;
+        this.createStyleInput()
+        if (Number(this.documentId) == 0) {
+            this.noDocumentId = true;
+            this.gotDocumentId = false;
+
+
+            documentService.getDocuments((documents) => {
+                this.docs = documents;
+            })
+        } else {
+            this.gotDocumentId = true;
+            this.noDocumentId = false;
+
+
+            documentService.getDocument(this.documentId, (document) => {
+                this.title = document.title;
+                var newStyleInput = {};
+                for (var key in document.style) {
+                    var value = document.style[key];
+                    if (value != "") {
+                        newStyleInput[key] = value;
+                    }
                 }
-            }            
-            this.styleInput = newStyleInput;
-        })
+                this.styleInput = newStyleInput;
+            })
+        }
+
     }
 
     createStyleInput() {
@@ -243,6 +259,23 @@ export class DocumentStyle {
         }
 
         this.documentService.changeStyle(this.documentId, newStyleInput);
+    }
+
+    setDocumentId(docId, docNumber) {
+        this.documentId = docId;
+        this.gotDocumentId = true;
+        this.noDocumentId = false;
+
+        this.title = document.title;
+        var newStyleInput = {};
+        for (var key in this.docs[docNumber].style) {
+            var value = this.docs[docNumber].style[key];
+            if (value != "") {
+                newStyleInput[key] = value;
+            }
+        }
+        this.styleInput = newStyleInput;
+
     }
 
 }

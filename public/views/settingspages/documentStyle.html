@@ -1,17 +1,26 @@
-    <h1> Document style</h1>
-
-    <b>{{title}}</b>
 <div id="" style="overflow-y: scroll; height:67%;">
+    <section *ngIf="noDocumentId">
+        <h1> Document style</h1>
+        <ul style="">
+            <li id="select" (click)="setDocumentId(doc.id,i)" *ngFor="#doc of docs; #i = index">{{doc.title}}:
+            </li>
+        </ul>
+    </section>
 
-    
-    <ul style="">
-        <li id="styleItems" *ngFor="#styleItem of styleItems; #i = index">{{styleItem}}:
-            <tr>
-            <input type="text" [(ngModel)]="styleInput[styleItem]" />
-            {{styleInput[styleItem]}}
-        </li>
-    </ul>
+    <section *ngIf="gotDocumentId">
+        <h2> Document style for: {{title}}</h2>
+        <br>
+        <button type="button" (click)="sendStyleToServer()">Update style</button>
+        <a href="/docs/{{documentId}}" type="button">Go back to document</a>
+        <br>
+        <br>
+
+        <ul style="">
+            <li id="styleItems" *ngFor="#styleItem of styleItems; #i = index">{{styleItem}}:
+
+                <input type="text" [(ngModel)]="styleInput[styleItem]" /> {{styleInput[styleItem]}}
+            </li>
+        </ul>
+    </section>
 
 </div>
-
-    <button type="button" (click)="sendStyleToServer()">Click Me!</button>
