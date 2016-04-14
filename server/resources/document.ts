@@ -97,3 +97,20 @@ export function saveDocument(document, callback) {
         }
     })
 }
+
+
+ export function update(req: express.Request, res: express.Response) {
+    console.log("documentController.updateDocument()");
+      
+    if(req.body.documentStyle != null){
+        console.log("got style on server")
+        repository.update({_id: req.params.id}, {_style: req.body.documentStyle}, (error, document) => {
+            if(error){
+                res.send(error);
+            } else {
+                res.jsonp(document);
+            }
+    	});
+    }
+    
+}
