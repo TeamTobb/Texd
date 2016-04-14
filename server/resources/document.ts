@@ -58,6 +58,11 @@ export function getDocuments(req: express.Request, res: express.Response) {
     var document6 = new Document(6, "Title 6", "Name 6", ["Bjon", "Borgar"], chapters6);
     var document7 = new Document(7, "Title 7", "Name 7", ["Bjon", "Borgar"], chapters7);
 
+    var style1 = {}
+    style1["testKey"] = "testValue"
+
+    document1.style = style1;
+
     var documentArray = [];
     documentArray.push(document1, document2, document3, document4, document5, document6, document7);
 
@@ -88,6 +93,7 @@ export function saveDocument(document, callback) {
             callback(error, document._id)
         } else {
             callback(null, document._id);
+
         }
     })
 }

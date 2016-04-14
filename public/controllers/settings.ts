@@ -2,10 +2,12 @@ import {Component, OnInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {SettingsPage} from './settingspage';
 import {DocumentStyle} from './settingsPages/documentStyle';
+import {DocumentService} from '../data_access/document.ts';
 
 @Component({
     selector: 'settings',
     templateUrl: 'views/settings.html',
+    providers: [DocumentService],
     directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([
@@ -25,7 +27,7 @@ export class SettingsComponent {
 
         switch (settingType) {
             case 0:
-                this._router.navigate(['DocumentStyle', { id: settingType }]);
+                this._router.navigate(['DocumentStyle', { id: 0 }]);
                 break;
             case 1:
                 this._router.navigate(['SettingsPage', { id: settingType }]);

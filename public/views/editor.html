@@ -19,6 +19,19 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Upload Image</button>
                 <button id="uploadPluginButton" style="">Upload Plugin</button>
+                <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
+                
+                <select id="selectFont">
+                    <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
+                </select>
+                <select id="selectSize">
+                    <option value="{{size}}" *ngFor="#size of sizePicker; #i = index">{{size}}</option>
+                </select>
+               
+               
+               
+                
+                
             </span>
             <span id="buttonsContainerRight" style="float: right; padding-right: 30px">
                 <button id="hidePreview">Hide Preview</button>
@@ -47,19 +60,19 @@
     <h1 contenteditable="true" class="header-widget"></h1>
 
     <div class="image-widget" style="background-color: #EEE">
-		<img class="image-frame" src="test.jpg" height="100px" width="100px">
-		<br>
-		<span class="image-text">This is some text</span>
-	</div>
+        <img class="image-frame" src="test.jpg" height="100px" width="100px">
+        <br>
+        <span class="image-text">This is some text</span>
+    </div>
 
 </div>
 
 <section *ngIf="showUploadDiv">
     <div class="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
-       <fileuploader>
+        <fileuploader>
 
-       </fileuploader>
+        </fileuploader>
 
     </div>
 </section>
