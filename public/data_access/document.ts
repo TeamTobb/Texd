@@ -50,7 +50,7 @@ export class DocumentService {
                     this.changeOrder.to = parsed.to
                     this.changeOrder.text = parsed.text
                 }
-                
+
                 if (parsed.chapterName) {
                     for (var chapter of this.document.chapters) {
                         if (chapter.id == parsed.chapterId) {
@@ -67,6 +67,14 @@ export class DocumentService {
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
+    }
+
+    public changeChapters(from, to) {
+        var fromChapter = this.document.chapters[from];
+        this.document.chapters.splice(from, 1);
+        this.document.chapters.splice(to, 0, fromChapter);
+        console.log("done changing");
+        // send diff!
     }
 
     public changeTitle(id: string, newTitle: string) {

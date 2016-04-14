@@ -135,6 +135,40 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 cm.widgetEnter = undefined;
             }
         });
+
+        // drag events for chapters
+        document.addEventListener("dragstart", function(event) {
+            event.dataTransfer.setData("dragData", event.target.id);
+        });
+
+        document.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener("drop", (event ) => {
+            event.preventDefault();
+            var c0 = event.target.className;
+            var par = $(event.target).parent();
+            var c1 = par[0].className;
+            var grandpar = $(event.target).parent().parent();
+            var c2 = grandpar[0].className;
+            var grandgrandpar = $(event.target).parent().parent().parent();
+            var c3 = grandgrandpar[0].className;
+            var d = "droptarget";
+            var dragged_id = event.dataTransfer.getData("dragData");
+            if ( c0 == d ) this.changeChapterPositions(dragged_id, event.target.id);
+            else if (c1 == d) this.changeChapterPositions(dragged_id, par[0].id);
+            else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
+            else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
+        });
+
+    }
+
+    public changeChapterPositions(from, to) {
+        if(from == to) return;
+        var from_id = from.split("_")[2];
+        var to_id = to.split("_")[2];
+        this.documentService.changeChapters(from_id, to_id);
     }
 
     // test
