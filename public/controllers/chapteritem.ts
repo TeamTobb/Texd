@@ -28,8 +28,8 @@ export class ChapterItem implements OnChanges {
     }
 
     rename($event, chapterId, documentId){
-        var newName: string = $event.target.innerHTML
-        this.documentService.changeChapterName(documentId, newName, chapterId);
+        var newchapterName: string = $event.target.innerHTML
+        this.documentService.sendDiff({newchapterName}, chapterId)
         $event.target.setAttribute("contenteditable", "false");
     }
 

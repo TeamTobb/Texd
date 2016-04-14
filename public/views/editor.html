@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="editorContainer">
-        <cmcomponent id="cmcomponent" [document]=document [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+        <cmcomponent id="cmcomponent" [document]=document (emitChangeChapter)="changeChapter($event)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
         [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
     </div>
 </div>

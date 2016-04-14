@@ -18,17 +18,19 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 })
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
-    @Input() document : Document;
+    @Input() document: Document;
     @Input() chapterId: string;
     @Input() changeOrderFrom: any;
     @Input() changeOrderTo: any;
     @Input() changeOrderText: any;
-
+    @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
+    
     public editor;
 
     public widgetTest;
 
     public isInitialized = false;
+    private current_chapter;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -37,22 +39,20 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if(!this.isInitialized) {
-            if (changes["lines"] && this.editor !== undefined) {
-                var arr = [];
-                for (var line in this.lines) {
-                    arr.push(this.lines[line].raw);
-                }
-                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 });
-                this.isInitialized = true;
+        if (changes["lines"] && this.editor !== undefined) {
+            var arr = [];
+            for (var line in this.lines) {
+                arr.push(this.lines[line].raw);
             }
+            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
         }
+        
         if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
             console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
             this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
         }
     }
-
+    
     ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "hashscript",
@@ -143,7 +143,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         // console.log(event);
         console.log("deleteChapterFromDB(" + nr + ")");
         this.document.chapters.splice(nr, 1);
-        this.documentService.sendDiffDeleteChapter(this.chapterId, nr);
+        this.documentService.sendDiff({ deleteChapter: true, chapterIndex: nr }, this.chapterId)
     }
 
     // test 2
@@ -154,8 +154,11 @@ export class CmComponent implements AfterViewInit, OnChanges {
         //     return;
         // }
         console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
+
         // this.documentService.currentChapter = chapter_number;
-        // this.current_chapter = chapter_number;
+        this.current_chapter = chapter_number;
+        console.log("we are emitting: " + chapter_number)
+        this.emitChangeChapter.emit(chapter_number)
         // this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter " + (current_chapter + 1), [l]));
         // this.documentService.sendDiffNewChapter({},this.chapterId, current_chapter);
     }
@@ -164,9 +167,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public createChapter() {
         console.log("new chapter::");
         var l = new Line("Text", []);
-        var current_chapter = this.documentService.currentChapter;
-        this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter " + (current_chapter + 1), [l]));
-        this.documentService.sendDiffNewChapter({},this.chapterId, current_chapter);
+        this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New chapter", [l]));
+        this.documentService.sendDiff({ newchapter: true, chapterIndex: this.current_chapter }, this.chapterId);
     }
 
     parseWidgets(cm) {

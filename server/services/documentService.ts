@@ -60,6 +60,17 @@ export class DocumentService {
             console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
         }
+        
+        else if(diff.newchapterName){
+            console.log("Changing chapter name")
+            
+            for(var chapter of document._chapters){
+                if(chapter._id == diff.chapterId){
+                    chapter._header = diff.newchapterName
+                    break;
+                }
+            }
+        }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
             var lines = []

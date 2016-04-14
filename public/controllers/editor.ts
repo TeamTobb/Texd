@@ -38,7 +38,7 @@ export class EditorController implements AfterViewInit {
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
     public changeOrder: any;
-
+    
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams) {
         this.changeOrder = this.documentService.changeOrder
         this.element = currElement;
@@ -113,6 +113,14 @@ export class EditorController implements AfterViewInit {
             }
         });
     }
+    
+    public changeChapter(i){
+        this.current_chapter = i;
+        console.log("URRENT CHAPTER IS NOW " + i)  
+    }
+    
+    //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+    //     [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
