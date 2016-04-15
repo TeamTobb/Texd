@@ -39,8 +39,9 @@ export class EditorController implements AfterViewInit {
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
-    private choosenSize: string;
-    
+    private choosenSize: string;  
+    //  TODO: Bjon check this
+    private style = {}; 
     @Input() fontToBe: any;
     @ViewChild(CmComponent) cmcomponent: CmComponent;
     
@@ -52,6 +53,9 @@ export class EditorController implements AfterViewInit {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
+                this.style = document2.style;
+                this.choosenSize = this.document.style["fontSize"];
+                this.choosenFont = this.document.style["fontFamily"];
             })
             this.documentService.currentChapter = this.current_chapter;
         }
@@ -160,6 +164,10 @@ export class EditorController implements AfterViewInit {
             }
         });
 
+        $("#viewDocument").click(() => {
+            this.parseWholeDocument();
+        });
+
         $('#selectFont').change(() => {
             this.choosenFont = $('#selectFont').val();
             console.log(this.choosenFont);
@@ -174,7 +182,7 @@ export class EditorController implements AfterViewInit {
     public changeChapter(i) {
         this.current_chapter = i;
     }
-    
+
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
             this.documentService.changeTitle(this.document.id, $event.target.innerHTML);
@@ -187,22 +195,34 @@ export class EditorController implements AfterViewInit {
             console.log("ctrl+p");
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
-                console.log("done parsing.. inserting!");
-                document.getElementById('previewframe').removeAttribute;
                 document.getElementById('previewframe').innerHTML = parsedHTML;
                 this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize + "px";
+                this.document.style["fontSize"] = this.choosenSize;
+                this.documentService.changeStyle(this.document.id, this.document.style);
+                for (var key in this.document.style) {
+                    var value = this.document.style[key];
+                    document.getElementById('previewframe').style[key] = value;
+                }
+            })
+
+        }
+        keyMap[67] = () => {
+            console.log("ctrl+c");
+            var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+                document.getElementById('previewframe').innerHTML = parsedHTML;
+                this.document.style["fontFamily"] = this.choosenFont;
+                this.document.style["fontSize"] = this.choosenSize+"px";
                 console.log(this.document.style)
 
                 for (var key in this.document.style) {
                     var value = this.document.style[key];
                     document.getElementById('previewframe').style[key] = value;
                 }
-            })
+            });
         }
-        keyMap[67] = () => {
+        keyMap[69] = () => {
             console.log("ctrl+c");
-            // this.createChapter();
+            this.parseWholeDocument();
         }
 
         if ($event.ctrlKey) {
@@ -211,6 +231,26 @@ export class EditorController implements AfterViewInit {
                 keyMap[$event.which]();
             }
         }
+    }
+
+    public parseWholeDocument() {
+        var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+            var total = "<html><body><head><title>test</title></head><div id='content'>";
+            total += parsedHTML;
+            total += "</div></body></html>";
+            var w = window.open("", "_blank", "");
+            var doc = w.document;
+            doc.open();
+            doc.write(total);
+            this.document.style["fontFamily"] = this.choosenFont;
+            this.document.style["fontSize"] = this.choosenSize+"px";
+            for (var key in this.document.style) {
+                var value = this.document.style[key];
+                doc.getElementById('content').style[key] = value;
+            }
+            doc.close();
+            w.focus();
+        });
     }
 
     public showUploadDivToggle(hide) {

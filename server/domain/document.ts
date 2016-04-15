@@ -10,13 +10,14 @@ class Document {
     private _style: any;
 
 
-    constructor(idTest?, title?, documentname?, authors?, chapters?) {
+    constructor(idTest?, title?, documentname?, authors?, chapters?, style?) {
         if (idTest && title && documentname && authors && chapters) {
             this._idTest = idTest;
             this._title = title;
             this._documentname = documentname;
             this._authors = authors;
             this._chapters = chapters;
+            this._style = style;
         }
     }
 
