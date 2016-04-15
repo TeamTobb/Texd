@@ -15,11 +15,8 @@ import {SnappetParser} from "../utils/snappetParser.ts";
 export class DocumentService {
     private _socket;
     public parseMap: ParseMap = new ParseMap();
-
     public cm = null;
-
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
-
     public _senderId: string;
     public diffSenderId = {
         id: ""
@@ -162,15 +159,8 @@ export class DocumentService {
     
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + id, JSON.stringify({ documentStyle: newStyle }), { headers: headers }).subscribe(res => {
-            // Only actually change the title and send socket messages if status==OK
-            if (res.status == 200) {
-                /*this._socket.send(JSON.stringify({ name: 'name', documentId: id, title: newTitle, senderId: "hello" }));
-                this.document.title = newTitle;*/
-                console.log("Style saved successfully ")
-            }
-        });
+        this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle}));
+       
     }
     
     

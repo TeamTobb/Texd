@@ -47,28 +47,24 @@ export class EditorController implements AfterViewInit {
     public changeOrder: any;
 
 
-    public cursorActivity: any; 
+    public cursorActivity: any;
     public diffSenderId: any;
-    public selectionRangeAnchor: any;  
-    public selectionRangeHead: any; 
+    public selectionRangeAnchor: any;
+    public selectionRangeHead: any;
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
     private choosenSize: string;
+    private style = {};
 
     @Input() fontToBe: any;
-    constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
+    constructor(private http: Http, public currElement: ElementRef, public documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.changeOrder = this.documentService.changeOrder;
         this.cursorActivity = this.documentService.cursorActivity;
         this.diffSenderId = this.documentService.diffSenderId;
         this.selectionRangeAnchor = this.documentService.selectionRangeAnchor;
         this.selectionRangeHead = this.documentService.selectionRangeHead;
-
-   
-
-
         this.changeOrder = this.documentService.changeOrder
-
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -76,11 +72,21 @@ export class EditorController implements AfterViewInit {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
+                this.style = document2.style;
+                          
+               
+                this.choosenSize = this.document.style["fontSize"];
+                this.choosenFont = this.document.style["fontFamily"];
+                
+
             })
             this.documentService.currentChapter = this.current_chapter;
         }
-        
+
         this.setFontPickerAndSizePicker();
+
+            
+
     }
 
     ngAfterViewInit() {
@@ -92,18 +98,18 @@ export class EditorController implements AfterViewInit {
             left = $('#leftInContainerForEditor'),
             right = $('#rightInContainerForEditor'),
             handle = $('#handle2');
-        handle.on('mousedown', function(e) {
+        handle.on('mousedown', function (e) {
             isResizing = true;
             lastDownX = e.clientX;
         });
-        $(document).on('mousemove', function(e) {
+        $(document).on('mousemove', function (e) {
             // we don't want to do anything if we aren't resizing.
             if (!isResizing)
                 return;
             offsetRight = container.width() - (e.clientX - container.offset().left);
             left.css('right', offsetRight);
             right.css('width', offsetRight);
-        }).on('mouseup', function(e) {
+        }).on('mouseup', function (e) {
             // stop resizing
             isResizing = false;
         });
@@ -153,13 +159,10 @@ export class EditorController implements AfterViewInit {
             console.log(this.choosenSize);
         });
     }
-    
-    public changeChapter(i){
-        this.current_chapter = i;  
+
+    public changeChapter(i) {
+        this.current_chapter = i;
     }
-    
-    //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
-    //     [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
@@ -173,13 +176,16 @@ export class EditorController implements AfterViewInit {
             console.log("ctrl+p");
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
-                console.log("done parsing.. inserting!");
                 document.getElementById('previewframe').removeAttribute;
                 document.getElementById('previewframe').innerHTML = parsedHTML;
 
                 this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize+"px";
-                console.log(this.document.style)
+                
+                //console.log("HER: "+this.document.style["fontFamily"]);
+                this.document.style["fontSize"] = this.choosenSize;
+                this.documentService.changeStyle(this.document.id, this.document.style);
+               
+                console.log(this.document.style)                
 
                 for (var key in this.document.style) {
                     var value = this.document.style[key];

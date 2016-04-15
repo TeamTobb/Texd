@@ -16,6 +16,7 @@ export class Document {
             this._authors = payload._authors;
             this._chapters = new Array<Chapter>();
             this._style = payload._style;
+            console.log("Payload er OK: "+JSON.stringify(payload._style))
 
             for (var i = 0; i < payload._chapters.length; i++) {
                 this._chapters.push(new Chapter(payload._chapters[i]._header, []));

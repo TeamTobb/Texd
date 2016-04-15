@@ -17,7 +17,7 @@ export function read(req: express.Request, res: express.Response) {
         if (error) {
             res.send(error);
         } else {
-            res.jsonp(document);
+            res.jsonp(document);           
         }
     });
 }
@@ -50,18 +50,19 @@ export function getDocuments(req: express.Request, res: express.Response) {
     var chapters6 = [new Chapter("Doc6 chapter1", lines6)];
     var chapters7 = [new Chapter("Doc7 chapter1", lines7)];
 
-    var document1 = new Document(1, "Title 1", "Name 1", ["Jorgen", "Borgar"], chapters1);
-    var document2 = new Document(2, "Title 2", "Name 2", ["Jorgen", "Bjon"], chapters2);
-    var document3 = new Document(3, "Title 3", "Name 3", ["Bjon", "Borgar"], chapters3);
-    var document4 = new Document(4, "Title 4", "Name 4", ["Bjon", "Borgar"], chapters4);
-    var document5 = new Document(5, "Title 5", "Name 5", ["Bjon", "Borgar"], chapters5);
-    var document6 = new Document(6, "Title 6", "Name 6", ["Bjon", "Borgar"], chapters6);
-    var document7 = new Document(7, "Title 7", "Name 7", ["Bjon", "Borgar"], chapters7);
-
     var style1 = {}
-    style1["testKey"] = "testValue"
+    style1["fontSize"] = "12px";
+    style1["fontFamily"] = "\"Times New Roman\", Times, serif";
 
-    document1.style = style1;
+
+    var document1 = new Document(1, "Title 1", "Name 1", ["Jorgen", "Borgar"], chapters1, style1);
+    var document2 = new Document(2, "Title 2", "Name 2", ["Jorgen", "Bjon"], chapters2, style1);
+    var document3 = new Document(3, "Title 3", "Name 3", ["Bjon", "Borgar"], chapters3, style1);
+    var document4 = new Document(4, "Title 4", "Name 4", ["Bjon", "Borgar"], chapters4, style1);
+    var document5 = new Document(5, "Title 5", "Name 5", ["Bjon", "Borgar"], chapters5, style1);
+    var document6 = new Document(6, "Title 6", "Name 6", ["Bjon", "Borgar"], chapters6, style1);
+    var document7 = new Document(7, "Title 7", "Name 7", ["Bjon", "Borgar"], chapters7, style1);
+
 
     var documentArray = [];
     documentArray.push(document1, document2, document3, document4, document5, document6, document7);
@@ -98,19 +99,3 @@ export function saveDocument(document, callback) {
     })
 }
 
-
- export function update(req: express.Request, res: express.Response) {
-    console.log("documentController.updateDocument()");
-      
-    if(req.body.documentStyle != null){
-        console.log("got style on server")
-        repository.update({_id: req.params.id}, {_style: req.body.documentStyle}, (error, document) => {
-            if(error){
-                res.send(error);
-            } else {
-                res.jsonp(document);
-            }
-    	});
-    }
-    
-}

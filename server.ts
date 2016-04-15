@@ -43,6 +43,7 @@ server.on('connection', ws => {
         console.log("recived socket message on server");
         
         documentService.updateDocument(message);
+        
         /*documentRoutes.updateDocumentText(JSON.parse(message), () => {      
                 
         })*/
@@ -135,7 +136,6 @@ app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', documentRoutes.getDocuments);
-app.post('/document/:id', documentRoutes.update);
 app.get('/documents/:documentid/:chapterid', (req, res)=>{
     documentService.getChapter(req, res)
 })

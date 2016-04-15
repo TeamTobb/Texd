@@ -14,12 +14,12 @@ export class DocumentService {
     documentIsUpdated = {};
 
     constructor() {
-        documentRoutes.getAllDocuments((documents) => {
+       documentRoutes.getAllDocuments((documents) => {
             for (var document of documents) {
                 this.documents[document["id"]] = document;
             }
             console.log(JSON.stringify(this.documents, null, 2));
-            this.documentIsUpdated[document["id"]] = false
+            this.documentIsUpdated[document["id"]] = false           
         })
 
         setInterval(() => {
@@ -53,7 +53,7 @@ export class DocumentService {
             }
         }
     }
-
+    
     updateDocument(diff2) {
         console.log("updateDocument(diff) START")
         var diff = JSON.parse(diff2);
@@ -64,7 +64,10 @@ export class DocumentService {
             console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
-        }
+        }        
+        else if (diff.documentStyle){
+            document._style = diff.documentStyle;            
+        }        
         else if (diff.deleteChapter) {
             console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
