@@ -20,22 +20,23 @@
                 <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Upload Image</button>
                 <button id="uploadPluginButton" style="">Upload Plugin</button>
                 <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
-                
+
                 <select id="selectFont">
                     <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
                 </select>
                 <select id="selectSize">
                     <option value="{{size}}" *ngFor="#size of sizePicker; #i = index">{{size}}</option>
                 </select>
-               
-               
-               
-                
-                
+
+
+
+
+
             </span>
             <span id="buttonsContainerRight" style="float: right; padding-right: 30px">
                 <button id="hidePreview">Hide Preview</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="viewDocument">View Document</button>
                 <button id="updatePreview">Update Preview</button>
             </span>
         </div>
