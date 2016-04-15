@@ -47,10 +47,10 @@ export class EditorController implements AfterViewInit {
     public changeOrder: any;
 
 
-    public cursorActivity: any; 
+    public cursorActivity: any;
     public diffSenderId: any;
-    public selectionRangeAnchor: any;  
-    public selectionRangeHead: any; 
+    public selectionRangeAnchor: any;
+    public selectionRangeHead: any;
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
@@ -64,7 +64,7 @@ export class EditorController implements AfterViewInit {
         this.selectionRangeAnchor = this.documentService.selectionRangeAnchor;
         this.selectionRangeHead = this.documentService.selectionRangeHead;
 
-   
+
 
 
         this.changeOrder = this.documentService.changeOrder
@@ -79,7 +79,7 @@ export class EditorController implements AfterViewInit {
             })
             this.documentService.currentChapter = this.current_chapter;
         }
-        
+
         this.setFontPickerAndSizePicker();
     }
 
@@ -153,11 +153,11 @@ export class EditorController implements AfterViewInit {
             console.log(this.choosenSize);
         });
     }
-    
+
     public changeChapter(i){
-        this.current_chapter = i;  
+        this.current_chapter = i;
     }
-    
+
     //  <cmcomponent id="cmcomponent" ([document]=document (emitChangeChapter)="changeChapter(i)" [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
     //     [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
 
@@ -174,7 +174,7 @@ export class EditorController implements AfterViewInit {
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 console.log("done parsing.. inserting!");
-                document.getElementById('previewframe').removeAttribute;
+                // document.getElementById('previewframe').removeAttribute;
                 document.getElementById('previewframe').innerHTML = parsedHTML;
 
                 this.document.style["fontFamily"] = this.choosenFont;
@@ -186,10 +186,13 @@ export class EditorController implements AfterViewInit {
                     document.getElementById('previewframe').style[key] = value;
                 }
             })
+
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
-            // this.createChapter();
+            var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+                document.getElementById('previewframe').innerHTML = parsedHTML;
+            });
         }
 
         if ($event.ctrlKey) {
