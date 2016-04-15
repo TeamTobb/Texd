@@ -53,6 +53,9 @@ export class DocumentService {
                     this.diff = parsed;
                     this._todosObserver.next(this.diff);
                 }
+                if (parsed.documentStyle) {
+                    this.document.style = parsed.documentStyle;
+                }
             }
         }
 
@@ -86,10 +89,10 @@ export class DocumentService {
 
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
-        this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle}));
-       
+        this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle }));
+
     }
-    
+
     public updateLines() {
         if (this.cm == null) return;
         var tempLines: string[] = [];
@@ -106,7 +109,7 @@ export class DocumentService {
     public parseDocument(callback: (parsedHTML: string) => void) {
         if (this._textParser == null || this._jsonParser == null) callback(null);
         this.getDocument2(this.document.id, (tempDoc: Document) => {
-            var totalHTML : string = "";
+            var totalHTML: string = "";
             for (var c in tempDoc.chapters) {
                 var lines: Line[] = tempDoc.chapters[c].lines;
                 var parsedJSON = this._textParser.getParsedJSON(lines);
