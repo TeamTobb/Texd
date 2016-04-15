@@ -39,14 +39,8 @@ var documentService = new DocumentService.DocumentService();
 
 
 server.on('connection', ws => {
-    ws.on('message', message => {
-        console.log("recived socket message on server");
-        
+    ws.on('message', message => {        
         documentService.updateDocument(message);
-        
-        /*documentRoutes.updateDocumentText(JSON.parse(message), () => {      
-                
-        })*/
         broadcast(message)
     });
 });

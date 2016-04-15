@@ -1,12 +1,10 @@
 import {ParseMap} from "../utils/parseMap.ts";
-import {Component, ElementRef, Renderer, Input, AfterViewInit, OnChanges, SimpleChange} from 'angular2/core';
+import {Component, ElementRef, Renderer, Input, ViewChild, AfterViewInit, OnChanges, SimpleChange} from 'angular2/core';
 import {Http, HTTP_BINDINGS, Response} from 'angular2/http';
 import {Injectable, } from 'angular2/core';
 import {RouteParams} from 'angular2/router';
 import 'rxjs/Rx';
-
 import {ButtonCheckbox} from 'ng2-bootstrap/ng2-bootstrap';
-
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Line, Chapter} from '../domain/document.ts';
@@ -17,12 +15,9 @@ import {FileUploaderClass} from './fileUpLoader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
-
-import {Select} from 'ng2-select';
+import {Observer} from 'rxjs/Observer';
 import {CORE_DIRECTIVES} from 'angular2/common';
 import {DROPDOWN_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
-
-//Upload file
 import {NgZone} from 'angular2/core';
 import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 
@@ -41,27 +36,16 @@ export class EditorController implements AfterViewInit {
     private snappetParser: SnappetParser;
     private showUploadDiv = false;
     public filesToUpload: Array<File> = [];
-    public changeOrder: any;
-
-
-    public cursorActivity: any;
-    public diffSenderId: any;
-    public selectionRangeAnchor: any;
-    public selectionRangeHead: any;
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
-    private choosenSize: string;
-    private style = {};
-
+    private choosenSize: string;  
+    //  TODO: Bjon check this
+    private style = {}; 
     @Input() fontToBe: any;
-    constructor(private http: Http, public currElement: ElementRef, public documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
-        this.changeOrder = this.documentService.changeOrder;
-        this.cursorActivity = this.documentService.cursorActivity;
-        this.diffSenderId = this.documentService.diffSenderId;
-        this.selectionRangeAnchor = this.documentService.selectionRangeAnchor;
-        this.selectionRangeHead = this.documentService.selectionRangeHead;
-        this.changeOrder = this.documentService.changeOrder
+    @ViewChild(CmComponent) cmcomponent: CmComponent;
+    
+    constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
@@ -70,17 +54,54 @@ export class EditorController implements AfterViewInit {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
                 this.style = document2.style;
-                          
-               
                 this.choosenSize = this.document.style["fontSize"];
                 this.choosenFont = this.document.style["fontFamily"];
-                
-
             })
             this.documentService.currentChapter = this.current_chapter;
         }
-
         this.setFontPickerAndSizePicker();
+    }
+
+    ngOnInit() {
+        this.documentService.diffObserver.subscribe((diff) => {
+            if (diff.cursorActivity || diff.ranges) {
+                this.cmcomponent.cursorActivity(diff);
+            }
+            
+            if (diff.from && diff.to && diff.text) {
+                this.cmcomponent.changeOrder(diff);
+            }
+
+            if (diff.newchapterName) {
+                for (var chapter of this.document.chapters) {
+                    if (chapter.id == diff.chapterId) {
+                        chapter.header = diff.newchapterName;
+                        break;
+                    }
+                }
+            }
+
+            if (diff.newchapter) {
+                var l = new Line("Text", []);
+                this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New chapter", [l]))
+            }
+
+            if (diff.deleteChapter) {
+                this.document.chapters.splice(diff.chapterIndex, 1);
+            }
+
+            if (diff.changeChapter) {
+                var fromChapter = this.document.chapters[diff.fromChapter];
+                this.document.chapters.splice(diff.fromChapter, 1);
+                this.document.chapters.splice(diff.toChapter, 0, fromChapter);
+                // here is a bug, if you are currently editing one of the moved chapters,
+                // u will automaticly also change chapter, as the index u are in is now a different chapter
+            }
+        })
+    }
+
+    cursorActivity(diff) {
+        this.cmcomponent.cursorActivity(diff);
     }
 
     ngAfterViewInit() {
@@ -158,10 +179,9 @@ export class EditorController implements AfterViewInit {
         });
     }
 
-    public changeChapter(i){
+    public changeChapter(i) {
         this.current_chapter = i;
     }
-
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
@@ -176,15 +196,9 @@ export class EditorController implements AfterViewInit {
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
-
                 this.document.style["fontFamily"] = this.choosenFont;
-                
-                //console.log("HER: "+this.document.style["fontFamily"]);
                 this.document.style["fontSize"] = this.choosenSize;
                 this.documentService.changeStyle(this.document.id, this.document.style);
-               
-                console.log(this.document.style)                
-
                 for (var key in this.document.style) {
                     var value = this.document.style[key];
                     document.getElementById('previewframe').style[key] = value;
@@ -266,12 +280,9 @@ export class EditorController implements AfterViewInit {
             this.sizePicker.push(index)
         }
     }
-
-
-
+    
     fontSelected(font) {
         console.log(font)
         console.log(this.fontToBe)
     }
-
 }
