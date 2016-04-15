@@ -1,4 +1,4 @@
-<li id="chapterItem">
-    <div (dblclick)="ondblclickChapter($event)" (blur)="rename($event, chapterId, documentId)" style="display: inline">{{chapterName}}</div>
-        <button (click)="delete(chapterId)">del</button>
-</li>
+<div id="chapterItem">
+    <span id="chapterItemText" (dblclick)="ondblclickChapter($event)" (blur)="rename($event, chapterId, documentId)" style="display: inline">{{chapterName}}</span>
+    <button id="deleteChapterButton" (click)="delete($event, chapterId)">-</button>
+</div>

@@ -1,35 +1,44 @@
-//Singleton (eager initialization) - achieved through @Component-providers in app.js
 import {Http, Headers, Response, RequestOptions} from 'angular2/http';
+import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt";
 import {Injectable, bind} from 'angular2/core';
 import {Component, ViewChild, Input, Output, Renderer, ElementRef} from 'angular2/core';
-
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
-import {Document, Chapter, Paragraph} from "../domain/document.ts"
+import {Document, Chapter, Line} from "../domain/document.ts"
+import {Observable} from 'rxjs/Observable';
 import {Diff} from "../domain/diff.ts";
 import {ParseMap} from "../utils/parseMap.ts";
 import {SnappetParser} from "../utils/snappetParser.ts";
+import {EditorController} from '../controllers/editor.ts'
+import {Observer} from 'rxjs/Observer';
 
 @Injectable()
 export class DocumentService {
     private _socket;
     public parseMap: ParseMap = new ParseMap();
-
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
-
     public _senderId: string;
-    private _textParser: Parser;
-    private _jsonParser: jsonToHtml;
+    private _textParser: Parser = null;
+    private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
-    public changeOrder: any = {
-        from: {}, 
-        to: {}, 
-        text: {}
-    }
+    private jwthelper;
+    public currentChapter: number;
+    public cm: any;
+    public diffObserver: Observable<any>;
+    private _todosObserver: Observer<any>;
+    public diff: any = {};
 
-    constructor(private http: Http) {
-        this._senderId = "" + Math.random();
+    constructor(private http: Http, private authHttp: AuthHttp) {
+        this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
+        this.jwthelper = new JwtHelper()
+        var token = localStorage.getItem('id_token')
 
+        if (token != null && typeof (token) != 'undefined') {
+            var decoded = this.jwthelper.decodeToken(token)
+            this._senderId = decoded.username
+        } else {
+            this._senderId = "" + Math.random();
+        }
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
@@ -39,128 +48,120 @@ export class DocumentService {
         this._socket = new WebSocket('ws://localhost:3001');
         this._socket.onmessage = message => {
             var parsed = JSON.parse(message.data)
-            if(parsed.senderId != this._senderId){
-                this.changeOrder.from = parsed.from
-                this.changeOrder.to = parsed.to
-                this.changeOrder.text = parsed.text
-            }
-           
-            
-            // var parsed = JSON.parse(message.data);
-            // if (parsed.newDiff) {
-            //     var diff: Diff = new Diff([], [], [], [], [], [], [], [], parsed.newDiff);
-
-            //     if (diff.documentId == this.document.id) {
-            //         if (diff.newchapter == true) {
-            //             this.document.chapters[diff.chapterIndex + 1].id = parsed.elementId;
-            //             if (this._senderId != parsed.senderId) {
-            //                 this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New Chapter", [diff.paragraph]));
-            //             }
-            //         } else {
-            //             if (diff.newelement == true) {
-            //                 this.document.chapters[diff.chapterIndex].paragraphs[diff.index + 1].id = parsed.elementId;
-            //                 if (this._senderId != parsed.senderId) {
-            //                     this.document.chapters[diff.chapterIndex].paragraphs.splice(diff.index + 1, 0, diff.paragraph);
-            //                 }
-            //             } else if (this._senderId != parsed.senderId) {
-            //                 this._document.chapters.forEach((chapter) => {
-            //                     if(chapter.id == diff.chapterId){
-            //                         // chapter.paragraphs[diff.index] = diff.paragraph
-            //                         chapter.paragraphs[diff.index].raw = diff.paragraph.raw;
-            //                         chapter.paragraphs[diff.index].metadata = diff.paragraph.metadata
-            //                     }
-            //                 })
-            //             } else if (this._senderId != parsed.senderId) {
-            //                     this.document.chapters[diff.chapterIndex].paragraphs[diff.index].raw = diff.paragraph.raw;
-            //                     this.document.chapters[diff.chapterIndex].paragraphs[diff.index].metadata = diff.paragraph.metadata
-            //                 }
-            //             }
-            //         }
-            //     }
-            //     if (parsed.title && parsed.documentId == this.document.id) {
-            //         this.document.title = parsed.title;
-            //     }
-            }            
-        }
-    
-    public changeTitle(id: string, newTitle: string) {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + id,
-            JSON.stringify({ documentTitle: newTitle }),
-            { headers: headers }).subscribe(res => {
-                // Only actually change the title and send socket messages if status==OK
-                if (res.status == 200) {
-                    this._socket.send(JSON.stringify({ name: 'name', documentId: id, title: newTitle, senderId: "hello" }));
-                    this.document.title = newTitle;
+            if (parsed.senderId != this._senderId) {
+                if (parsed.documentId == this.document.id) {
+                    this.diff = parsed;
+                    this._todosObserver.next(this.diff);
+                }
+                if (parsed.documentStyle) {
+                    this.document.style = parsed.documentStyle;
                 }
             }
-            );
-    }
-    
-    //TODO implement changeChapterName() new URL
-    public changeChapterName(documentId: string, newchapterName: string, chapterId: number) {
-        console.log(documentId)
-        console.log(chapterId)
+        }
 
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + documentId, //add chapter number to the URL
-            JSON.stringify({
-                documentId: documentId,
-                newchapterName: newchapterName,
-                chapterId: chapterId
-            }),
-            { headers: headers }).subscribe(res => {
-                console.log(res)
-                //TODO send out socket change to everyone
-                // Only actually change the title and send socket messages if status==OK
-                /* if(res.status==200){
-                     this._socket.send(JSON.stringify({chapterHeader: 'name', chapterId: chapterId, documentId: documentId, message: newchapterName, senderId: "hello" }));
-                     this.document.chapters[chapterId].header = newchapterName;
-                 }*/
-            }
-            );
-    }
-
-    public parseChapter(currentChapter, callback: (parsedParagraphs: string[]) => void) {
-        //TODO its not suppose to be a GET
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
-
-            var nonParsedParagraphs: Paragraph[] = this.document.chapters[currentChapter].paragraphs;
-            var parsedParagraphs: string[] = [];
-
-            for (var index = 0; index < nonParsedParagraphs.length; index++) {
-                var element: Paragraph = nonParsedParagraphs[index];
-                var parsedElem = this._textParser.getParsedJSONSingle(element)
-                var html = this._jsonParser.getParsedHTML(parsedElem)
-                parsedParagraphs.push(html);
-            }
-            callback(parsedParagraphs);
         });
     }
 
-    public parseSingleParagraph(para: Paragraph): string {
-        var parsedJSON: string = this._textParser.getParsedJSONSingle(para);
-        return this._jsonParser.getParsedHTML(parsedJSON);
-    } 
-    
+    public changeChapters(from, to, chapterId) {
+        var fromChapter = this.document.chapters[from];
+        this.document.chapters.splice(from, 1);
+        this.document.chapters.splice(to, 0, fromChapter);
+        this.sendDiff({ changeChapter: true, fromChapter: from, toChapter: to }, chapterId);
+        console.log("done changing");
+        // send diff!
+    }
+
+    public changeTitle(id: string, newTitle: string) {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        this.http.post('./document/' + id, JSON.stringify({ documentTitle: newTitle }), { headers: headers }).subscribe(res => {
+            // Only actually change the title and send socket messages if status==OK
+            if (res.status == 200) {
+                this._socket.send(JSON.stringify({ name: 'name', documentId: id, title: newTitle, senderId: "hello" }));
+                this.document.title = newTitle;
+            }
+        });
+    }
+
+    public changeStyle(id: string, newStyle: any) {
+        var headers = new Headers();
+        this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle }));
+
+    }
+
+    public updateLines() {
+        if (this.cm == null) return;
+        var tempLines: string[] = [];
+        for (var i = 0; i < this.cm.lineCount(); i++) {
+            var text: string = this.cm.getLine(i);
+            tempLines.push(text);
+        }
+        this._document.chapters[this.currentChapter].lines = [];
+        for (var l in tempLines) {
+            this._document.chapters[this.currentChapter].lines.push(new Line(tempLines[l], []));
+        }
+    }
+
+    public parseDocument(callback: (parsedHTML: string) => void) {
+        if (this._textParser == null || this._jsonParser == null) callback(null);
+        this.getDocument2(this.document.id, (tempDoc: Document) => {
+            var totalHTML: string = "";
+            for (var c in tempDoc.chapters) {
+                var lines: Line[] = tempDoc.chapters[c].lines;
+                var parsedJSON = this._textParser.getParsedJSON(lines);
+                var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+                totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                totalHTML += parsedHTML;
+            }
+            callback(totalHTML);
+        })
+    }
+
+    public parseChapter(callback: (parsedHTML: string) => void) {
+        if (this._textParser != null && this._jsonParser != null) {
+            var lines: Line[] = this.document.chapters[this.currentChapter].lines;
+            var parsedJSON = this._textParser.getParsedJSON(lines);
+            var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+            // this.document.style
+            callback(parsedHTML);
+        }
+    }
+
     public sendDiff(diff: any, chapterId: string) {
-        // diff.documentId = this.document.id
-        // this._socket.send(JSON.stringify({ senderId: this._senderId, newDiff: diff }));
-        diff.senderId = this._senderId;
+        var color = localStorage.getItem('id_color')
+        if (color != null) {
+            diff.color = color;
+        } else {
+            diff.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+        }
+        diff.senderId = this._senderId
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
-        this._socket.send(JSON.stringify(diff))
+        this._socket.send(JSON.stringify(diff));
+    }
+
+    public getDocument2(documentId: string, callback: (document: Document) => any) {
+        this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
+            var tempDoc = new Document([], [], [], [], [], res);
+            callback(tempDoc);
+        })
     }
 
     public getDocument(documentId: string, callback: (document: Document) => any) {
         this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
             this.document = new Document([], [], [], [], [], res);
             callback(this.document);
+        })
+    }
+
+    public getChapter(chapterId: string, callback: (chapter: any) => any) {
+        console.log("get chapter")
+        this.http.get('/documents/' + this.document.id + '/' + chapterId).map((res: Response) => res.json()).subscribe(res => {
+            callback(res);
         })
     }
 
@@ -181,5 +182,12 @@ export class DocumentService {
             })
             console.log(JSON.stringify(documents, null, 2));
         });
+    }
+
+    public getSnappets(callback: (snappets: any) => void) {
+        this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
+            console.log("we got snappets: " + JSON.stringify(res, null, 2))
+            callback(res);
+        })
     }
 }

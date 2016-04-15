@@ -1,35 +1,41 @@
-#wrapper {
-  display: block;
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
-textarea {
-    border: none;
-    resize: none;
-    overflow: hidden;
-    display: block;
-    /*outline: none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;*/
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
+  margin-left: 15px;
 }
 
-#previewFrame {
-    height: 600px;
+.box .row {
+  /*flex: 0 1 30px;*/
+}
+
+.box .row.header {
+  flex: 0 1 auto;
+}
+
+.box .row.content {
+  flex: 1 1 auto;
+  height: 100%;
+  position: relative;
 }
 
 #title {
-  color: orange;
+  color: black;
   text-align: center;
 }
 
-#body {
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-  font-size: 16px;
-}
-
-#documentName {
+#title h2 {
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 #changeDocumentName {
@@ -44,46 +50,158 @@ textarea {
   outline: none;
 }
 
-#textAreaWrapper {
-  display: flex;
-}
-
-/* testing */
-
-#cointainer {
-    width: 100%;
-    font-size: 12px;
-    overflow: hidden; /* contain floated elements */
-    background: #ccc
-}
-
-#center {
-    float: left;
-    background-color: #eee;
-    width: 100%;
-}
-
-
 #chapterLi:hover {
     color: blue;
 }
 
-
 #chapterItem {
-    margin-left: 2em;
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 
+#cmcomponentwrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: row;
+}
+
+#chapter_bar {
+    position: relative;
+    flex: 0 1 auto;
+    width: 200px;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+#editor_div {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+#chaptersContainer {
+    flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+#chaptersContainerScrollBox {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    overflow-y: scroll;
+}
+
+#newchapter {
+    width: 100%;
+    height: 40px;
+    font-size: 30px;
+    text-align: center;
+    border-top: 2px solid black;
+    background-color: #EEEEEE;
+}
+
+#newchapter:hover {
+    background-color: #ddd;
 }
 
 #chapterItem:hover {
-    background-color: #ccc
+    background-color: #ccc;
+}
+
+#editorContainer {
+    background-color: yellow;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+#cmcomponent {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#containerForEditor {
+    position: relative;
+    flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+    /* Disable selection so it doesn't get annoying */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: moz-none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#containerForEditor #leftInContainerForEditor {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin-right: 20px;
+    right: 40%;
+}
+
+#containerForEditor #rightInContainerForEditor {
+    position: absolute;
+    height: 100%;
+    right: 20px;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+#containerForEditor #handle2 {
+    position: absolute;
+    height: 100%;
+    left: -8px;
+    top: 0;
+    bottom: 0;
+    width: 16px;
+    background-color: black;
+    cursor: w-resize;
+    z-index: 11;
+}
+
+#sidebarbutton {
+    /*font-size: 16px;*/
+}
+
+#deleteChapterButton {
+    width: 30px;
+    height: 100%;
+    flex: 0 1 auto;
+}
+
+#chapterItemText {
+    font-size: 13px;
+    margin-left: 5px;
+    flex: 1 1 auto;
 }
 
 .roundedBorder {
     border: 2px solid black;
-      padding: 50px;
-      outline: black solid 5px;
-      outline-offset: 5px;
-  }
+    padding: 50px;
+    outline: black solid 5px;
+    outline-offset: 5px;
+    height: 800px;
+}
+
 .widget-templates {display:none}
 
 .bold-widget {
@@ -98,31 +216,94 @@ textarea {
     text-decoration: underline;
 }
 
+.cursor-widget {
+    width: 20px;
+    height: 20px; 
+}
+
 .header-widget {
 
 }
 
-#buttonsContainer {
-    width: 84.5%;
-    background-color: #ccc;
-    position:fixed;
-    z-index: 99;
-    top:250px;
-    border: 1 px solid black;
-        padding: 5px;
-        border-radius: 3px;
+.editorContainerBox {
+    display: flex;
+    flex-flow: column;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
-#uploadDiv{
-    background-color: greenyellow;
-    width: 50%;
-    height: 50%;
+.beforeEditorContainer {
+    flex: 0 1 auto;
+    position: relative;
+}
+
+.editorContainer {
+    flex: 1 1 auto;
+    position: relative;
+}
+
+#buttonsContainer {
+    height: 35px;
+    width: 100%;
+    background-color: #ccc;
+    border: 1 px solid black;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+#previewframe {
+    height: 100%;
+    width: 98%;
+    display: block;
+    padding-left: 10px;
+    overflow: scroll;
+    word-wrap: break-word;
+}
+.uploadDiv{
+    z-index: 999;
+    background-color: lightsteelblue;
+    width: 80%;
+    height: 80%;
     position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
     margin-left: auto;
     margin-right: auto;
     left: 0;
     right: 0;
+    background: lightgray; 
+}
 
+
+.columns{
+    margin: 10%;
+    height: 80%;
+    width: 80%;
+   
+}
+
+.headerForUpload{
+    text-align: center;
+}
+
+.is-4{
+    width: 35%;
+    height: 30%;
+    float: left;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: lightgreen;
+    margin: 7%;
+    
+}
+
+.message-header{
+    text-align: center;
+}
+
+.message-body{
+    text-align: center;
 }
 
 .image-widget {
@@ -130,12 +311,20 @@ textarea {
     background-color:#f4f4f4;
     box-shadow:2px 2px 2px #DEDEDE;
     width:96%;
-    margin:0 auto;
-    text-align:center
+    text-align: center;
+    margin: 0 auto;
+}
+.image-frame {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /*margin:0 auto;*/
+    /*text-align:center;*/
 }
 .image-text {
+    display: inline-block;
     padding:3px 0 4px;
     font-size:small;
     margin:0 auto;
-    text-align:center
+    /*text-align:center;*/
 }

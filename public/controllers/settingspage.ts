@@ -6,7 +6,7 @@ import {Router, RouteParams} from 'angular2/router';
     providers: [],
     template: '<div>teststring 2 from child:: {{test}}<br> {{chaptersText[current_chapter]}}<br></div>'
 })
-export class SettingsPage implements OnInit {
+export class SettingsPage {
     public test: string = "";
     public current_chapter = 0;
     private chapters: string[] = ["setting 0", "setting 1"];
@@ -29,9 +29,6 @@ export class SettingsPage implements OnInit {
         }
     }
 
-    ngOnInit() {
-        this.test = "testtest";
-        console.log("onInit");
-    }
+   
 
 }

@@ -1,39 +1,49 @@
-<div id="wrapper">
-    <div id="body">
-        <br>
-        <div class="btn-group" dropdown keyboardNav="true">
-            <button id="simple-btn-keyboard-nav" type="button" class="btn btn-primary" dropdownToggle>
-                Choose chapter <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="simple-btn-keyboard-nav">
-                <chapteritem (toBeDeleted)="deleteChapterFromDB(chapter.id)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
-                *ngFor="#chapter of document.chapters; #i = index" (click)="changeChapter(i)"></chapteritem>
-                <li class="divider dropdown-divider"></li>
-                <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
-                <li class="divider dropdown-divider"></li>
-                <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
-            </ul>
-        </div>
-        <br>
-        <br>
+<!-- editor and topbar frame -->
+<div class="editorContainerBox">
+    <div class="beforeEditorContainer">
         <div id="title">
-            <h1 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h1></div>
-        <br>
-        <br>
-        <div id="container">
-            <div class="roundedBorder" id="center">
-                <div id="buttonsContainer">
-                    <button id="insertbold" style="font-weight: bold">bold</button>
-                    <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">upload Image</button>
-                    <button id="insertitalic" style="font-style: italic">italic</button>
-                    <button id="insertunderline" style="text-decoration: underline;">underline</button>
-                    <button id="insertheader" style="font-style: bold">header</button>
-                    <button id="insertimagetest" style="font-style: bold">imagetest</button>
-                </div>
-                <cmcomponent [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
-                [changeOrderFrom]=changeOrder.from [changeOrderTo]=changeOrder.to [changeOrderText]=changeOrder.text></cmcomponent>
-            </div>
+            <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
         </div>
+        <div id="buttonsContainer">
+            <span id="buttonsContainerLeft">
+                <button id="sidebarbutton">></button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="insertheader" style="font-style: bold">Header</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="insertbold" style="font-weight: bold">b</button>
+                <button id="insertitalic" style="font-style: italic">i</button>
+                <button id="insertunderline" style="text-decoration: underline;">u</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="inserttable">[][]</button>
+                <button id="insertmath">√π</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Upload Image</button>
+                <button id="uploadPluginButton" style="">Upload Plugin</button>
+                <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
+
+                <select id="selectFont">
+                    <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
+                </select>
+                <select id="selectSize">
+                    <option value="{{size}}px" *ngFor="#size of sizePicker; #i = index">{{size}}px</option>
+                </select>
+
+
+
+
+
+            </span>
+            <span id="buttonsContainerRight" style="float: right; padding-right: 30px">
+                <button id="hidePreview">Hide Preview</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="viewDocument">View Document</button>
+                <button id="updatePreview">Update Preview</button>
+            </span>
+        </div>
+    </div>
+    <div class="editorContainer">
+        <cmcomponent id="cmcomponent" [document]=document [chapterId]=document.chapters[current_chapter].id [lines]=document.chapters[current_chapter].lines
+        (emitChangeChapter)="changeChapter($event)"></cmcomponent>
     </div>
 </div>
 
@@ -42,19 +52,24 @@
     <span class="bold-widget"></span>
     <span contenteditable="true" class="italic-widget"></span>
     <span contenteditable="true" class="underline-widget"></span>
+    <span contenteditable="true" class="image-edit"></span>
+    <span contenteditable="false" class="cursor-widget"></span>
     <h1 contenteditable="true" class="header-widget"></h1>
 
     <div class="image-widget" style="background-color: #EEE">
-		<!-- <center> -->
-			<img class="image-frame" src="test.jpg" height="250px" width="250px">
-			<br>
-			<span class="image-text">This is some text</span>
-		<!-- </center> -->
-	</div>
+        <img class="image-frame" src="test.jpg" height="100px" width="100px">
+        <br>
+        <span class="image-text">This is some text</span>
+    </div>
+
 </div>
 
 <section *ngIf="showUploadDiv">
-    <div id="uploadDiv">
+    <div class="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
+        <fileuploader>
+
+        </fileuploader>
+
     </div>
 </section>

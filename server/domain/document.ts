@@ -1,4 +1,3 @@
-import Paragraph = require('./paragraph')
 import Chapter = require('./chapter');
 
 class Document {
@@ -8,14 +7,17 @@ class Document {
     private _documentname: string;
     private _authors: string[];
     private _chapters: Chapter[];
+    private _style: any;
 
-    constructor(idTest?, title?, documentname?, authors?, chapters?) {
+
+    constructor(idTest?, title?, documentname?, authors?, chapters?, style?) {
         if (idTest && title && documentname && authors && chapters) {
             this._idTest = idTest;
             this._title = title;
             this._documentname = documentname;
             this._authors = authors;
             this._chapters = chapters;
+            this._style = style;
         }
     }
 
@@ -27,6 +29,13 @@ class Document {
         this._id = value;
     }
 
+    get style(): any {
+        return this._style;
+    }
+
+    set style(value) {
+        this._style = value;
+    }
     get idTest(): number {
         return this._idTest;
     }
@@ -68,4 +77,4 @@ class Document {
     }
 }
 
-export = Document; 
+export = Document;

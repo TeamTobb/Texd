@@ -5,8 +5,9 @@ export class Document {
     private _documentname: string;
     private _authors: string[];
     private _chapters: Chapter[];
+    private _style: {};
 
-    constructor(idTest?, title?, documentname?, authors?, chapters?, payload?) {
+    constructor(idTest?, title?, documentname?, authors?, chapters?, payload?, style?) {
         if (payload) {
             this._id = payload._id;
             this._title = payload._title;
@@ -14,6 +15,8 @@ export class Document {
             this._idTest = payload._idTest;
             this._authors = payload._authors;
             this._chapters = new Array<Chapter>();
+            this._style = payload._style;
+            console.log("Payload er OK: "+JSON.stringify(payload._style))
 
             for (var i = 0; i < payload._chapters.length; i++) {
                 this._chapters.push(new Chapter(payload._chapters[i]._header, []));
@@ -80,6 +83,14 @@ export class Document {
 
     set chapters(value) {
         this._chapters = value;
+    }
+    
+    get style(): {} {
+        return this._style;
+    }
+
+    set style(value) {
+        this._style = value;
     }
 }
 
