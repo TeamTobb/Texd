@@ -1,63 +1,35 @@
-//Singleton (eager initialization) - achieved through @Component-providers in app.js
 import {Http, Headers, Response, RequestOptions} from 'angular2/http';
-import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt"; //I am stating it twice
+import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt";
 import {Injectable, bind} from 'angular2/core';
 import {Component, ViewChild, Input, Output, Renderer, ElementRef} from 'angular2/core';
-
 import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Chapter, Line} from "../domain/document.ts"
+import {Observable} from 'rxjs/Observable';
 import {Diff} from "../domain/diff.ts";
 import {ParseMap} from "../utils/parseMap.ts";
 import {SnappetParser} from "../utils/snappetParser.ts";
+import {EditorController} from '../controllers/editor.ts'
+import {Observer} from 'rxjs/Observer';
 
 @Injectable()
 export class DocumentService {
     private _socket;
     public parseMap: ParseMap = new ParseMap();
-
-    public cm = null;
-
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
-
     public _senderId: string;
-    public diffSenderId = {
-        id: ""
-    }
     private _textParser: Parser = null;
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
     private jwthelper;
     public currentChapter: number;
-
-    public changeOrder: any = {
-        from: {},
-        to: {},
-        text: {},
-        chapterId: {}
-    }
-
-    public cursorActivity: any = {
-        cursorActivity: {
-            "line": 0,
-            "ch": 0,
-            "xRel": 0,
-            "outside": true
-        },
-        color: {}
-    }
-
-    public selectionRangeAnchor: any = {
-        line: "",
-        ch: ""
-    }
-    public selectionRangeHead: any = {
-        line: {},
-        ch: {}
-    }
+    public cm: any;
+    public diffObserver: Observable<any>;
+    private _todosObserver: Observer<any>;
+    public diff: any = {};
 
     constructor(private http: Http, private authHttp: AuthHttp) {
-
+        this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
         this.jwthelper = new JwtHelper()
         var token = localStorage.getItem('id_token')
 
@@ -78,56 +50,8 @@ export class DocumentService {
             var parsed = JSON.parse(message.data)
             if (parsed.senderId != this._senderId) {
                 if (parsed.documentId == this.document.id) {
-                    this.changeOrder.from = parsed.from
-                    this.changeOrder.to = parsed.to
-                    this.changeOrder.text = parsed.text
-
-                    if (parsed.cursorActivity) {
-                        this.diffSenderId.id = parsed.senderId
-                        this.cursorActivity.cursorActivity.line = parsed.cursorActivity.line;
-                        this.cursorActivity.cursorActivity.ch = parsed.cursorActivity.ch;
-                        this.cursorActivity.color = parsed.color;
-                    }
-
-                    if (parsed.ranges) {
-                        this.diffSenderId.id = parsed.senderId
-                        this.selectionRangeAnchor.line = parsed.ranges[0].anchor.line;
-                        this.selectionRangeAnchor.ch = parsed.ranges[0].anchor.ch;
-                        this.selectionRangeHead.line = parsed.ranges[0].head.line;
-                        this.selectionRangeHead.ch = parsed.ranges[0].head.ch;
-                    }
-                    if (parsed.from && parsed.to && parsed.text) {
-                        this.changeOrder.from = parsed.from
-                        this.changeOrder.to = parsed.to
-                        this.changeOrder.text = parsed.text
-                        this.changeOrder.chapterId = parsed.chapterId
-                    }
-
-                    if (parsed.newchapterName) {
-                        for (var chapter of this.document.chapters) {
-                            if (chapter.id == parsed.chapterId) {
-                                chapter.header = parsed.newchapterName;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (parsed.newchapter) {
-                        var l = new Line("Text", []);
-                        this.document.chapters.splice(parsed.chapterIndex + 1, 0, new Chapter("New chapter", [l]))
-                    }
-
-                    if (parsed.deleteChapter) {
-                        this.document.chapters.splice(parsed.chapterIndex, 1);
-                    }
-
-                    if (parsed.changeChapter) {
-                        var fromChapter = this.document.chapters[parsed.fromChapter];
-                        this.document.chapters.splice(parsed.fromChapter, 1);
-                        this.document.chapters.splice(parsed.toChapter, 0, fromChapter);
-                        // here is a bug, if you are currently editing one of the moved chapters,
-                        // u will automaticly also change chapter, as the index u are in is now a different chapter
-                    }
+                    this.diff = parsed;
+                    this._todosObserver.next(this.diff);
                 }
             }
         }
@@ -159,7 +83,7 @@ export class DocumentService {
             }
         });
     }
-    
+
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -172,8 +96,6 @@ export class DocumentService {
             }
         });
     }
-    
-    
 
     public updateLines() {
         if (this.cm == null) return;
@@ -190,7 +112,6 @@ export class DocumentService {
 
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
-            
             var lines: Line[] = this.document.chapters[this.currentChapter].lines;
             var parsedJSON = this._textParser.getParsedJSON(lines);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
@@ -209,7 +130,6 @@ export class DocumentService {
         diff.senderId = this._senderId
         diff.documentId = this.document.id;
         diff.chapterId = chapterId;
-        console.log(diff);
         this._socket.send(JSON.stringify(diff));
     }
 

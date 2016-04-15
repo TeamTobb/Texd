@@ -55,7 +55,6 @@ export class DocumentService {
     }
 
     updateDocument(diff2) {
-        console.log("updateDocument(diff) START")
         var diff = JSON.parse(diff2);
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
@@ -96,8 +95,6 @@ export class DocumentService {
                     break;
                 }
             }
-
-            console.log("trying to update: " + JSON.stringify(diff, null, 2));
             if (diff.origin == '+input') {
                 if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
                     var raw = lines[diff.from.line]._raw.slice(diff.to.ch);

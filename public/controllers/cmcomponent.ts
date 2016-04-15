@@ -20,40 +20,96 @@ export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
     @Input() document: Document;
     @Input() chapterId: string;
-    @Input() changeOrderFrom: any;
-    @Input() changeOrderTo: any;
-    @Input() changeOrderText: any;
-
-    @Input() cursorActivityLine: any;
-    @Input() cursorActivityCh: any;
-    @Input() cursorColor: any;
-    @Input() diffSenderId: string;
-    @Input() selectionRangeAnchor: any;
-    @Input() selectionRangeHead: any;
-
-    @Input() changeOrderChapterId: any;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
-
-
+    
     public editor;
-
-    public widgetTest;
-
-    public isInitialized = false;
+    public widgetTest; 
     private current_chapter;
-
     public cursorwidgets = {};
     public selections = {}
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
-        console.log("chapterid: " + this.chapterId);
+    }
+    
+    cursorActivity(diff) {
+        if ("" + this.chapterId == "" + diff.chapterId) {
+            if (diff.cursorActivity) {
+                if (this.cursorwidgets[diff.senderId] != undefined) {
+                    this.cursorwidgets[diff.senderId].clear()
+                }
+                try {
+                    if (this.cursorwidgets[diff.senderId] != undefined) {
+                        this.cursorwidgets[diff.senderId].clear()
+                    }
+                    this.cursorwidgets[diff.senderId] = CursorWidget(this.editor, null, false, diff.cursorActivity.line, diff.cursorActivity.ch, diff.color)
+                } catch (error) {
+                    console.log(error)
+                }
+                
+                var element;
+                if (document.getElementById('user' + diff.senderId)) {
+                    element = document.getElementById('user' + diff.senderId)
+                } else {
+                    element = document.createElement('span');
+                }
+
+                element.id = "user" + diff.senderId
+                element.innerHTML = diff.senderId
+                element.style.color = diff.color
+                document.getElementById('buttonsContainer').appendChild(element)
+            }
+
+            else if (diff.ranges) {
+                var from = {
+                    line: diff.ranges[0].anchor.line,
+                    ch: diff.ranges[0].anchor.ch
+                }
+
+                var to = {
+                    line: diff.ranges[0].head.line,
+                    ch: diff.ranges[0].head.ch
+                }
+
+                if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
+                    //  Oneliner to swap variables
+                    to = [from, from = to][0];
+                }
+
+                if (this.selections[diff.senderId]) {
+                    this.selections[diff.senderId].clear()
+                }
+
+                var css = ".selectionRange { background-color: " + diff.color + ";}";
+                var htmlDiv = document.createElement('div');
+                htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
+                document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
+                
+                try {
+                    this.selections[diff.senderId] = this.editor.markText(from, to, {
+                        className: "selectionRange"
+                    })
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        }
+    }
+
+    public changeOrder(diff) {
+        try {
+            if (this.chapterId == diff.chapterId) {
+                this.editor.getDoc().replaceRange(diff.text, diff.from, diff.to)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-
         if (changes["chapterId"] && this.editor !== undefined) {
+            console.log("changes in chapter")
             this.documentService.getChapter(this.chapterId, (chapter) => {
                 var arr = [];
                 for (var line of chapter._lines) {
@@ -61,77 +117,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 }
                 this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
             })
-        }
-
-        if ((changes["changeOrderFrom"] || changes["changeOrderTo"] || changes["changeOrderText"]) && (this.editor != undefined)) {
-
-            try {
-                console.log("we have changes in changeorder: " + JSON.stringify(changes, null, 2))
-                for (var chapter of this.document.chapters) {
-                    if (this.chapterId == this.changeOrderChapterId) {
-                        this.editor.getDoc().replaceRange(this.changeOrderText, this.changeOrderFrom, this.changeOrderTo)
-                        break;
-                    }
-                }
-            } catch(error){
-                console.log(error)
-            }
-          
-        }
-
-        if (changes["cursorActivityLine"] || changes["cursorActivityCh"] || changes["cursorColor"] || changes["diffSenderId"]) {
-            try {
-                if (this.cursorwidgets[this.diffSenderId] != undefined) {
-                    this.cursorwidgets[this.diffSenderId].clear()
-                }
-                this.cursorwidgets[this.diffSenderId] = CursorWidget(this.editor, null, false, this.cursorActivityLine, this.cursorActivityCh, this.cursorColor)
-            } catch (error) {
-                console.log(error)
-            }
-
-            var element;
-            if (document.getElementById('user' + this.diffSenderId)) {
-                element = document.getElementById('user' + this.diffSenderId)
-            } else {
-                element = document.createElement('span');
-            }
-
-            element.id = "user" + this.diffSenderId
-            element.innerHTML = this.diffSenderId
-            element.style.color = this.cursorColor
-            document.getElementById('buttonsContainer').appendChild(element)
-
-            // TODO: Put this in its own change detector if, for some reason it doesnt fire. 
-            var from = {
-                line: this.selectionRangeAnchor.line,
-                ch: this.selectionRangeAnchor.ch
-            }
-
-            var to = {
-                line: this.selectionRangeHead.line,
-                ch: this.selectionRangeHead.ch
-            }
-
-            if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
-                //  Oneliner to swap variables
-                to = [from, from = to][0];
-            }
-
-            if (this.selections[this.diffSenderId]) {
-                this.selections[this.diffSenderId].clear()
-            }
-
-            var css = ".selectionRange { background-color: " + this.cursorColor + ";}";
-            var htmlDiv = document.createElement('div');
-            htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
-            document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
-            try {
-                this.selections[this.diffSenderId] = this.editor.markText(from, to, {
-                    className: "selectionRange"
-                })
-            } catch (error) {
-                console.log(error)
-            }
         }
     }
 
@@ -146,11 +131,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         })
 
         this.documentService.cm = this.editor;
-
         this.editor.on("change", (cm, change) => {
-            console.log("CHANGE:: ");
-            console.log(change);
-            console.log(change.origin);
             if (change.origin != "setValue" && change.origin != "+onParse") {
                 for (var r in change.removed) {
                     if (change.removed[r].indexOf("#") != -1) {
@@ -167,7 +148,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 }
                 for (var r in change.text) {
                     if (change.text[r].indexOf("#") != -1) {
-                        console.log("added a # - parsing widgets");
                         // fetch cursor
                         var cursorPos = this.editor.getCursor();
                         this.editor.setValue(this.editor.getValue());
@@ -195,9 +175,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }, this.chapterId)
         })
 
-
         this.editor.on("beforeSelectionChange", (cm, obj) => {
-            console.log(JSON.stringify(obj, null, 2));
             this.documentService.sendDiff(obj, this.chapterId)
         })
 
@@ -217,7 +195,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             new UnderlineWidget(this.editor, null, false);
         });
 
-        this.editor.on("cursorActivity", function(cm) {
+        this.editor.on("cursorActivity", function (cm) {
             if (cm.widgetEnter) {
                 // check to see if movement is purely navigational, or if it
                 // doing something like extending selection
@@ -231,11 +209,11 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
 
         // drag events for chapters
-        document.addEventListener("dragstart", function(event) {
+        document.addEventListener("dragstart", function (event) {
             event.dataTransfer.setData("dragData", event.target.id);
         });
 
-        document.addEventListener("dragover", function(event) {
+        document.addEventListener("dragover", function (event) {
             event.preventDefault();
         });
 
@@ -264,36 +242,19 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var to_id = to.split("_")[2];
         this.documentService.changeChapters(from_id, to_id, this.chapterId);
     }
-
-    // test
+    
     public deleteChapterFromDB(nr: number) {
-        // event.stopPropagation();
-        // console.log(event);
-        console.log("deleteChapterFromDB(" + nr + ")");
         this.document.chapters.splice(nr, 1);
         this.documentService.sendDiff({ deleteChapter: true, chapterIndex: nr }, this.chapterId)
     }
 
-    // test 2
     public changeChapter(event, chapter_number: number) {
-        console.log(event);
-        // if($event.target != this) {
-        //     console.log("NOT THIS TARGET");
-        //     return;
-        // }
-        console.log("CHANGE CHAPTER:   changeChapter(chapter_number : " + chapter_number + ")")
-
-        // this.documentService.currentChapter = chapter_number;
         this.current_chapter = chapter_number;
-        console.log("we are emitting: " + chapter_number)
         this.emitChangeChapter.emit(chapter_number)
-        // this.document.chapters.splice(current_chapter + 1, 0, new Chapter("New Chapter " + (current_chapter + 1), [l]));
-        // this.documentService.sendDiffNewChapter({},this.chapterId, current_chapter);
     }
 
     // move all these into the chapterItem component? // need to inject document etc.
     public createChapter() {
-        console.log("new chapter::");
         var l = new Line("Text", []);
         this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New chapter", [l]));
         this.documentService.sendDiff({ newchapter: true, chapterIndex: this.current_chapter }, this.chapterId);
@@ -315,7 +276,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     // must make a proper register for widget types etc...
     insertWidget(type, range) {
-        console.log("inserting widget type : " + type + ", range: " + JSON.stringify(range));
         if (type == "#b") {
             new BoldWidget(this.editor, range, true);
         }
@@ -326,12 +286,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     // Ctrl + J = BOLD
     public onKeyPressEvent(cm, e) {
-        console.log("keypress");
-        console.log(e);
         if (e.ctrlKey) {
-            console.log(e);
             if (e.code === "KeyJ") {
-                console.log("test");
                 new BoldWidget(this.editor, null, false);
             }
         }
@@ -345,8 +301,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 "templates": snappets
             }
             CodeMirror.templatesHint.addTemplates(templates);
-            CodeMirror.commands.autocomplete = function(cm) {
-                CodeMirror.showHint(cm, function(cm) {
+            CodeMirror.commands.autocomplete = function (cm) {
+                CodeMirror.showHint(cm, function (cm) {
                     return CodeMirror.showHint(cm, CodeMirror.ternHint, { async: true });
                 });
             }
