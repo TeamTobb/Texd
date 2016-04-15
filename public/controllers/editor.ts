@@ -5,9 +5,6 @@ import {Injectable, } from 'angular2/core';
 import {RouteParams} from 'angular2/router';
 import 'rxjs/Rx';
 
-//import {Select} from 'ng2-select';
-
-
 import {ButtonCheckbox} from 'ng2-bootstrap/ng2-bootstrap';
 
 import {Parser} from '../utils/parser.ts';
@@ -84,9 +81,6 @@ export class EditorController implements AfterViewInit {
         }
 
         this.setFontPickerAndSizePicker();
-
-            
-
     }
 
     ngAfterViewInit() {
@@ -149,6 +143,10 @@ export class EditorController implements AfterViewInit {
             }
         });
 
+        $("#viewDocument").click(() => {
+            this.parseWholeDocument();
+        });
+
         $('#selectFont').change(() => {
             this.choosenFont = $('#selectFont').val();
             console.log(this.choosenFont);
@@ -160,9 +158,10 @@ export class EditorController implements AfterViewInit {
         });
     }
 
-    public changeChapter(i) {
+    public changeChapter(i){
         this.current_chapter = i;
     }
+
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
@@ -176,7 +175,6 @@ export class EditorController implements AfterViewInit {
             console.log("ctrl+p");
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
-                document.getElementById('previewframe').removeAttribute;
                 document.getElementById('previewframe').innerHTML = parsedHTML;
 
                 this.document.style["fontFamily"] = this.choosenFont;
@@ -192,10 +190,25 @@ export class EditorController implements AfterViewInit {
                     document.getElementById('previewframe').style[key] = value;
                 }
             })
+
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
-            // this.createChapter();
+            var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+                document.getElementById('previewframe').innerHTML = parsedHTML;
+                this.document.style["fontFamily"] = this.choosenFont;
+                this.document.style["fontSize"] = this.choosenSize+"px";
+                console.log(this.document.style)
+
+                for (var key in this.document.style) {
+                    var value = this.document.style[key];
+                    document.getElementById('previewframe').style[key] = value;
+                }
+            });
+        }
+        keyMap[69] = () => {
+            console.log("ctrl+c");
+            this.parseWholeDocument();
         }
 
         if ($event.ctrlKey) {
@@ -204,6 +217,26 @@ export class EditorController implements AfterViewInit {
                 keyMap[$event.which]();
             }
         }
+    }
+
+    public parseWholeDocument() {
+        var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+            var total = "<html><body><head><title>test</title></head><div id='content'>";
+            total += parsedHTML;
+            total += "</div></body></html>";
+            var w = window.open("", "_blank", "");
+            var doc = w.document;
+            doc.open();
+            doc.write(total);
+            this.document.style["fontFamily"] = this.choosenFont;
+            this.document.style["fontSize"] = this.choosenSize+"px";
+            for (var key in this.document.style) {
+                var value = this.document.style[key];
+                doc.getElementById('content').style[key] = value;
+            }
+            doc.close();
+            w.focus();
+        });
     }
 
     public showUploadDivToggle(hide) {

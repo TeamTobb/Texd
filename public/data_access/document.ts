@@ -156,14 +156,14 @@ export class DocumentService {
             }
         });
     }
-    
+
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
         this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle}));
        
     }
-    
-    
+
+
 
     public updateLines() {
         if (this.cm == null) return;
@@ -178,13 +178,27 @@ export class DocumentService {
         }
     }
 
+    public parseDocument(callback: (parsedHTML: string) => void) {
+        if (this._textParser == null || this._jsonParser == null) callback(null);
+        this.getDocument2(this.document.id, (tempDoc: Document) => {
+            var totalHTML : string = "";
+            for (var c in tempDoc.chapters) {
+                var lines: Line[] = tempDoc.chapters[c].lines;
+                var parsedJSON = this._textParser.getParsedJSON(lines);
+                var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+                totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                totalHTML += parsedHTML;
+            }
+            callback(totalHTML);
+        })
+    }
+
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
-            
             var lines: Line[] = this.document.chapters[this.currentChapter].lines;
             var parsedJSON = this._textParser.getParsedJSON(lines);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-            this.document.style
+            // this.document.style
             callback(parsedHTML);
         }
     }
@@ -201,6 +215,13 @@ export class DocumentService {
         diff.chapterId = chapterId;
         console.log(diff);
         this._socket.send(JSON.stringify(diff));
+    }
+
+    public getDocument2(documentId: string, callback: (document: Document) => any) {
+        this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
+            var tempDoc = new Document([], [], [], [], [], res);
+            callback(tempDoc);
+        })
     }
 
     public getDocument(documentId: string, callback: (document: Document) => any) {
