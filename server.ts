@@ -130,7 +130,7 @@ app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', documentRoutes.getDocuments);
-app.get('/documents/:documentid/:chapterid', (req, res)=>{
+app.get('/documents/:documentid/:chapterIndex', (req, res)=>{
     documentService.getChapter(req, res)
 })
 app.get('/*', indexroutes.index);

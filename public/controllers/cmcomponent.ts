@@ -19,21 +19,20 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 export class CmComponent implements AfterViewInit, OnChanges {
     @Input() lines: Line[];
     @Input() document: Document;
-    @Input() chapterId: string;
+    @Input() current_chapter: number;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
-    
+
     public editor;
-    public widgetTest; 
-    private current_chapter;
+    public widgetTest;
     public cursorwidgets = {};
     public selections = {}
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
     }
-    
+
     cursorActivity(diff) {
-        if ("" + this.chapterId == "" + diff.chapterId) {
+        if ("" + this.current_chapter == "" + diff.chapterIndex) {
             if (diff.cursorActivity) {
                 if (this.cursorwidgets[diff.senderId] != undefined) {
                     this.cursorwidgets[diff.senderId].clear()
@@ -46,7 +45,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 } catch (error) {
                     console.log(error)
                 }
-                
+
                 var element;
                 if (document.getElementById('user' + diff.senderId)) {
                     element = document.getElementById('user' + diff.senderId)
@@ -84,7 +83,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 var htmlDiv = document.createElement('div');
                 htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
                 document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
-                
+
                 try {
                     this.selections[diff.senderId] = this.editor.markText(from, to, {
                         className: "selectionRange"
@@ -98,25 +97,38 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public changeOrder(diff) {
         try {
-            if (this.chapterId == diff.chapterId) {
+            if (this.current_chapter == diff.chapterIndex) {
                 this.editor.getDoc().replaceRange(diff.text, diff.from, diff.to)
             }
         } catch (error) {
             console.log(error)
         }
     }
-
+    
+    getChapter() {
+        this.documentService.getChapter(this.current_chapter, (chapter) => {
+            var arr = [];
+            for (var line of chapter._lines) {
+                arr.push(line._raw)
+            }
+            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
+        })
+    }
     //Parsing on all changes
     ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-        if (changes["chapterId"] && this.editor !== undefined) {
+        // TODO: Shouldn't be necessary to have both of these change events. Best way would be to 
+        // only listen to change ["current_chapter"] and get the chapter
+        if (changes["current_chapter"] && this.editor !== undefined) {
             console.log("changes in chapter")
-            this.documentService.getChapter(this.chapterId, (chapter) => {
-                var arr = [];
-                for (var line of chapter._lines) {
-                    arr.push(line._raw)
-                }
-                this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
-            })
+            this.getChapter()
+        }
+
+        if (changes["lines"] && this.editor !== undefined) {
+            var arr = [];
+            for (var line of this.lines) {
+                arr.push(line.raw)
+            }
+            this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
         }
     }
 
@@ -160,7 +172,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             }
             if (typeof (change.origin) !== 'undefined') {
                 if (change.origin != "setValue" && change.origin != "+onParse") {
-                    this.documentService.sendDiff(change, this.chapterId);
+                    this.documentService.sendDiff(change, this.current_chapter);
                 }
             }
         });
@@ -172,11 +184,11 @@ export class CmComponent implements AfterViewInit, OnChanges {
         this.editor.on("cursorActivity", (cm, change) => {
             this.documentService.sendDiff({
                 cursorActivity: this.editor.getCursor(),
-            }, this.chapterId)
+            }, this.current_chapter)
         })
 
         this.editor.on("beforeSelectionChange", (cm, obj) => {
-            this.documentService.sendDiff(obj, this.chapterId)
+            this.documentService.sendDiff(obj, this.current_chapter)
         })
 
         // should probably be defined somewhere else
@@ -233,19 +245,18 @@ export class CmComponent implements AfterViewInit, OnChanges {
             else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
             else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
         });
-
     }
 
     public changeChapterPositions(from, to) {
         if (from == to) return;
         var from_id = from.split("_")[2];
         var to_id = to.split("_")[2];
-        this.documentService.changeChapters(from_id, to_id, this.chapterId);
+        this.documentService.changeChapters(from_id, to_id, this.current_chapter);
     }
-    
+
     public deleteChapterFromDB(nr: number) {
         this.document.chapters.splice(nr, 1);
-        this.documentService.sendDiff({ deleteChapter: true, chapterIndex: nr }, this.chapterId)
+        this.documentService.sendDiff({ deleteChapter: true }, nr);
     }
 
     public changeChapter(event, chapter_number: number) {
@@ -257,7 +268,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public createChapter() {
         var l = new Line("Text", []);
         this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New chapter", [l]));
-        this.documentService.sendDiff({ newchapter: true, chapterIndex: this.current_chapter }, this.chapterId);
+        this.documentService.sendDiff({ newchapter: true }, this.current_chapter);
     }
 
     parseWidgets(cm) {
