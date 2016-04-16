@@ -31,7 +31,6 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 export class EditorController implements AfterViewInit {
     public document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter: number = 0;
-    public current_paragraph: number = 0;
     public element: ElementRef;
     private snappetParser: SnappetParser;
     private showUploadDiv = false;
@@ -50,6 +49,8 @@ export class EditorController implements AfterViewInit {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
+                this.current_chapter = 0; 
+             
                 this.choosenSize = this.document.style["fontSize"];
                 this.choosenFont = this.document.style["fontFamily"];
                 $("#selectFont").val(this.choosenFont);                
@@ -71,16 +72,11 @@ export class EditorController implements AfterViewInit {
             }
 
             if (diff.newchapterName) {
-                for (var chapter of this.document.chapters) {
-                    if (chapter.id == diff.chapterId) {
-                        chapter.header = diff.newchapterName;
-                        break;
-                    }
-                }
+                this.document.chapters[diff.chapterIndex].header = diff.newchapterName; 
             }
 
             if (diff.newchapter) {
-                var l = new Line("Text", []);
+                var l = new Line("...", []);
                 this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New chapter", [l]))
             }
 
@@ -94,6 +90,10 @@ export class EditorController implements AfterViewInit {
                 this.document.chapters.splice(diff.toChapter, 0, fromChapter);
                 // here is a bug, if you are currently editing one of the moved chapters,
                 // u will automaticly also change chapter, as the index u are in is now a different chapter
+            }
+            
+            if(diff.newtitle){
+                this.document.title = diff.newtitle; 
             }
         })
     }
@@ -185,7 +185,7 @@ export class EditorController implements AfterViewInit {
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
-            this.documentService.changeTitle(this.document.id, $event.target.innerHTML);
+            this.documentService.sendDiff({newtitle: $event.target.innerHTML}, this.current_chapter);
         }
     }
 
