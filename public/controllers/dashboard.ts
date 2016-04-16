@@ -34,7 +34,7 @@ export class DashboardComponent {
                     for (var j = 0; j < this.maxColumns; j++) {
                         if (iter != documents.length) {
                             tempDoc[index][j] = documents[iter]
-                            iter++
+                            iter++                        
                         } else{
                             break;
                         }

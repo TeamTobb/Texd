@@ -72,7 +72,7 @@ export class DocumentService {
         this.document.chapters.splice(to, 0, fromChapter);
         this.sendDiff({ changeChapter: true, fromChapter: from, toChapter: to }, chapterIndex);
     }
-    
+
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
         this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle }));
@@ -105,6 +105,28 @@ export class DocumentService {
             }
             callback(totalHTML);
         })
+    }
+
+    public parseSpecificDocument(documentId, callback: (parsedHTML: string) => void) {
+        setTimeout(() => {
+            console.log("ØNSKER OG BRUUUKE PLUGINN")
+
+            if (this._textParser == null || this._jsonParser == null) callback(null);
+            else {
+                this.getDocument2(documentId, (tempDoc: Document) => {
+                    var totalHTML: string = "";
+                    for (var c in tempDoc.chapters) {
+                        var lines: Line[] = tempDoc.chapters[c].lines;
+                        var parsedJSON = this._textParser.getParsedJSON(lines);
+                        var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+                        totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                        totalHTML += parsedHTML;
+                    }
+                    callback(totalHTML);
+                })
+            }
+        }, 1000)
+
     }
 
     public parseChapter(callback: (parsedHTML: string) => void) {
@@ -175,4 +197,10 @@ export class DocumentService {
             callback(res);
         })
     }
+    public parseSingleDocument(documentId, callback: (phtml: string) => any) {
+        this.parseSpecificDocument(documentId, (parsedHTML) => {
+            callback(parsedHTML)
+        })
+    }
+
 }

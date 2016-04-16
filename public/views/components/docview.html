@@ -1,10 +1,21 @@
-<div class="docView" style=" background-color: white;
+<div class="docView" style=" 
+
+background-color: white;
     border: 2px solid black;
         padding: 5px;
         border-radius: 0px;
-        text-align: center;">
+        text-align: center;
+        overflow-y: 300px;
+        
+        width: 200px;
+    height: 282px;
+    overflow: scroll;">
     {{title}}
-    <div>" {{preview}} "</div>
-    
+
+    <div id="previewframe{{preview._id}}" style="">
+
+    </div>
+
+
     <br>
 </div>
