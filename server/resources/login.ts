@@ -14,10 +14,10 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 passport.use(new BearerStrategy(
-    function(token, done) {
+    function (token, done) {
         try {
             var decoded = jwt.decode(token, secret);
-            Account.findOne({ username: decoded.username }, function(err, user) {
+            Account.findOne({ username: decoded.username }, function (err, user) {
                 if (err) {
                     console.log("error")
                     return done(err);
@@ -44,7 +44,7 @@ router.post('/login', passport.authenticate('local'), (req, res, next) => {
             var token = jwt.encode(req.user, secret);
             res.json({ success: true, token: token });
         } else {
-            res.json({ sucess: false })
+            res.json({ success: false })
         }
     })
 });
@@ -53,10 +53,13 @@ router.post('/register', (req, res) => {
     Account.register(new Account({ username: req.body.username }), req.body.password, (err, account) => {
         if (err) {
             res.send(err);
+        } else {
+            passport.authenticate('local')(req, res, () => {
+                res.send({ success: true });
+                return;
+            });
+            res.send({ success: false });
         }
-        passport.authenticate('local')(req, res, () => {
-            res.send({ sucess: true })
-        });
     });
 });
 

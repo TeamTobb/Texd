@@ -66,27 +66,13 @@ export class DocumentService {
         });
     }
 
-    public changeChapters(from, to, chapterId) {
+    public changeChapters(from, to, chapterIndex) {
         var fromChapter = this.document.chapters[from];
         this.document.chapters.splice(from, 1);
         this.document.chapters.splice(to, 0, fromChapter);
-        this.sendDiff({ changeChapter: true, fromChapter: from, toChapter: to }, chapterId);
-        console.log("done changing");
-        // send diff!
+        this.sendDiff({ changeChapter: true, fromChapter: from, toChapter: to }, chapterIndex);
     }
-
-    public changeTitle(id: string, newTitle: string) {
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        this.http.post('./document/' + id, JSON.stringify({ documentTitle: newTitle }), { headers: headers }).subscribe(res => {
-            // Only actually change the title and send socket messages if status==OK
-            if (res.status == 200) {
-                this._socket.send(JSON.stringify({ name: 'name', documentId: id, title: newTitle, senderId: "hello" }));
-                this.document.title = newTitle;
-            }
-        });
-    }
-
+    
     public changeStyle(id: string, newStyle: any) {
         var headers = new Headers();
         this._socket.send(JSON.stringify({ documentId: id, documentStyle: newStyle }));
@@ -131,7 +117,7 @@ export class DocumentService {
         }
     }
 
-    public sendDiff(diff: any, chapterId: string) {
+    public sendDiff(diff: any, chapterIndex: any) {
         var color = localStorage.getItem('id_color')
         if (color != null) {
             diff.color = color;
@@ -140,7 +126,7 @@ export class DocumentService {
         }
         diff.senderId = this._senderId
         diff.documentId = this.document.id;
-        diff.chapterId = chapterId;
+        diff.chapterIndex = chapterIndex;
         this._socket.send(JSON.stringify(diff));
     }
 
@@ -158,9 +144,9 @@ export class DocumentService {
         })
     }
 
-    public getChapter(chapterId: string, callback: (chapter: any) => any) {
+    public getChapter(chapterIndex: number, callback: (chapter: any) => any) {
         console.log("get chapter")
-        this.http.get('/documents/' + this.document.id + '/' + chapterId).map((res: Response) => res.json()).subscribe(res => {
+        this.http.get('/documents/' + this.document.id + '/' + chapterIndex).map((res: Response) => res.json()).subscribe(res => {
             callback(res);
         })
     }

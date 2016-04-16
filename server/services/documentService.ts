@@ -14,12 +14,12 @@ export class DocumentService {
     documentIsUpdated = {};
 
     constructor() {
-       documentRoutes.getAllDocuments((documents) => {
+        documentRoutes.getAllDocuments((documents) => {
             for (var document of documents) {
                 this.documents[document["id"]] = document;
             }
             console.log(JSON.stringify(this.documents, null, 2));
-            this.documentIsUpdated[document["id"]] = false           
+            this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
@@ -44,16 +44,12 @@ export class DocumentService {
     getChapter(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             var documentid: string = req.params.documentid;
-            var chapterid: string = req.params.chapterid;
-            for (var chapter of this.documents[documentid]._chapters) {
-                if (chapter._id == chapterid) {
-                    res.jsonp(chapter);
-                    return;
-                }
-            }
+            var chapterIndex = req.params.chapterIndex;
+            var chapter = this.documents[documentid]._chapters[chapterIndex]
+            res.jsonp(this.documents[documentid]._chapters[chapterIndex]);
         }
     }
-    
+
     updateDocument(diff2) {
         var diff = JSON.parse(diff2);
         this.documentIsUpdated[diff.documentId] = true;
@@ -63,10 +59,14 @@ export class DocumentService {
             console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
-        }        
-        else if (diff.documentStyle){
-            document._style = diff.documentStyle;            
-        }        
+        }
+        if (diff.newtitle) {
+            document._title = diff.newtitle;
+        }
+
+        else if (diff.documentStyle) {
+            document._style = diff.documentStyle;
+        }
         else if (diff.deleteChapter) {
             console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
@@ -75,29 +75,39 @@ export class DocumentService {
         else if (diff.newchapterName) {
             console.log("Changing chapter name")
 
-            for (var chapter of document._chapters) {
-                if (chapter._id == diff.chapterId) {
-                    chapter._header = diff.newchapterName
-                    break;
-                }
+
+            if (document._chapters[diff.chapterIndex] != undefined) {
+                document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
+            // for (var chapter of document._chapters) {
+            //     if (chapter._id == diff.chapterId) {
+            //         chapter._header = diff.newchapterName
+            //         break;
+            //     }
+            // }
         }
-        else if(diff.changeChapter) {
+        else if (diff.changeChapter) {
             console.log("changing position on chapters");
             var fromChapter = document._chapters[diff.fromChapter];
             document._chapters.splice(diff.fromChapter, 1);
             document._chapters.splice(diff.toChapter, 0, fromChapter);
         }
         else if (typeof (diff.from !== 'undefined')) {
+            console.log("We got index: " + diff.chapterIndex)
             //TODO prevent fake ID
             var lines = []
 
-            for (var chapter of document._chapters) {
-                if (chapter._id == diff.chapterId) {
-                    lines = chapter._lines;
-                    break;
-                }
-            }
+            // for (var chapter of document._chapters) {
+            //     if (chapter._id == diff.chapterId) {
+            //         lines = chapter._lines;
+            //         break;
+            //     }
+            // }
+            // if (document._chapters[diff.chapterIndex] != undefined) {
+            console.log("We found lines! Setting")
+            lines = document._chapters[diff.chapterIndex]._lines;
+            // }
+
             if (diff.origin == '+input') {
                 if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
                     var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
@@ -136,10 +146,6 @@ export class DocumentService {
                 var fromCh = diff.from.ch;
                 var toLine = diff.to.line;
                 var toCh = diff.to.ch;
-
-                var query = { $set: {} };
-                var paragraphset = "_chapters.0._lines." + fromLine;
-
 
                 if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
                     var endraw = lines[diff.to.line]._raw.slice(0);
