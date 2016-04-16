@@ -1,5 +1,6 @@
 *.js
 !public/lib/**
+!jspdf.min.js
 node_modules/
 typings/
 *.map
