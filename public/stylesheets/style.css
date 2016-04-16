@@ -101,6 +101,10 @@ body {
     overflow-y: scroll;
 }
 
+.droptarget.active {
+    background-color: lightblue; 
+}
+
 #newchapter {
     width: 100%;
     height: 40px;

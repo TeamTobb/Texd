@@ -166,7 +166,6 @@ export class DocumentService {
                 documents.push(new Document([], [], [], [], [], document));
                 callback(documents);
             })
-            console.log(JSON.stringify(documents, null, 2));
         });
     }
 

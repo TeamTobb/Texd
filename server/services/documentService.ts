@@ -93,100 +93,92 @@ export class DocumentService {
             document._chapters.splice(diff.toChapter, 0, fromChapter);
         }
         else if (typeof (diff.from !== 'undefined')) {
-            console.log("We got index: " + diff.chapterIndex)
             //TODO prevent fake ID
             var lines = []
 
-            // for (var chapter of document._chapters) {
-            //     if (chapter._id == diff.chapterId) {
-            //         lines = chapter._lines;
-            //         break;
-            //     }
-            // }
-            // if (document._chapters[diff.chapterIndex] != undefined) {
-            console.log("We found lines! Setting")
-            lines = document._chapters[diff.chapterIndex]._lines;
-            // }
+            if (document._chapters[diff.chapterIndex] != undefined) {
+                lines = document._chapters[diff.chapterIndex]._lines;
+                
+                if (diff.origin == '+input') {
+                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
+                        var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
+                        var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
+                        var line = new lineModel({ _raw: raw, metadata: [] })
 
-            if (diff.origin == '+input') {
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
-                    var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
-                    var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
-                    var line = new lineModel({ _raw: raw, metadata: [] })
+                        lines[diff.from.line]._raw = firstRaw
 
-                    lines[diff.from.line]._raw = firstRaw
+                        lines.splice(diff.from.line + 1, 0, line)
+                    } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
+                        console.log("Tekst erstattet med bokstaver")
 
-                    lines.splice(diff.from.line + 1, 0, line)
-                } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
-                    console.log("Tekst erstattet med bokstaver")
+                        var fromLine = diff.from.line;
+                        var fromCh = diff.from.ch;
+                        var toLine = diff.to.line;
+                        var toCh = diff.to.ch;
 
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+
+                        if (fromLine == toLine) {
+                            var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw;
+                        } else if (fromLine != toLine) {
+                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
+                            var lastRow = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRow + lastRow;
+                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                        }
+                    } else {  //ny bokstav
+                        var raw: any = lines[diff.from.line]["_raw"];
+                        lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
+                    }
+                } else if (diff.origin == '+delete' || diff.origin == 'cut') {
                     var fromLine = diff.from.line;
                     var fromCh = diff.from.ch;
                     var toLine = diff.to.line;
                     var toCh = diff.to.ch;
 
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-
-                    if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
-                    } else if (fromLine != toLine) {
-                        var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
-                        var lastRow = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRow + lastRow;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
+                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
+                        var endraw = lines[diff.to.line]._raw.slice(0);
+                        lines[diff.from.line]._raw += endraw;
+                        lines.splice(diff.to.line, 1)
+                    } else {
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        if (fromLine == toLine) {
+                            var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw;
+                        } else if (fromLine != toLine) {
+                            var firstRaw: any = firstLine.slice(0, fromCh);
+                            var lastRaw = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRaw + lastRaw;
+                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                        }
                     }
-                } else {  //ny bokstav
-                    var raw: any = lines[diff.from.line]["_raw"];
-                    lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
-                }
-            } else if (diff.origin == '+delete' || diff.origin == 'cut') {
-                var fromLine = diff.from.line;
-                var fromCh = diff.from.ch;
-                var toLine = diff.to.line;
-                var toCh = diff.to.ch;
+                } else if (diff.origin == 'paste') {
+                    var fromLine = diff.from.line;
+                    var fromCh = diff.from.ch;
+                    var toLine = diff.to.line;
+                    var toCh = diff.to.ch;
 
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                    var endraw = lines[diff.to.line]._raw.slice(0);
-                    lines[diff.from.line]._raw += endraw;
-                    lines.splice(diff.to.line, 1)
-                } else {
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-                    if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
-                    } else if (fromLine != toLine) {
-                        var firstRaw: any = firstLine.slice(0, fromCh);
-                        var lastRaw = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRaw + lastRaw;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
-                    }
-                }
-            } else if (diff.origin == 'paste') {
-                var fromLine = diff.from.line;
-                var fromCh = diff.from.ch;
-                var toLine = diff.to.line;
-                var toCh = diff.to.ch;
-
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                    var endraw = lines[diff.to.line]._raw.slice(0);
-                    lines[diff.from.line]._raw += endraw;
-                    lines.splice(diff.to.line, 1)
-                } else if (diff.text.length > 1) {
-                    console.log("diff.text.length>1 = True")
-                } else {
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-                    if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
-                    } else if (fromLine != toLine) {
-                        var firstRaw: any = firstLine.slice(0, fromCh);
-                        var lastRaw = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
+                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
+                        var endraw = lines[diff.to.line]._raw.slice(0);
+                        lines[diff.from.line]._raw += endraw;
+                        lines.splice(diff.to.line, 1)
+                    } else if (diff.text.length > 1) {
+                        console.log("diff.text.length>1 = True")
+                    } else {
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        if (fromLine == toLine) {
+                            var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw;
+                        } else if (fromLine != toLine) {
+                            var firstRaw: any = firstLine.slice(0, fromCh);
+                            var lastRaw = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
+                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                        }
                     }
                 }
             }

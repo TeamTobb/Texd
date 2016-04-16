@@ -1,7 +1,7 @@
 import {Component, Input, Output, OnChanges, SimpleChange} from 'angular2/core';
 import {Http, Headers, HTTP_PROVIDERS, HTTP_BINDINGS, Response} from 'angular2/http';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
-import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt"; //I am stating it twice
+import {AuthHttp, AuthConfig, JwtHelper} from "angular2-jwt/angular2-jwt";
 import {Directive} from "angular2/core";
 import {OnInit} from 'angular2/core';
 import {DocumentService} from '../data_access/document.ts';

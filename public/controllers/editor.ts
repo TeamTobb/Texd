@@ -49,11 +49,11 @@ export class EditorController implements AfterViewInit {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
-                this.current_chapter = 0; 
-             
+                this.current_chapter = 0;
+
                 this.choosenSize = this.document.style["fontSize"];
                 this.choosenFont = this.document.style["fontFamily"];
-                $("#selectFont").val(this.choosenFont);                
+                $("#selectFont").val(this.choosenFont);
                 $("#selectSize").val(this.choosenSize);
             })
             this.documentService.currentChapter = this.current_chapter;
@@ -72,7 +72,7 @@ export class EditorController implements AfterViewInit {
             }
 
             if (diff.newchapterName) {
-                this.document.chapters[diff.chapterIndex].header = diff.newchapterName; 
+                this.document.chapters[diff.chapterIndex].header = diff.newchapterName;
             }
 
             if (diff.newchapter) {
@@ -91,9 +91,9 @@ export class EditorController implements AfterViewInit {
                 // here is a bug, if you are currently editing one of the moved chapters,
                 // u will automaticly also change chapter, as the index u are in is now a different chapter
             }
-            
-            if(diff.newtitle){
-                this.document.title = diff.newtitle; 
+
+            if (diff.newtitle) {
+                this.document.title = diff.newtitle;
             }
         })
     }
@@ -185,7 +185,7 @@ export class EditorController implements AfterViewInit {
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
-            this.documentService.sendDiff({newtitle: $event.target.innerHTML}, this.current_chapter);
+            this.documentService.sendDiff({ newtitle: $event.target.innerHTML }, this.current_chapter);
         }
     }
 
@@ -253,28 +253,24 @@ export class EditorController implements AfterViewInit {
             doc.close();
 
             // testing
+            // var doc2 = new jsPDF();
+            // // var elementHandler = {
+            // //   '#ignorePDF': function (element, renderer) {
+            // //     return true;
+            // //   }
+            // // };
+            // var source = w.document.getElementsByTagName("body")[0];
+            // doc2.fromHTML(
+            //     source,
+            //     15,
+            //     15,
+            //     {
+            //       'width': 180
+            //     });
 
+            // doc2.output("dataurlnewwindow");
 
-
-
-            var doc2 = new jsPDF();
-            // var elementHandler = {
-            //   '#ignorePDF': function (element, renderer) {
-            //     return true;
-            //   }
-            // };
-            var source = w.document.getElementsByTagName("body")[0];
-            doc2.fromHTML(
-                source,
-                15,
-                15,
-                {
-                  'width': 180
-                });
-
-            doc2.output("dataurlnewwindow");
-
-            doc2.focus();
+            // doc2.focus();
 
             // done testing
 

@@ -54,11 +54,7 @@ router.post('/register', (req, res) => {
         if (err) {
             res.send(err);
         } else {
-            passport.authenticate('local')(req, res, () => {
-                res.send({ success: true });
-                return;
-            });
-            res.send({ success: false });
+            res.send({ success: true });
         }
     });
 });

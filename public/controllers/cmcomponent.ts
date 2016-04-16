@@ -30,7 +30,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
     }
-
+    
     cursorActivity(diff) {
         if ("" + this.current_chapter == "" + diff.chapterIndex) {
             if (diff.cursorActivity) {
@@ -104,7 +104,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             console.log(error)
         }
     }
-    
+
     getChapter() {
         this.documentService.getChapter(this.current_chapter, (chapter) => {
             var arr = [];
@@ -115,14 +115,12 @@ export class CmComponent implements AfterViewInit, OnChanges {
         })
     }
     //Parsing on all changes
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) { 
         // TODO: Shouldn't be necessary to have both of these change events. Best way would be to 
         // only listen to change ["current_chapter"] and get the chapter
         if (changes["current_chapter"] && this.editor !== undefined) {
-            console.log("changes in chapter")
             this.getChapter()
-        }
-
+        } 
         if (changes["lines"] && this.editor !== undefined) {
             var arr = [];
             for (var line of this.lines) {
@@ -132,7 +130,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
     }
 
-    ngAfterViewInit() {
+    ngAfterViewInit() { 
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "hashscript",
             lineNumbers: true,
@@ -140,8 +138,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             extraKeys: {
                 "Ctrl-Space": "autocomplete"
             }
-        })
-
+        }) 
         this.documentService.cm = this.editor;
         this.editor.on("change", (cm, change) => {
             if (change.origin != "setValue" && change.origin != "+onParse") {
@@ -261,7 +258,17 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public changeChapter(event, chapter_number: number) {
         this.current_chapter = chapter_number;
+        this.changeActiveChapter(); 
         this.emitChangeChapter.emit(chapter_number)
+    }
+
+    public changeActiveChapter() {
+        var selectedChapter = document.getElementById('chapter_item_' + this.current_chapter);
+        var otherChapters = document.getElementsByClassName('droptarget');
+        for (var i = 0; i < otherChapters.length; i++) {
+            otherChapters[i].className = "droptarget";
+        }
+        selectedChapter.className = "droptarget active";
     }
 
     // move all these into the chapterItem component? // need to inject document etc.

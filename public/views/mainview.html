@@ -3,7 +3,8 @@
         <tabset>
             <tab heading="Dashboard" (select)="goToDashboard()"></tab>
             <tab heading="Settings" (select)="goToSettings()"></tab>
-            <tab heading="Login" (select)="goToLogin()"></tab>
+            <tab *ngIf="loggedIn" heading="Logout" (select)="logOut()"></tab>
+            <tab *ngIf="notLoggedIn" heading="Login" (select)="goToLogin()"></tab>
             <tab heading="Register" (select)="goToRegister()"></tab>
         </tabset>
     </div>
