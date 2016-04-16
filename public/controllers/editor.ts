@@ -39,12 +39,9 @@ export class EditorController implements AfterViewInit {
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
-    private choosenSize: string;  
-    //  TODO: Bjon check this
-    private style = {}; 
-    @Input() fontToBe: any;
+    private choosenSize: string;
     @ViewChild(CmComponent) cmcomponent: CmComponent;
-    
+
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
         renderer.listenGlobal('document', 'keydown', ($event) => {
@@ -53,9 +50,10 @@ export class EditorController implements AfterViewInit {
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
-                this.style = document2.style;
                 this.choosenSize = this.document.style["fontSize"];
                 this.choosenFont = this.document.style["fontFamily"];
+                $("#selectFont").val(this.choosenFont);                
+                $("#selectSize").val(this.choosenSize);
             })
             this.documentService.currentChapter = this.current_chapter;
         }
@@ -67,7 +65,7 @@ export class EditorController implements AfterViewInit {
             if (diff.cursorActivity || diff.ranges) {
                 this.cmcomponent.cursorActivity(diff);
             }
-            
+
             if (diff.from && diff.to && diff.text) {
                 this.cmcomponent.changeOrder(diff);
             }
@@ -177,6 +175,8 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
+
+
     }
 
     public changeChapter(i) {
@@ -208,10 +208,10 @@ export class EditorController implements AfterViewInit {
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
-            var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+            var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
                 this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize+"px";
+                this.document.style["fontSize"] = this.choosenSize + "px";
                 console.log(this.document.style)
 
                 for (var key in this.document.style) {
@@ -234,7 +234,7 @@ export class EditorController implements AfterViewInit {
     }
 
     public parseWholeDocument() {
-        var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+        var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
             var total = "<html><body><head><title>test</title></head><div id='content'>";
             total += parsedHTML;
             total += "</div></body></html>";
@@ -243,7 +243,7 @@ export class EditorController implements AfterViewInit {
             doc.open();
             doc.write(total);
             this.document.style["fontFamily"] = this.choosenFont;
-            this.document.style["fontSize"] = this.choosenSize+"px";
+            this.document.style["fontSize"] = this.choosenSize + "px";
             for (var key in this.document.style) {
                 var value = this.document.style[key];
                 doc.getElementById('content').style[key] = value;
@@ -279,10 +279,5 @@ export class EditorController implements AfterViewInit {
         for (var index = 6; index < 100; index++) {
             this.sizePicker.push(index)
         }
-    }
-    
-    fontSelected(font) {
-        console.log(font)
-        console.log(this.fontToBe)
     }
 }
