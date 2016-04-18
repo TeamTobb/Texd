@@ -101,7 +101,7 @@ export function GeneralSpanWidget(cm, optRange, className, hashtag) {
     } else {
         cm.replaceSelection(" " + hashtag + " " + cm.getSelection() + " # ", "around");
     }
-    cm.refresh();
+    // cm.refresh();
 }
 
 
@@ -123,7 +123,7 @@ export function CursorWidget(cm, optRange, onParse, line, ch, color) {
         }
 
         var mark = cm.setBookmark(from, options);
-        cm.refresh();
+        // cm.refresh();
         return mark;
     }
 }
@@ -246,5 +246,5 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
     }, false);
 
     cm.setCursor(to);
-    cm.refresh();
+    // cm.refresh();
 }
