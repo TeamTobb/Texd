@@ -24,7 +24,7 @@
                 <select id="selectFont">
                     <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
                 </select>
-                
+
                 <select id="selectSize">
                     <option value="{{size}}px" *ngFor="#size of sizePicker; #i = index">{{size}}px</option>
                 </select>
@@ -46,12 +46,13 @@
 
 <!-- widgets -->
 <div class="widget-templates">
-    <span class="bold-widget"></span>
-    <span contenteditable="true" class="italic-widget"></span>
-    <span contenteditable="true" class="underline-widget"></span>
+    <span class="general-span-widget"></span>
+    <!-- <span class="bold-widget"></span> -->
+    <!-- <span contenteditable="true" class="italic-widget"></span> -->
+    <!-- <span contenteditable="true" class="underline-widget"></span> -->
     <span contenteditable="true" class="image-edit"></span>
     <span contenteditable="false" class="cursor-widget"></span>
-    <h1 contenteditable="true" class="header-widget"></h1>
+    <!-- <h1 contenteditable="true" class="header-widget"></h1> -->
 
     <div class="image-widget" style="background-color: #EEE">
         <img class="image-frame" src="test.jpg" height="100px" width="100px">

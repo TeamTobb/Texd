@@ -102,7 +102,7 @@ body {
 }
 
 .droptarget.active {
-    background-color: lightblue; 
+    background-color: lightblue;
 }
 
 #newchapter {
@@ -222,11 +222,17 @@ body {
 
 .cursor-widget {
     width: 20px;
-    height: 20px; 
+    height: 20px;
 }
 
 .header-widget {
-
+    /*display: block;*/
+    font-size: 2em;
+    /*margin-top: 0.67em;
+    margin-bottom: 0.67em;*/
+    /*margin-left: 0;
+    margin-right: 0;*/
+    font-weight: bold;
 }
 
 .editorContainerBox {
@@ -276,7 +282,7 @@ body {
     margin-right: auto;
     left: 0;
     right: 0;
-    background: lightgray; 
+    background: lightgray;
 }
 
 
@@ -284,7 +290,7 @@ body {
     margin: 10%;
     height: 80%;
     width: 80%;
-   
+
 }
 
 .headerForUpload{
@@ -299,7 +305,7 @@ body {
     border-radius: 10px;
     background-color: lightgreen;
     margin: 7%;
-    
+
 }
 
 .message-header{
@@ -337,8 +343,8 @@ body {
     display: flex;
     flex-flow: row;
     width: 100%;
-    height: 100%;   
-    background-color: yellow; 
+    height: 100%;
+    background-color: yellow;
 }
 
 .settingsLeftTable {
@@ -366,10 +372,10 @@ body {
     color: white;
 }
 
-.settingsPageright{  
-    flex: 1 1 auto; 
+.settingsPageright{
+    flex: 1 1 auto;
      width: 100%;
-     height: 100%; 
+     height: 100%;
      background-color: pink;
 }
 
@@ -389,13 +395,13 @@ body {
     text-decoration: none;
 }
 
-.docView{ 
+.docView{
     background-color: white;
     border: 2px solid black;
         padding: 5px;
         border-radius: 0px;
         text-align: center;
-        overflow-y: 300px;        
+        overflow-y: 300px;
         width: 200px;
     height: 282px;
     overflow: scroll;

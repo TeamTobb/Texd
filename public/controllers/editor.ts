@@ -201,6 +201,7 @@ export class EditorController implements AfterViewInit {
         var keyMap = {};
         keyMap[80] = () => {
             console.log("ctrl+p");
+            // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;

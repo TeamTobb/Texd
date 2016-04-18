@@ -6,7 +6,7 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget, CursorWidget} from "./widget.ts";
+import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget, CursorWidget, GeneralSpanWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
 
 function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
@@ -30,7 +30,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
     }
-    
+
     cursorActivity(diff) {
         if ("" + this.current_chapter == "" + diff.chapterIndex) {
             if (diff.cursorActivity) {
@@ -115,12 +115,12 @@ export class CmComponent implements AfterViewInit, OnChanges {
         })
     }
     //Parsing on all changes
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) { 
-        // TODO: Shouldn't be necessary to have both of these change events. Best way would be to 
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+        // TODO: Shouldn't be necessary to have both of these change events. Best way would be to
         // only listen to change ["current_chapter"] and get the chapter
         if (changes["current_chapter"] && this.editor !== undefined) {
             this.getChapter()
-        } 
+        }
         if (changes["lines"] && this.editor !== undefined) {
             var arr = [];
             for (var line of this.lines) {
@@ -130,7 +130,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
     }
 
-    ngAfterViewInit() { 
+    ngAfterViewInit() {
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "hashscript",
             lineNumbers: true,
@@ -138,7 +138,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             extraKeys: {
                 "Ctrl-Space": "autocomplete"
             }
-        }) 
+        })
         this.documentService.cm = this.editor;
         this.editor.on("change", (cm, change) => {
             if (change.origin != "setValue" && change.origin != "+onParse") {
@@ -190,31 +190,20 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
-            // what to do about the enter function ?
-            this.widgetTest = new BoldWidget(this.editor, null);
-            this.editor.widgetEnter = $.proxy(this.widgetTest, 'enterIfDefined', 'left');
+            this.editor.focus();
+            new GeneralSpanWidget(this.editor, null, "bold-widget", "#b");
         });
         $("#insertheader").click(() => {
-            new HeaderWidget(this.editor, null, false);
+            this.editor.focus();
+            new GeneralSpanWidget(this.editor, null, "header-widget", "#h1");
         });
         $("#insertitalic").click(() => {
-            new ItalicWidget(this.editor, null, false);
+            this.editor.focus();
+            new GeneralSpanWidget(this.editor, null, "italic-widget", "#i");
         });
         $("#insertunderline").click(() => {
-            new UnderlineWidget(this.editor, null, false);
-        });
-
-        this.editor.on("cursorActivity", function (cm) {
-            if (cm.widgetEnter) {
-                // check to see if movement is purely navigational, or if it
-                // doing something like extending selection
-                var cursorHead = cm.getCursor('head');
-                var cursorAnchor = cm.getCursor('anchor');
-                if (posEq(cursorHead, cursorAnchor)) {
-                    cm.widgetEnter();
-                }
-                cm.widgetEnter = undefined;
-            }
+            this.editor.focus();
+            new GeneralSpanWidget(this.editor, range, "underline-widget", "#u");
         });
 
         // drag events for chapters
@@ -258,7 +247,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     public changeChapter(event, chapter_number: number) {
         this.current_chapter = chapter_number;
-        this.changeActiveChapter(); 
+        this.changeActiveChapter();
         this.emitChangeChapter.emit(chapter_number)
     }
 
@@ -287,6 +276,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var widgetMap = [];
         widgetMap["#b"] = true;
         widgetMap["#img"] = true;
+        widgetMap["#h1"] = true;
+        widgetMap["#i"] = true;
+        widgetMap["#u"] = true;
         WidgetParser.searchForWidgets(widgetMap, parseLines, (type, range) => {
             this.insertWidget(type, range);
         });
@@ -295,10 +287,19 @@ export class CmComponent implements AfterViewInit, OnChanges {
     // must make a proper register for widget types etc...
     insertWidget(type, range) {
         if (type == "#b") {
-            new BoldWidget(this.editor, range, true);
+            new GeneralSpanWidget(this.editor, range, "bold-widget", "#b");
         }
         else if (type == "#img") {
             new ImageWidget(this.editor, range, true);
+        }
+        else if (type == "#h1") {
+            new GeneralSpanWidget(this.editor, range, "header-widget", "#h1");
+        }
+        else if (type == "#i") {
+            new GeneralSpanWidget(this.editor, range, "italic-widget", "#i");
+        }
+        else if (type == "#u") {
+            new GeneralSpanWidget(this.editor, range, "underline-widget", "#u");
         }
     }
 
