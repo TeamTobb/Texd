@@ -31,15 +31,6 @@ export class FileUploaderClass {
 
     }
 
-
-    /*handleBasicUpload(data): void {
-        console.log(data)
-        this.basicResp = data;
-        this.zone.run(() => {
-            this.basicProgress = data.progress.percent;
-        });
-    }*/
-
     handleMultipleUpload(data): void {
         this.selectedFileIsUploading = true;
         let index = this.multipleResp.findIndex(x => x.id === data.id);
@@ -62,9 +53,6 @@ export class FileUploaderClass {
         });
 
         this.multipleProgress = Math.floor(uploaded / (total / 100));
-
-
-
     }
 
     handleDropUpload(data): void {
@@ -90,7 +78,4 @@ export class FileUploaderClass {
 
         this.dropProgress = Math.floor(uploaded / (total / 100));
     }
-    
-    
-
 }

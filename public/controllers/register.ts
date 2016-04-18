@@ -18,7 +18,6 @@ export class RegisterController {
     }
 
     public alerts: Array<Object> = [];
-
     constructor(private http: Http) {
         this.user = { username: "", password: "" }
     }
