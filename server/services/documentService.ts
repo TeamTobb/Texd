@@ -150,28 +150,32 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == 'paste') {
+                    // TODO: Make sure this works 100% 
                     var fromLine = diff.from.line;
                     var fromCh = diff.from.ch;
                     var toLine = diff.to.line;
                     var toCh = diff.to.ch;
+                    var beginning = lines[fromLine]._raw.slice(0, fromCh);
+                    var end = lines[toLine]._raw.slice(toCh);
 
-                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                        var endraw = lines[diff.to.line]._raw.slice(0);
-                        lines[diff.from.line]._raw += endraw;
-                        lines.splice(diff.to.line, 1)
-                    } else if (diff.text.length > 1) {
-                        console.log("diff.text.length>1 = True")
-                    } else {
-                        var firstLine: String = lines[fromLine]._raw;
-                        var lastLine: String = lines[toLine]._raw;
-                        if (fromLine == toLine) {
-                            var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                            lines[fromLine]._raw = newraw;
-                        } else if (fromLine != toLine) {
-                            var firstRaw: any = firstLine.slice(0, fromCh);
-                            var lastRaw = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                    if (fromLine == toLine) {
+                        if (diff.text.length == 1) {
+                            lines[fromLine]._raw = beginning + diff.text[0] + end;
+                        } else {
+                            lines[fromLine]._raw = beginning + diff.text[0];
+                            for (var i = 1; i < diff.text.length - 1; i++) {
+                                lines.splice(fromLine + i, 0, { _raw: diff.text[i], _metadata: [] })
+                            }
+                            lines.splice(toLine + diff.text.length - 1, 0, { _raw: diff.text[diff.text.length - 1] + end, _metadata: [] })
+                        }
+                    } else if (fromLine != toLine) {
+                        lines.splice(fromLine + 1, (toLine - fromLine));
+                        lines[fromLine]._raw = beginning + diff.text[0];
+                        for (var i = 1; i < diff.text.length - 1; i++) {
+                            lines.splice(i, 0, { _raw: diff.text[i], _metadata: [] })
+                        }
+                        if (diff.text.length != 1) {
+                            lines.splice(fromLine + diff.text.length - 1, 0, { _raw: diff.text[diff.text.length - 1] + end, _metadata: [] })
                         }
                     }
                 } else if (diff.origin == '+snappet') {
