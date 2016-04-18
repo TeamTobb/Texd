@@ -22,7 +22,7 @@ export class SettingsComponent implements AfterViewInit {
     }
     ngAfterViewInit() {
         if (this.active == 0) {
-            this.setSelectedSettingsTab(0)
+            //this.setSelectedSettingsTab(0)
         }       
     }
 
