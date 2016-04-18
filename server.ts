@@ -128,6 +128,7 @@ app.post('/uploadFile', uploadRoutes.upload);
 app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
 app.get('/snappets', snappetRoutes.read);
+app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {
     documentService.getDocument(req, res)
 })

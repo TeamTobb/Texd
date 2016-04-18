@@ -56,8 +56,118 @@ export class DocumentStyle {
             })
         }
     }
-    createStyleInput() {
-        this.styleItems.push("alignContent");
+    createStyleInput() {       
+        this.styleItems.push("backgroundColor");
+        this.styleItems.push("backgroundImage");
+        this.styleItems.push("backgroundPosition");
+        this.styleItems.push("backgroundRepeat");
+        this.styleItems.push("backgroundSize");
+        this.styleItems.push("border");
+        this.styleItems.push("borderRadius");
+        this.styleItems.push("color");
+        this.styleItems.push("filter");
+        this.styleItems.push("font");
+        this.styleItems.push("fontFamily");
+        this.styleItems.push("fontSize");
+        this.styleItems.push("fontStyle");
+        this.styleItems.push("fontVariant");
+        this.styleItems.push("fontWeight");
+        this.styleItems.push("fontSizeAdjust");
+        this.styleItems.push("fontStretch");
+        this.styleItems.push("letterSpacing");
+        this.styleItems.push("lineHeight");
+        this.styleItems.push("listStyle");
+        this.styleItems.push("listStyleImage");
+        this.styleItems.push("listStylePosition");
+        this.styleItems.push("listStyleType");
+        this.styleItems.push("margin");
+        this.styleItems.push("marginBottom");
+        this.styleItems.push("marginLeft");
+        this.styleItems.push("marginRight");
+        this.styleItems.push("marginTop");
+        this.styleItems.push("opacity");
+        this.styleItems.push("outline");
+        this.styleItems.push("outlineColor");
+        this.styleItems.push("outlineOffset");
+        this.styleItems.push("outlineStyle");
+        this.styleItems.push("outlineWidth");
+        this.styleItems.push("overflow");
+        this.styleItems.push("overflowX");
+        this.styleItems.push("overflowY");
+        this.styleItems.push("padding");
+        this.styleItems.push("paddingBottom");
+        this.styleItems.push("paddingLeft");
+        this.styleItems.push("paddingRight");
+        this.styleItems.push("paddingTop");
+        this.styleItems.push("pageBreakAfter");
+        this.styleItems.push("pageBreakBefore");
+        this.styleItems.push("pageBreakInside");
+        this.styleItems.push("quotes");
+        this.styleItems.push("textAlign");
+        this.styleItems.push("textAlignLast");
+        this.styleItems.push("textDecoration");
+        this.styleItems.push("textDecorationColor");
+        this.styleItems.push("textDecorationLine");
+        this.styleItems.push("textDecorationStyle");
+        this.styleItems.push("textIndent");
+        this.styleItems.push("textJustify");
+        this.styleItems.push("textOverflow");
+        this.styleItems.push("textShadow");
+        this.styleItems.push("textTransform");
+        this.styleItems.push("transition");
+        this.styleItems.push("transitionProperty");
+        this.styleItems.push("transitionDuration");
+        this.styleItems.push("transitionTimingFunction");
+        this.styleItems.push("transitionDelay");
+        this.styleItems.push("verticalAlign");
+        this.styleItems.push("visibility");
+        this.styleItems.push("width");
+        this.styleItems.push("wordBreak");
+        this.styleItems.push("wordSpacing");
+        this.styleItems.push("wordWrap");
+        this.styleItems.push("zIndex");
+
+        this.styleItems.forEach(element => {
+            this.styleInput[element] = "";
+        });
+    }
+
+    sendStyleToServer() {
+        console.log("Sender style til Sever")
+        var newStyleInput = {};
+        for (var key in this.styleInput) {
+            var value = this.styleInput[key];
+            if (value != "") {
+                newStyleInput[key] = value;
+            }
+        }
+
+        this.documentService.changeStyle(this.documentId, newStyleInput);
+    }
+
+    setDocumentId(docId, docNumber) {
+        this.documentId = docId;
+        this.gotDocumentId = true;
+        this.noDocumentId = false;
+
+        this.title = document.title;
+        var newStyleInput = {};
+        for (var key in this.docs[docNumber].style) {
+            var value = this.docs[docNumber].style[key];
+            if (value != "") {
+                newStyleInput[key] = value;
+            }
+        }
+        this.styleInput = newStyleInput;
+
+    }
+
+}
+
+
+/*
+Possible: 
+this.styleItems.push("alignContent");
         this.styleItems.push("alignItems");
         this.styleItems.push("alignSelf");
         this.styleItems.push("animation");
@@ -239,39 +349,4 @@ export class DocumentStyle {
         this.styleItems.push("widows");
         this.styleItems.push("zIndex");
 
-        this.styleItems.forEach(element => {
-            this.styleInput[element] = "";
-        });
-    }
-
-    sendStyleToServer() {
-        console.log("Sender style til Sever")
-        var newStyleInput = {};
-        for (var key in this.styleInput) {
-            var value = this.styleInput[key];
-            if (value != "") {
-                newStyleInput[key] = value;
-            }
-        }
-        
-        this.documentService.changeStyle(this.documentId, newStyleInput);
-    }
-
-    setDocumentId(docId, docNumber) {
-        this.documentId = docId;
-        this.gotDocumentId = true;
-        this.noDocumentId = false;
-
-        this.title = document.title;
-        var newStyleInput = {};
-        for (var key in this.docs[docNumber].style) {
-            var value = this.docs[docNumber].style[key];
-            if (value != "") {
-                newStyleInput[key] = value;
-            }
-        }
-        this.styleInput = newStyleInput;
-
-    }
-
-}
+*/

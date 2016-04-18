@@ -205,5 +205,13 @@ export class DocumentService {
             callback(parsedHTML)
         })
     }
+    
+     public getFilesInDir(documentId, callback: (files: any) => void) {
+         console.log("2 OK"+documentId)
+        this.http.get('./getFilesInDir/'+documentId).map((res: Response) => res.json()).subscribe(res => {            
+            console.log("we got files from dir: " + JSON.stringify(res, null, 2))
+            callback(res);
+        })
+    }
 
 }

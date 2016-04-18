@@ -1,16 +1,18 @@
-import {Component, NgZone} from 'angular2/core';
+import {Component, NgZone, Input, AfterViewInit} from 'angular2/core';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
+import {DocumentService} from '../data_access/document.ts';
+
 //import {UPLOAD_DIRECTIVES} from '../utils/ng2-uploader/ng2-uploader.ts';
 
 @Component({
     selector: 'fileuploader',
     templateUrl: 'views/fileUploader.html',
     styleUrls: ['stylesheets/style.css'],
-    providers: [],
+    providers: [DocumentService],
     directives: [UPLOAD_DIRECTIVES],
     pipes: []
 })
-export class FileUploaderClass {
+export class FileUploaderClass implements AfterViewInit {
     zone: NgZone;
     options: Object = {
         url: './upload/photo'
@@ -25,11 +27,37 @@ export class FileUploaderClass {
     dragedFileIsUploading = false;
     selectedFileIsUploaded = false;
     dragedFileIsUploaded = false;
+    public dirFiles = [];
+    public tests = [];
+    @Input() docId;
 
-    constructor() {
+    constructor(private documentService: DocumentService) {
         this.zone = new NgZone({ enableLongStackTrace: false });
+    }
+
+
+    ngAfterViewInit() {
+        console.log(this.docId._id)
+        this.findAllPhotos()
+    }
+
+    private findAllPhotos() {
+        console.log("1 OK")
+        this.documentService.getFilesInDir(this.docId._id, (files) => {
+            if (!files.errno) {
+                files.forEach(file => {
+                    this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + file);
+                    //console.log(this.dirFiles);
+
+                });
+            }
+        });
+
+
 
     }
+
+
 
     handleMultipleUpload(data): void {
         this.selectedFileIsUploading = true;
@@ -53,6 +81,7 @@ export class FileUploaderClass {
         });
 
         this.multipleProgress = Math.floor(uploaded / (total / 100));
+
     }
 
     handleDropUpload(data): void {
@@ -77,5 +106,6 @@ export class FileUploaderClass {
         });
 
         this.dropProgress = Math.floor(uploaded / (total / 100));
+
     }
 }

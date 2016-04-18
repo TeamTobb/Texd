@@ -11,18 +11,27 @@ import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
 import lineModel = documentModel.lineModel;
 
-/*
-ready to delete? 
-export function read(req: express.Request, res: express.Response) {
-    console.log("documentController.retrieveDocument()");
-    repository.findOne({ _id: req.params.id }, (error, document) => {
-        if (error) {
-            res.send(error);
-        } else {
-            res.jsonp(document);           
-        }
-    });
-}*/
+
+export function getFilesInDir(req: express.Request, res: express.Response) {
+    console.log("getFilesInDir"+req.params.id);
+    var docIdDir = {}
+    docIdDir["photos"] = {}
+    var fs = require('fs');
+    var result = fs.readdir("./public/uploads/document/"+req.params.id+"/photos/", (err, files)=>{
+        if (err){
+            console.log(err)
+            console.log("Error in getFilesInDir");     
+            res.jsonp(err)       
+        }else {
+            console.log("File Success");
+            
+            res.jsonp(files);
+        }  
+        
+    })
+
+
+}
 
 export function getAllDocuments(callback) {
     repository.find({}, (error, document) => {
@@ -100,4 +109,3 @@ export function saveDocument(document, callback) {
         }
     })
 }
-

@@ -65,8 +65,7 @@
 <section *ngIf="showUploadDiv">
     <div class="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
-        <fileuploader>
-
+        <fileuploader [docId]="document" >
         </fileuploader>
 
     </div>
