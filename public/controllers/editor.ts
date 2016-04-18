@@ -244,7 +244,11 @@ export class EditorController implements AfterViewInit {
 
     public parseWholeDocument() {
         var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-            var total = "<html><body><head><title>test</title></head><div id='content'>";
+            var total = "<html><body><head>";
+            // should probably not add the whole stylesheet? make a simpler one just for parsing?
+            total += "<base href='" + document.location.origin + "' />";
+            total += '<link rel="stylesheet" type="text/css" href="stylesheets/style.css">';
+            total += "<title>test</title></head><div id='content'>";
             total += parsedHTML;
             total += "</div></body></html>";
             // var d2 =
