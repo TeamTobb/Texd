@@ -13,6 +13,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var http = require('http');
 var WebSocket = require('ws');
+var os = require('os');
 
 import Diff = require('./server/domain/diff');
 
@@ -39,7 +40,7 @@ var documentService = new DocumentService.DocumentService();
 
 
 server.on('connection', ws => {
-    ws.on('message', message => {        
+    ws.on('message', message => {
         documentService.updateDocument(message);
         broadcast(message)
     });
@@ -74,7 +75,7 @@ app.use(passport.initialize());
 var multer = require('multer')
 
 var storage = multer.diskStorage({
-    destination: function(req, file, callback) {
+    destination: function (req, file, callback) {
         var documentID: string = ""
         for (var index = 0; index < req.rawHeaders.length; index++) {
             var element = req.rawHeaders[index];
@@ -84,16 +85,16 @@ var storage = multer.diskStorage({
 
             }
         }
-        var documentDir = './public/uploads/document/'+ documentID.trim()// '/photos'
+        var documentDir = './public/uploads/document/' + documentID.trim()// '/photos'
         var photoDirForDocId = documentDir + '/photos'
         var fs = require('fs');
         if (!fs.existsSync(documentDir)) {
             fs.mkdirSync(documentDir);
-            fs.mkdirSync(photoDirForDocId);           
+            fs.mkdirSync(photoDirForDocId);
         }
         callback(null, photoDirForDocId);
     },
-    filename: function(req, file, callback) {
+    filename: function (req, file, callback) {
         console.log(req.rawHeaders)
         var originalName: string = ""
         for (var index = 0; index < req.rawHeaders.length; index++) {
@@ -110,10 +111,10 @@ var upload = multer({ storage: storage }).single('photo');
 
 
 //TODO Change to app.use() Create one upload, with different paths for photo, JSON...
-app.post('/upload/photo', function(req, res) {
+app.post('/upload/photo', function (req, res) {
     console.log(req)
     console.log("POST POST POST ")
-    upload(req, res, function(err) {
+    upload(req, res, function (err) {
         if (err) {
             return res.end("Error uploading file.");
         }
@@ -130,12 +131,27 @@ app.get('/snappets', snappetRoutes.read);
 app.get('/document/:id', documentRoutes.read);
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', documentRoutes.getDocuments);
-app.get('/documents/:documentid/:chapterIndex', (req, res)=>{
+app.get('/documents/:documentid/:chapterIndex', (req, res) => {
     documentService.getChapter(req, res)
 })
+
+app.get('/wsip', (req, res) => {
+    var address;
+    var ifaces = os.networkInterfaces();
+    for (var dev in ifaces) {
+        var iface = ifaces[dev].filter(function (details) {
+            return details.family === 'IPv4' && details.internal === false;
+        });
+        if (iface.length > 0) {
+            address = iface[0].address;
+            res.jsonp({ ip: address })
+        }
+    }
+})
+
 app.get('/*', indexroutes.index);
 
-app.listen(httpPort, function() {
+app.listen(httpPort, function () {
     console.log("Demo Express server listening on port %d", httpPort);
 });
 

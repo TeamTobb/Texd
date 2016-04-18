@@ -74,23 +74,17 @@ export class DocumentService {
 
         else if (diff.newchapterName) {
             console.log("Changing chapter name")
-
-
             if (document._chapters[diff.chapterIndex] != undefined) {
                 document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
-            // for (var chapter of document._chapters) {
-            //     if (chapter._id == diff.chapterId) {
-            //         chapter._header = diff.newchapterName
-            //         break;
-            //     }
-            // }
         }
         else if (diff.changeChapter) {
             console.log("changing position on chapters");
-            var fromChapter = document._chapters[diff.fromChapter];
-            document._chapters.splice(diff.fromChapter, 1);
-            document._chapters.splice(diff.toChapter, 0, fromChapter);
+            if (document._chapters[diff.fromChapter] != undefined && document._chapters[diff.toChapter] != undefined) {
+                var fromChapter = document._chapters[diff.fromChapter];
+                document._chapters.splice(diff.fromChapter, 1);
+                document._chapters.splice(diff.toChapter, 0, fromChapter);
+            }
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
@@ -98,7 +92,7 @@ export class DocumentService {
 
             if (document._chapters[diff.chapterIndex] != undefined) {
                 lines = document._chapters[diff.chapterIndex]._lines;
-                
+
                 if (diff.origin == '+input') {
                     if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
                         var raw = lines[diff.from.line]._raw.slice(diff.to.ch);

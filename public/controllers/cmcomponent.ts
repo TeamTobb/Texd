@@ -273,7 +273,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     // move all these into the chapterItem component? // need to inject document etc.
     public createChapter() {
-        var l = new Line("Text", []);
+        var l = new Line("...", []);
         this.document.chapters.splice(this.current_chapter + 1, 0, new Chapter("New chapter", [l]));
         this.documentService.sendDiff({ newchapter: true }, this.current_chapter);
     }

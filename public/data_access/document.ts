@@ -14,7 +14,7 @@ import {Observer} from 'rxjs/Observer';
 
 @Injectable()
 export class DocumentService {
-    private _socket;
+    private _socket: WebSocket;
     public parseMap: ParseMap = new ParseMap();
     private _document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public _senderId: string;
@@ -45,19 +45,22 @@ export class DocumentService {
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
 
-        this._socket = new WebSocket('ws://localhost:3001');
-        this._socket.onmessage = message => {
-            var parsed = JSON.parse(message.data)
-            if (parsed.senderId != this._senderId) {
-                if (parsed.documentId == this.document.id) {
-                    this.diff = parsed;
-                    this._todosObserver.next(this.diff);
-                }
-                if (parsed.documentStyle) {
-                    this.document.style = parsed.documentStyle;
+
+        this.http.get('./wsip').map((res: Response) => res.json()).subscribe(res => {
+            this._socket = new WebSocket('ws://' + res.ip + ':3001');
+            this._socket.onmessage = message => {
+                var parsed = JSON.parse(message.data)
+                if (parsed.senderId != this._senderId) {
+                    if (parsed.documentId == this.document.id) {
+                        this.diff = parsed;
+                        this._todosObserver.next(this.diff);
+                    }
+                    if (parsed.documentStyle) {
+                        this.document.style = parsed.documentStyle;
+                    }
                 }
             }
-        }
+        })
 
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
@@ -140,16 +143,18 @@ export class DocumentService {
     }
 
     public sendDiff(diff: any, chapterIndex: any) {
-        var color = localStorage.getItem('id_color')
-        if (color != null) {
-            diff.color = color;
-        } else {
-            diff.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+        if (this._socket.readyState == this._socket.OPEN){
+            var color = localStorage.getItem('id_color')
+            if (color != null) {
+                diff.color = color;
+            } else {
+                diff.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+            }
+            diff.senderId = this._senderId
+            diff.documentId = this.document.id;
+            diff.chapterIndex = chapterIndex;
+            this._socket.send(JSON.stringify(diff));
         }
-        diff.senderId = this._senderId
-        diff.documentId = this.document.id;
-        diff.chapterIndex = chapterIndex;
-        this._socket.send(JSON.stringify(diff));
     }
 
     public getDocument2(documentId: string, callback: (document: Document) => any) {
