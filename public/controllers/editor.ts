@@ -39,11 +39,16 @@ export class EditorController implements AfterViewInit {
     private sizePicker = [];
     private choosenFont: string;
     private choosenSize: string;
+
+    private globalListenFunc: Function;
+
     @ViewChild(CmComponent) cmcomponent: CmComponent;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
-        renderer.listenGlobal('document', 'keydown', ($event) => {
+        console.log("setting renderer! ");
+        console.log(renderer);
+        this.globalListenFunc = renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
         if (this._routeParams.get('id')) {
@@ -179,6 +184,11 @@ export class EditorController implements AfterViewInit {
 
     }
 
+    ngOnDestroy() {
+        // Removs "listenGlobal" listener
+        this.globalListenFunc();
+    }
+
     public changeChapter(i) {
         this.current_chapter = i;
     }
@@ -253,24 +263,25 @@ export class EditorController implements AfterViewInit {
             doc.close();
 
             // testing
-            // var doc2 = new jsPDF();
-            // // var elementHandler = {
-            // //   '#ignorePDF': function (element, renderer) {
-            // //     return true;
-            // //   }
-            // // };
-            // var source = w.document.getElementsByTagName("body")[0];
-            // doc2.fromHTML(
-            //     source,
-            //     15,
-            //     15,
-            //     {
-            //       'width': 180
-            //     });
+            var doc2 = new jsPDF();
+            console.log(doc2);
+            // var elementHandler = {
+            //   '#ignorePDF': function (element, renderer) {
+            //     return true;
+            //   }
+            // };
+            var source = w.document.getElementsByTagName("body")[0];
+            doc2.fromHTML(
+                source,
+                15,
+                15,
+                {
+                  'width': 180
+                });
 
-            // doc2.output("dataurlnewwindow");
+            doc2.output("dataurlnewwindow");
 
-            // doc2.focus();
+            doc2.focus();
 
             // done testing
 
