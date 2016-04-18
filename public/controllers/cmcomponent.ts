@@ -192,7 +192,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
         $("#insertunderline").click(() => {
             this.editor.focus();
-            new GeneralSpanWidget(this.editor, range, "underline-widget", "#u");
+            new GeneralSpanWidget(this.editor, null, "underline-widget", "#u");
         });
 
         // drag events for chapters
