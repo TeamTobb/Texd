@@ -43,7 +43,6 @@ export class DocumentStyle {
             this.gotDocumentId = true;
             this.noDocumentId = false;
 
-
             documentService.getDocument(this.documentId, (document) => {
                 this.title = document.title;
                 var newStyleInput = {};
@@ -56,9 +55,7 @@ export class DocumentStyle {
                 this.styleInput = newStyleInput;
             })
         }
-
     }
-
     createStyleInput() {
         this.styleItems.push("alignContent");
         this.styleItems.push("alignItems");
@@ -256,6 +253,7 @@ export class DocumentStyle {
                 newStyleInput[key] = value;
             }
         }
+        
         this.documentService.changeStyle(this.documentId, newStyleInput);
     }
 

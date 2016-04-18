@@ -180,8 +180,6 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
-
-
     }
 
     ngOnDestroy() {
