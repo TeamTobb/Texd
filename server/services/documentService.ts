@@ -174,6 +174,16 @@ export class DocumentService {
                             lines.splice(fromLine + 1, diff.removed.length - 1);
                         }
                     }
+                } else if (diff.origin == '+snappet') {
+                    // TODO: add logic for handling snappets that are inserted on lines with text on them
+                    var linefrom: number = diff.from.line;
+                    for (var text in diff.text) {
+                        if (Number(text) == 0) {
+                            lines[linefrom]._raw = diff.text[text];
+                        } else {
+                            lines.splice(linefrom + Number(text), 0, { _raw: diff.text[text], _metadata: [] })
+                        }
+                    }
                 }
             }
         }
