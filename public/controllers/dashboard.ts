@@ -24,26 +24,6 @@ export class DashboardComponent {
     constructor(private _router: Router, private _documentService: DocumentService) {
         this._documentService.getDocuments((documents) => {
             this.documents = documents;
-
-            var row = Math.ceil(documents.length / this.maxColumns)
-            var tempDoc = []
-            var iter = 0;
-            for (var index = 0; index < row; index++) {
-                if (documents.length > iter) {
-                    tempDoc[index] = [];
-                    for (var j = 0; j < this.maxColumns; j++) {
-                        if (iter != documents.length) {
-                            tempDoc[index][j] = documents[iter]
-                            iter++                        
-                        } else{
-                            break;
-                        }
-                    }
-                } else {
-                    break;
-                }
-            }
-            this.documentGrid = tempDoc;
         });
     }
 

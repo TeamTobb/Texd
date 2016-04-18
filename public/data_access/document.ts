@@ -111,24 +111,26 @@ export class DocumentService {
     }
 
     public parseSpecificDocument(documentId, callback: (parsedHTML: string) => void) {
-        setTimeout(() => {
-            console.log("ØNSKER OG BRUUUKE PLUGINN")
+        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
+            this.parseMap.generateParseMap(res);
+            this._textParser = new Parser(this.parseMap.parseMap);
+            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
 
-            if (this._textParser == null || this._jsonParser == null) callback(null);
-            else {
-                this.getDocument2(documentId, (tempDoc: Document) => {
-                    var totalHTML: string = "";
-                    for (var c in tempDoc.chapters) {
-                        var lines: Line[] = tempDoc.chapters[c].lines;
-                        var parsedJSON = this._textParser.getParsedJSON(lines);
-                        var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-                        totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
-                        totalHTML += parsedHTML;
-                    }
-                    callback(totalHTML);
-                })
-            }
-        }, 1000)
+            this.getDocument2(documentId, (tempDoc: Document) => {
+                var totalHTML: string = "";
+                for (var c in tempDoc.chapters) {
+                    var lines: Line[] = tempDoc.chapters[c].lines;
+                    var parsedJSON = this._textParser.getParsedJSON(lines);
+                    var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
+                    totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                    totalHTML += parsedHTML;
+                }
+                callback(totalHTML);
+            })
+        });
+
+
+
 
     }
 
