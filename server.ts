@@ -13,7 +13,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var http = require('http');
 var WebSocket = require('ws');
-var os = require('os');
+var publicIp = require('public-ip');
 
 import Diff = require('./server/domain/diff');
 
@@ -136,17 +136,9 @@ app.get('/documents/:documentid/:chapterIndex', (req, res) => {
 })
 
 app.get('/wsip', (req, res) => {
-    var address;
-    var ifaces = os.networkInterfaces();
-    for (var dev in ifaces) {
-        var iface = ifaces[dev].filter(function (details) {
-            return details.family === 'IPv4' && details.internal === false;
-        });
-        if (iface.length > 0) {
-            address = iface[0].address;
-            res.jsonp({ ip: address })
-        }
-    }
+    publicIp.v4((err, ip) => {
+        res.jsonp({ ip: ip })
+    });
 })
 
 app.get('/*', indexroutes.index);

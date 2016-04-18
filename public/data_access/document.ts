@@ -143,7 +143,7 @@ export class DocumentService {
     }
 
     public sendDiff(diff: any, chapterIndex: any) {
-        if (this._socket.readyState == this._socket.OPEN){
+        if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN){
             var color = localStorage.getItem('id_color')
             if (color != null) {
                 diff.color = color;
