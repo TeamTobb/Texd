@@ -128,10 +128,6 @@ export class DocumentService {
                 callback(totalHTML);
             })
         });
-
-
-
-
     }
 
     public parseChapter(callback: (parsedHTML: string) => void) {

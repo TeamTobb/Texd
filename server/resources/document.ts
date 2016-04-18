@@ -11,6 +11,8 @@ import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
 import lineModel = documentModel.lineModel;
 
+/*
+ready to delete? 
 export function read(req: express.Request, res: express.Response) {
     console.log("documentController.retrieveDocument()");
     repository.findOne({ _id: req.params.id }, (error, document) => {
@@ -20,7 +22,7 @@ export function read(req: express.Request, res: express.Response) {
             res.jsonp(document);           
         }
     });
-}
+}*/
 
 export function getAllDocuments(callback) {
     repository.find({}, (error, document) => {

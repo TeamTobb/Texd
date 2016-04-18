@@ -49,6 +49,15 @@ export class DocumentService {
             res.jsonp(this.documents[documentid]._chapters[chapterIndex]);
         }
     }
+    
+    
+    getDocument(req: express.Request, res: express.Response){
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.id;            
+            res.jsonp(this.documents[documentid]);
+            console.log("Fant doc: "+ req.params.id); 
+        }
+    }
 
     updateDocument(diff2) {
         var diff = JSON.parse(diff2);

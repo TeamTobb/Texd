@@ -128,7 +128,9 @@ app.post('/uploadFile', uploadRoutes.upload);
 app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
 app.get('/snappets', snappetRoutes.read);
-app.get('/document/:id', documentRoutes.read);
+app.get('/document/:id', (req, res) => {
+    documentService.getDocument(req, res)
+})
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', documentRoutes.getDocuments);
 app.get('/documents/:documentid/:chapterIndex', (req, res) => {

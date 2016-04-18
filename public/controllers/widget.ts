@@ -54,10 +54,10 @@ export function Widget(cm, optRange, onParse) {
     if(onParse) {
         this.parsing = true;
     }
-    console.log("WIDGEEEEET");
     this.cm = cm;
     var from = null;
     var to = null;
+    console.log(optRange);
     if (optRange != null) {
         this.value = this.cm.getRange(optRange.from, optRange.to).trim();
         from = optRange.from;
@@ -66,21 +66,10 @@ export function Widget(cm, optRange, onParse) {
         this.value = cm.getSelection();
         from = cm.getCursor("from");
         to = cm.getCursor("to");
+        console.log(from);
+        console.log(to);
     }
-
-    // this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
     this.mark = cm.markText(from, to);
-
-    if (this.enter) {
-        CodeMirror.on(this.mark, "beforeCursorEnter", (e) => {
-            console.log("wtf -- beforeCursorEnter function (inside widget)");
-            // register the enter function
-            // the actual movement happens if the cursor movement was a plain navigation
-            // but not if it was a backspace or selection extension, etc.
-            var direction = posEq(this.cm.getCursor(), this.mark.find().from) ? 'left' : 'right';
-            cm.widgetEnter = $.proxy(this, 'enterIfDefined', direction);
-        });
-    }
 }
 Widget.prototype.range = function() {
     var find = this.mark.find()
@@ -96,225 +85,47 @@ Widget.prototype.getText = function() {
     var r = this.range()
     return this.cm.getRange(r.from, r.to)
 }
-Widget.prototype.enterIfDefined = function(direction) {
-    // check to make sure the mark still exists
-    if (this.mark.find()) {
-        this.enter(direction);
-    } else {
-        this.cm.refresh();
-    }
-}
 
-export function BoldWidget(cm, optRange, onParse) {
-    this.node = $(".widget-templates .bold-widget").clone();
-    this.nodeEnd = $(".widget-templates .bold-widget").clone();
-
-    // adding listener to change event
-    // this.node[0].addEventListener("input", (e) => {
-    //     this.setValue(this.node[0].innerText);
-    // }, false);
-
+export function GeneralSpanWidget(cm, optRange, className, hashtag) {
+    this.node = $(".widget-templates .general-span-widget").clone();
+    this.nodeEnd = $(".widget-templates .general-span-widget").clone();
     this.domNode = this.node[0];
     this.domNodeEnd = this.nodeEnd[0];
     Widget.apply(this, arguments);
-    // this.node[0].textContent = this.value;
     this.node[0].textContent = "";
     this.nodeEnd[0].textContent = "";
-
     if (optRange != null) {
-        // need to replace 4 chars before to remove "#b" and 3 after to remove "#"
-        // optRange.from.ch -= 4;
-        // optRange.to.ch += 4;
-        // cm.replaceRange(cm.getRange(optRange.from, optRange.to), {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
-        // cm.replaceRange("", {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
-        // cm.replaceRange(cm.getRange(optRange.from, optRange.to), {line: optRange.from.line, ch: optRange.from.ch - 4}, {line: optRange.to.line, ch : optRange.to.ch + 3});
-
-        this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch}, {line: optRange.to.line, ch : optRange.to.ch}, {className: 'bold-widget'});
-
-        // cm.markText(optRange.from, {line: optRange.from.line, ch: optRange.from.ch+4}, {replacedWith: this.domNode, clearWhenEmpty: false});
+        this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch}, {line: optRange.to.line, ch : optRange.to.ch}, {className: className});
         cm.markText({line: optRange.to.line, ch: optRange.to.ch-2}, optRange.to, {replacedWith: this.domNodeEnd, clearWhenEmpty: false});
         cm.markText(optRange.from, {line: optRange.from.line, ch: optRange.from.ch+3}, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-
-
-
-        // this.mark = cm.markText({line: optRange.from.line, ch: optRange.from.ch - 3}, {line: optRange.to.line, ch : optRange.to.ch + 2}, {replacedWith: this.domNode, clearWhenEmpty: false});
     } else {
-        cm.replaceSelection(" #b " + cm.getSelection() + " # ", "around");
-        var from = cm.getCursor("from");
-        var to = cm.getCursor("to");
-        // this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-        this.mark = cm.markText(from, to, {className: 'bold-widget'});
-        // this.mark = cm.removeLineClass(1, "wrap", "bold-widget");
-
-
-
-        cm.markText(from, {line: from.line, ch: from.ch+4}, {replacedWith: this.domNode, clearWhenEmpty: false});
-        cm.markText({line: to.line, ch: to.ch-3}, to, {replacedWith: this.domNodeEnd, clearWhenEmpty: false});
-
-
-        cm.setCursor(to);
+        cm.replaceSelection(" " + hashtag + " " + cm.getSelection() + " # ", "around");
     }
-    cm.refresh();
-
-    // not currently working because u are never "inside" widget. just using style css.
-    this.node.keydown('left', (event) => {
-        if (getCaretPosition(this.node[0])===0) {
-            console.log("left");
-            this.exit('left');
-        }
-    });
-    this.node.keydown('right', (event) => {
-        var t = $(event.target);
-        if (getCaretPosition(this.node[0])==this.value.length) {
-            console.log("right");
-            this.exit('right');
-        }
-    });
-
-    this.parsing = false;
-}
-BoldWidget.prototype = Object.create(Widget.prototype)
-BoldWidget.prototype.setValue = function(val) {
-    this.value = val;
-    var pos = getCaretPosition(this.node[0]);
-    this.setText("#b " + this.value.toString() + " #");
-    moveCaret(window, pos);
-}
-BoldWidget.prototype.exit = function(direction) {
-    console.log("exit function.. :O oo ");
-    var range = this.mark.find();
-    this.cm.focus();
-    if (direction==='left') {
-        this.cm.setCursor(range.from)
-    } else {
-        this.cm.setCursor(range.to)
-    }
-}
-BoldWidget.prototype.enter = function(direction) {
-    // wrong?
-    console.log("enter function... :O oo oo oO O o");
-    // var t = this.node[0];
-    // t.focus();
-    // if (direction==='left') {
-    //     // setCursorPosition(0);
-    //     moveCaret(window, 0);
-    // } else {
-    //     moveCaret(window, this.value.length);
-    //     // setCursorPosition(t.val().length)
-    // }
+    // cm.refresh();
 }
 
-export function HeaderWidget(cm, optRange, onParse) {
-    this.node = $(".widget-templates .header-widget").clone();
 
-    // adding listener to change event
-    this.node[0].addEventListener("input", () => {
-        this.setValue(this.node[0].innerText);
-    }, false);
-
-    this.domNode = this.node[0];
-    Widget.apply(this, arguments);
-    this.node[0].textContent = this.value;
-
-    cm.replaceSelection(" #h1 " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-    cm.setCursor(to);
-    cm.refresh();
-
-    this.parsing = false;
-}
-HeaderWidget.prototype = Object.create(Widget.prototype)
-HeaderWidget.prototype.setValue = function(val) {
-    this.value = val;
-    var pos = getCaretPosition(this.node[0]);
-    this.setText(" #h1 " + this.value.toString() + " # ");
-    moveCaret(window, pos);
-}
-
-export function ItalicWidget(cm, optRange, onParse) {
-    this.node = $(".widget-templates .italic-widget").clone();
-
-    // adding listener to change event
-    this.node[0].addEventListener("input", () => {
-        this.setValue(this.node[0].innerText);
-    }, false);
-
-    this.domNode = this.node[0];
-    Widget.apply(this, arguments);
-    this.node[0].textContent = this.value;
-
-    cm.replaceSelection(" #i " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-    cm.setCursor(to);
-    cm.refresh();
-
-    this.parsing = false;
-}
-ItalicWidget.prototype = Object.create(Widget.prototype)
-ItalicWidget.prototype.setValue = function(val) {
-    this.value = val;
-    var pos = getCaretPosition(this.node[0]);
-    this.setText(" #i " + this.value.toString() + " # ");
-    moveCaret(window, pos);
-}
 
 export function CursorWidget(cm, optRange, onParse, line, ch, color) {
-    this.node = $(".widget-templates .cursor-widget").clone();    
+    this.node = $(".widget-templates .cursor-widget").clone();
     this.domNode = this.node[0];
     this.domNode.style.backgroundColor = color
     this.domNode.style.border = '1px solid ' + color
-    
+
     if(cm != undefined){
         var from = {
-            line: line, 
+            line: line,
             ch: ch
         }
-        
+
         var options = {
             widget: this.domNode
         }
-        
+
         var mark = cm.setBookmark(from, options);
-        cm.refresh();
+        // cm.refresh();
         return mark;
     }
-}
-
-export function UnderlineWidget(cm, optRange, onParse) {
-    this.node = $(".widget-templates .underline-widget").clone();
-
-    // adding listener to change event
-    this.node[0].addEventListener("input", () => {
-        this.setValue(this.node[0].innerText);
-    }, false);
-
-    this.domNode = this.node[0];
-    Widget.apply(this, arguments);
-    this.node[0].textContent = this.value;
-
-    cm.replaceSelection(" #u " + cm.getSelection() + " # ", "around");
-    var from = cm.getCursor("from");
-    var to = cm.getCursor("to");
-    this.mark = cm.markText(from, to, {replacedWith: this.domNode, clearWhenEmpty: false});
-
-    cm.setCursor(to);
-    cm.refresh();
-
-    this.parsing = false;
-}
-UnderlineWidget.prototype = Object.create(Widget.prototype)
-UnderlineWidget.prototype.setValue = function(val) {
-    this.value = val;
-    var pos = getCaretPosition(this.node[0]);
-    this.setText(" #u " + this.value.toString() + " # ");
-    moveCaret(window, pos);
 }
 
 // <div id="image-widget" style="background-color: #EEE">
@@ -435,5 +246,5 @@ ImageWidget.prototype.injectImage = function(cm, optRange) {
     }, false);
 
     cm.setCursor(to);
-    cm.refresh();
+    // cm.refresh();
 }

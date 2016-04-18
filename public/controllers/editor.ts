@@ -180,8 +180,6 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
-
-
     }
 
     ngOnDestroy() {
@@ -203,6 +201,7 @@ export class EditorController implements AfterViewInit {
         var keyMap = {};
         keyMap[80] = () => {
             console.log("ctrl+p");
+            // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
             this.documentService.updateLines();
             this.documentService.parseChapter((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
@@ -245,7 +244,11 @@ export class EditorController implements AfterViewInit {
 
     public parseWholeDocument() {
         var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-            var total = "<html><body><head><title>test</title></head><div id='content'>";
+            var total = "<html><body><head>";
+            // should probably not add the whole stylesheet? make a simpler one just for parsing?
+            total += "<base href='" + document.location.origin + "' />";
+            total += '<link rel="stylesheet" type="text/css" href="stylesheets/style.css">';
+            total += "<title>test</title></head><div id='content'>";
             total += parsedHTML;
             total += "</div></body></html>";
             // var d2 =
