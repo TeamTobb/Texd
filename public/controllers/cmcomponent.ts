@@ -25,7 +25,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public editor;
     public widgetTest;
     public cursorwidgets = {};
-    public selections = {}
+    public selections = {};
+    public inside_new_snappet = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -144,25 +145,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
             if (change.origin != "setValue" && change.origin != "+onParse") {
                 for (var r in change.removed) {
                     if (change.removed[r].indexOf("#") != -1) {
-                        console.log("Removed a # - parsing widgets");
-                        // fetch cursor
-                        var cursorPos = this.editor.getCursor();
-                        // do this inside the parseWidgets function instead ?
-                        this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
-                        // need to set cursor back now
-                        this.editor.setCursor(cursorPos);
                         break;
                     }
                 }
                 for (var r in change.text) {
                     if (change.text[r].indexOf("#") != -1) {
-                        // fetch cursor
-                        var cursorPos = this.editor.getCursor();
-                        this.editor.setValue(this.editor.getValue());
                         this.parseWidgets(this.editor);
-                        // need to set cursor back now
-                        this.editor.setCursor(cursorPos);
                         break;
                     }
                 }
@@ -268,6 +257,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     parseWidgets(cm) {
+        // stop if new snappet, still a dirty fix
+        if(this.inside_new_snappet) return;
+
+        // ... get cursor pos and reset the document before parsing new widgets.
+        var cursorPos = this.editor.getCursor();
+        this.editor.setValue(this.editor.getValue());
+
         var parseLines: string[] = [];
         for (var i = 0; i < cm.lineCount(); i++) {
             var text: string = cm.getLine(i);
@@ -282,6 +278,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         WidgetParser.searchForWidgets(widgetMap, parseLines, (type, range) => {
             this.insertWidget(type, range);
         });
+
+        // setting back cursor
+        this.editor.setCursor(cursorPos);
     }
 
     // must make a proper register for widget types etc...
@@ -320,8 +319,14 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 "templates": snappets
             }
             CodeMirror.templatesHint.addTemplates(templates);
-            CodeMirror.commands.autocomplete = function (cm) {
-                CodeMirror.showHint(cm, function (cm) {
+            CodeMirror.commands.autocomplete = (cm) => {
+                CodeMirror.showHint(cm, (cm) => {
+                    this.inside_new_snappet = true;
+                    setTimeout( () => {
+                        this.inside_new_snappet = false
+                        this.parseWidgets(this.editor);
+                        // this timer should not just be set static like this.. currently u will have 8 seconds to insert into the widget
+                    }, 8000);
                     return CodeMirror.showHint(cm, CodeMirror.ternHint, { async: true });
                 });
             }
