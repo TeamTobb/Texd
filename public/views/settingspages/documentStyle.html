@@ -6,7 +6,7 @@
     <section *ngIf="gotDocumentId">
         <h2> Document style for: {{title}}</h2>
         <br>
-        <button type="button" (click)="sendStyleToServer()">Update style</button>
+        <button type="button" (click)="updateStyle()">Update style</button>
         <a href="/docs/{{documentId}}" type="button">Go back to document</a>
     </section>
 
