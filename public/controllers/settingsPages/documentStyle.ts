@@ -141,7 +141,6 @@ export class DocumentStyle {
                 newStyleInput[key] = value;
             }
         }
-
         this.documentService.changeStyle(this.documentId, newStyleInput);
     }
 

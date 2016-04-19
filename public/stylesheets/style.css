@@ -274,7 +274,7 @@ body {
     z-index: 999;
     background-color: lightsteelblue;
     width: 80%; 
-    height: 80%;
+    height: 90%;
     position: absolute;
     margin-top: auto;
     margin-bottom: auto;
@@ -300,6 +300,12 @@ body {
     float:left;
 }
 
+.imgInButtonUpload{
+    margin: 1%;
+    width:100%; 
+    height:100%; 
+    float:left;
+}
 
 .columns{
     margin: 10%;

@@ -311,6 +311,14 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
     }
 
+    insertImageWidget(file){
+        var cursor = this.editor.getCursor();
+        var to = cursor;
+        to.line = cursor.line;
+        console.log(cursor)
+        this.editor.getDoc().replaceRange('\n#img @src "'+file+'" @height "100%" @width "100%" #\n', cursor, to, "paste");                
+    }
+   
     private setupCMAutocomplete() {
         this.documentService.getSnappets((snappets) => {
             var templates = {

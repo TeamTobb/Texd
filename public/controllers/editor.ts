@@ -279,7 +279,7 @@ export class EditorController implements AfterViewInit {
                 15,
                 15,
                 {
-                  'width': 180
+                    'width': 180
                 });
 
             doc2.output("dataurlnewwindow");
@@ -298,6 +298,11 @@ export class EditorController implements AfterViewInit {
 
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
+    }
+    
+    uploadClickedImage(file){
+        this.cmcomponent.insertImageWidget(file);
+        this.showUploadDivToggle(false);        
     }
 
     setFontPickerAndSizePicker() {
