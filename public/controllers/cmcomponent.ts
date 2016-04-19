@@ -26,7 +26,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public widgetTest;
     public cursorwidgets = {};
     public selections = {};
+
     public inside_new_snappet = false;
+    public disable_rich_text = false;
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
@@ -145,13 +147,13 @@ export class CmComponent implements AfterViewInit, OnChanges {
             if (change.origin != "setValue" && change.origin != "+onParse") {
                 for (var r in change.removed) {
                     if (change.removed[r].indexOf("#") != -1) {
-                        this.parseWidgets(this.editor);
+                        this.parseWidgets();
                         break;
                     }
                 }
                 for (var r in change.text) {
                     if (change.text[r].indexOf("#") != -1) {
-                        this.parseWidgets(this.editor);
+                        this.parseWidgets();
                         break;
                     }
                 }
@@ -193,6 +195,19 @@ export class CmComponent implements AfterViewInit, OnChanges {
         $("#insertunderline").click(() => {
             this.editor.focus();
             new GeneralSpanWidget(this.editor, null, "underline-widget", "#u");
+        });
+
+        $('#richTextButton').change(() =>{
+            if(this.disable_rich_text) {
+                this.disable_rich_text = false;
+                this.parseWidgets();
+            }
+            else {
+                this.disable_rich_text = true;
+                var cursorPos = this.editor.getCursor();
+                this.editor.setValue(this.editor.getValue());
+                this.editor.setCursor(cursorPos);
+            }
         });
 
         // drag events for chapters
@@ -256,17 +271,18 @@ export class CmComponent implements AfterViewInit, OnChanges {
         this.documentService.sendDiff({ newchapter: true }, this.current_chapter);
     }
 
-    parseWidgets(cm) {
+    parseWidgets() {
         // stop if new snappet, still a dirty fix
         if(this.inside_new_snappet) return;
+        if(this.disable_rich_text) return;
 
         // ... get cursor pos and reset the document before parsing new widgets.
         var cursorPos = this.editor.getCursor();
         this.editor.setValue(this.editor.getValue());
 
         var parseLines: string[] = [];
-        for (var i = 0; i < cm.lineCount(); i++) {
-            var text: string = cm.getLine(i);
+        for (var i = 0; i < this.editor.lineCount(); i++) {
+            var text: string = this.editor.getLine(i);
             parseLines.push(text);
         }
         var widgetMap = [];
@@ -306,7 +322,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
     public onKeyPressEvent(cm, e) {
         if (e.ctrlKey) {
             if (e.code === "KeyJ") {
-                new BoldWidget(this.editor, null, false);
+                new GeneralSpanWidget(this.editor, null, "bold-widget", "#b");
             }
         }
     }
@@ -324,7 +340,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
                     this.inside_new_snappet = true;
                     setTimeout( () => {
                         this.inside_new_snappet = false
-                        this.parseWidgets(this.editor);
+                        this.parseWidgets();
                         // this timer should not just be set static like this.. currently u will have 8 seconds to insert into the widget
                     }, 8000);
                     return CodeMirror.showHint(cm, CodeMirror.ternHint, { async: true });
