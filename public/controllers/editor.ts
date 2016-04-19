@@ -247,10 +247,10 @@ export class EditorController implements AfterViewInit {
             var total = "<html><body><head>";
             // should probably not add the whole stylesheet? make a simpler one just for parsing?
             total += "<base href='" + document.location.origin + "' />";
-            total += '<link rel="stylesheet" type="text/css" href="stylesheets/style.css">';
-            total += "<title>test</title></head><div id='content'>";
+            total += '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
+            total += "<title>test</title></head><div id='content'><div id='innercontent'";
             total += parsedHTML;
-            total += "</div></body></html>";
+            total += "</div></div></body></html>";
             // var d2 =
             var w = window.open("", "_blank", "");
             var doc = w.document;
@@ -261,7 +261,7 @@ export class EditorController implements AfterViewInit {
             for (var key in this.document.style) {
                 var value = this.document.style[key];
                 console.log(value);
-                doc.getElementById('content').style[key] = value;
+                doc.getElementById('innercontent').style[key] = value;
             }
             doc.close();
 
