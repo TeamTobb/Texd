@@ -334,7 +334,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 "context": "hashscript",
                 "templates": snappets
             }
-            CodeMirror.templatesHint.addTemplates(templates);
+            CodeMirror.templatesHint.replaceTemplates(templates);
             CodeMirror.commands.autocomplete = (cm) => {
                 CodeMirror.showHint(cm, (cm) => {
                     this.inside_new_snappet = true;
