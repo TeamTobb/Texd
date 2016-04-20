@@ -39,7 +39,7 @@ export class EditorController implements AfterViewInit {
     private sizePicker = [];
     private choosenFont: string;
     private choosenSize: string;
-    private cleanDiv; 
+    private cleanDiv;
 
     private globalListenFunc: Function;
 
@@ -134,11 +134,7 @@ export class EditorController implements AfterViewInit {
         });
 
         $("#updatePreview").click(() => {
-            this.documentService.updateLines();
-            this.documentService.parseChapter((parsedHTML) => {
-                console.log("done parsing.. inserting!");
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-            })
+            this.parsePreviewFrame();
         });
 
         var sidebarHidden = false;
@@ -181,8 +177,8 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
-        
-        
+
+
     }
 
     ngOnDestroy() {
@@ -205,7 +201,6 @@ export class EditorController implements AfterViewInit {
         keyMap[80] = () => {
             console.log("ctrl+p");
             this.parsePreviewFrame();
-
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
@@ -335,21 +330,20 @@ export class EditorController implements AfterViewInit {
     // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
 
     parsePreviewFrame() {
-        this.documentService.updateLines();
         this.documentService.parseChapter((parsedHTML) => {
             this.cleanDiv = $(".widget-templates .cleanDiv").clone();
-            
+
             document.getElementById('rightInContainerForEditor').replaceChild(this.cleanDiv[0], document.getElementById('previewframe'));
-            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')            
+            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')
             newElement[0].innerHTML = parsedHTML;
             newElement[0].id = 'previewframe'
-            
+
             this.document.style["fontFamily"] = this.choosenFont;
             this.document.style["fontSize"] = this.choosenSize;
             this.documentService.changeStyle(this.document.id, this.document.style);
 
             for (var key in this.document.style) {
-                var value = this.document.style[key];                
+                var value = this.document.style[key];
                 document.getElementById('previewframe').style[key] = value;
             }
         })

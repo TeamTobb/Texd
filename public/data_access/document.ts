@@ -82,19 +82,6 @@ export class DocumentService {
 
     }
 
-    public updateLines() {
-        if (this.cm == null) return;
-        var tempLines: string[] = [];
-        for (var i = 0; i < this.cm.lineCount(); i++) {
-            var text: string = this.cm.getLine(i);
-            tempLines.push(text);
-        }
-        this._document.chapters[this.currentChapter].lines = [];
-        for (var l in tempLines) {
-            this._document.chapters[this.currentChapter].lines.push(new Line(tempLines[l], []));
-        }
-    }
-
     public parseDocument(callback: (parsedHTML: string) => void) {
         if (this._textParser == null || this._jsonParser == null) callback(null);
         this.getDocument2(this.document.id, (tempDoc: Document) => {
@@ -130,12 +117,21 @@ export class DocumentService {
         });
     }
 
+    public getCurrentChapterLines() : Line[] {
+        if (this.cm == null) return;
+        var lineList : Line[] = [];
+        for (var i = 0; i < this.cm.lineCount(); i++) {
+            var text: string = this.cm.getLine(i);
+            lineList.push(new Line(text, []));
+        }
+        return lineList;
+    }
+
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
-            var lines: Line[] = this.document.chapters[this.currentChapter].lines;
+            var lines: Line[] = this.getCurrentChapterLines();
             var parsedJSON = this._textParser.getParsedJSON(lines);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-            // this.document.style
             callback(parsedHTML);
         }
     }
@@ -205,10 +201,10 @@ export class DocumentService {
             callback(parsedHTML)
         })
     }
-    
+
      public getFilesInDir(documentId, callback: (files: any) => void) {
          console.log("2 OK"+documentId)
-        this.http.get('./getFilesInDir/'+documentId).map((res: Response) => res.json()).subscribe(res => {            
+        this.http.get('./getFilesInDir/'+documentId).map((res: Response) => res.json()).subscribe(res => {
             console.log("we got files from dir: " + JSON.stringify(res, null, 2))
             callback(res);
         })
