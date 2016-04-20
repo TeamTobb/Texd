@@ -48,18 +48,18 @@ export class ParseMap {
                             if (temp_tag == "value") {
                                 html += value;
                             } else if (legalAttributes[temp_tag]) {
-                                console.log("@" + temp_tag);
-                                console.log(attributeList);
+                                // console.log("@" + temp_tag);
+                                // console.log(attributeList);
                                 if (attributeList["@" + temp_tag]) {
-                                    console.log("works??");
+                                    // console.log("works??");
                                     html += attributeList["@" + temp_tag];
                                 } else {
                                     // attribute is not present in the raw paragraph
-                                    console.log("error2");
+                                    console.log("error - attribute is not present in the raw paragraph");
                                 }
                             } else {
                                 // do some error handling
-                                console.log("error");
+                                console.log("error - in parseMap.generateHtmlWithAttr - not valid attribute or value (?)");
                             }
                             temp_tag = "";
                             html += testraw[char];
