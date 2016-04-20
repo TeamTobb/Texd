@@ -59,14 +59,17 @@ export class DocumentService {
                 }
             }
         })
-        this.getPlugins();
+        this.getPlugins(() => {
+            console.log("Plugins loaded");
+        });
     }
 
-    public getPlugins() {
+    public getPlugins(callback) {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
+            callback();
         });
     }
 
@@ -198,11 +201,11 @@ export class DocumentService {
     public getDocuments(callback: (documents: Document[]) => void) {
         var documents: Document[] = Array<Document>();
         this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
-            console.log(res);   
+            console.log(res);
             for (var doc in res) {
                 documents.push(new Document([], [], [], [], [], res[doc]))
-            }     
-            callback(documents);                     
+            }
+            callback(documents);
         });
     }
 

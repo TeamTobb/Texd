@@ -1,0 +1,21 @@
+<div class="settingsPagerightPlugin">
+    <div id="pluginpageheader">
+        <h1>Available plugins</h1>
+    </div>
+    <div id="scrollableviewplugin">
+        <div id="pluginTableWrapper">
+            <table id="pluginpagetable">
+                <tr class="pluginpagetabletr1">
+                    <td class="pluginpagetabletd1">Tag</td>
+                    <td class="pluginpagetabletd2">Description</td>
+                </tr>
+                <tr class="pluginpagetabletr2" *ngFor="#item of items; #i = index">
+                    <td class="pluginpagetabletd1">#{{item.tagname}}</td>
+                    <td class="pluginpagetabletd2">{{item.description}}</td>
+                </tr>
+            </table>
+            <!-- current dirty fix to prevent last item to get below view -->
+            <br><br>
+        </div>
+    </div>
+</div>
