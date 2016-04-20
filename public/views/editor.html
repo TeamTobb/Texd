@@ -18,7 +18,7 @@
                 <button id="insertmath">√π</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Upload Image</button>
-                <button id="uploadPluginButton" style="">Upload Plugin</button>
+                <button id="uploadPluginButton" style="" (click)="showUploadPlugin(true)">Upload Plugin</button>
                 <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
 
                 <select id="selectFont">
@@ -40,7 +40,7 @@
     </div>
     <div class="editorContainer">
         <cmcomponent id="cmcomponent" [document]=document [current_chapter]=current_chapter [lines]=document.chapters[current_chapter].lines
-        (emitChangeChapter)="changeChapter($event)"></cmcomponent>
+            (emitChangeChapter)="changeChapter($event)"></cmcomponent>
     </div>
 </div>
 
@@ -65,8 +65,10 @@
 <section *ngIf="showUploadDiv">
     <div class="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close</button>
-        <fileuploader [docId]="document" >
+        <fileuploader [docId]="document">
         </fileuploader>
 
     </div>
 </section>
+<pluginuploader>
+</pluginuploader>

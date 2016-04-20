@@ -14,6 +14,7 @@ var mongoose = require('mongoose');
 var http = require('http');
 var WebSocket = require('ws');
 var publicIp = require('public-ip');
+var fs = require('fs');
 
 import Diff = require('./server/domain/diff');
 
@@ -82,12 +83,10 @@ var storage = multer.diskStorage({
             if (element == "Referer") {
                 documentID = req.rawHeaders[index + 1].slice(req.rawHeaders[index + 1].length - 24, req.rawHeaders[index + 1].length);
                 console.log("Doc ID: " + documentID)
-
             }
         }
         var documentDir = './public/uploads/document/' + documentID.trim()// '/photos'
         var photoDirForDocId = documentDir + '/photos'
-        var fs = require('fs');
         if (!fs.existsSync(documentDir)) {
             fs.mkdirSync(documentDir);
             fs.mkdirSync(photoDirForDocId);
@@ -127,6 +126,23 @@ app.post('/uploadFile', uploadRoutes.upload);
 //Routes
 app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
+app.post('/plugins', (req, res) => {
+    var filename = req.body.plugin.pluginname;
+    var body = req.body.plugin.pluginbody; 
+    
+    console.log(JSON.stringify(filename, null, 2));
+    console.log(JSON.stringify(body, null, 2));
+
+    fs.writeFile("./server/plugins/" + filename + ".json" , JSON.stringify(body, null, 2), (err) => {
+        if (err) {
+            res.jsonp({success: false})
+        } else {
+            console.log("The file was saved!");
+            broadcast(JSON.stringify({newplugin: {name: filename, body: body}}))
+            res.jsonp({success: true})
+        }
+    });
+})
 app.get('/snappets', snappetRoutes.read);
 app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {

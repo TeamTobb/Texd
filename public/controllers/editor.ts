@@ -12,6 +12,7 @@ import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
 import {FileUploaderClass} from './fileUpLoader.ts'
+import {PluginUploader} from './pluginUploader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
@@ -25,7 +26,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES, PluginUploader]
 })
 
 export class EditorController implements AfterViewInit {
@@ -43,6 +44,7 @@ export class EditorController implements AfterViewInit {
     private globalListenFunc: Function;
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
+    @ViewChild(PluginUploader) pluginuploader: PluginUploader; 
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
@@ -294,6 +296,10 @@ export class EditorController implements AfterViewInit {
 
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
+    }
+    
+    public showUploadPlugin(){
+        this.pluginuploader.openModal();  
     }
 
     goToSettings() {

@@ -81,9 +81,29 @@ body {
 
 #editor_div {
     position: relative;
-    height: 100%;
+    height: 100%; 
     width: 100%;
     flex: 1 1 auto;
+}
+
+.modal-content{
+    width: 100%;
+    height: 100%;
+    margin-left: auto; 
+    margin-right: auto;
+}
+
+.plugin-uploader-container{
+    margin-left: auto; 
+    margin-right: auto;
+    /*height: auto;*/
+    /*width: auto;*/
+    width: 100%;
+    height: 60%;
+}
+
+.modal-lg {
+    height: 500px;
 }
 
 #chaptersContainer {
@@ -284,6 +304,19 @@ body {
     right: 0;
 }
 
+.uploadPluginDiv{
+    z-index: 999;
+    background-color: lightsteelblue;
+    width: 80%; 
+    height: 80%;
+    position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
 
 .photosInUploadDiv{
     width: 100%; 
