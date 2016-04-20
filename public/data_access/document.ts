@@ -39,18 +39,16 @@ export class DocumentService {
         } else {
             this._senderId = "" + Math.random();
         }
-        this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
-            this.parseMap.generateParseMap(res);
-            this._textParser = new Parser(this.parseMap.parseMap);
-            this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
-        });
 
 
         this.http.get('./wsip').map((res: Response) => res.json()).subscribe(res => {
             this._socket = new WebSocket('ws://' + res.ip + ':3001');
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
-                if (parsed.senderId != this._senderId) {
+
+                if (parsed.newplugin) {
+                    this.getPlugins();
+                } else if (parsed.senderId != this._senderId) {
                     if (parsed.documentId == this.document.id) {
                         this.diff = parsed;
                         this._todosObserver.next(this.diff);
@@ -61,12 +59,29 @@ export class DocumentService {
                 }
             }
         })
+        this.getPlugins();
+    }
 
+    public getPlugins() {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
             this._textParser = new Parser(this.parseMap.parseMap);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
         });
+    }
+
+    public postPlugin(plugin, callback) {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        this.http.post('./plugins', JSON.stringify({ plugin: plugin }), { headers: headers }).map((res: Response) => res.json()).subscribe(
+            (res) => {
+                if (res.success == true) {
+                    this.getPlugins();
+                    callback();
+                }
+            }, (err) => {
+                console.log(err);
+            })
     }
 
     public changeChapters(from, to, chapterIndex) {
@@ -141,7 +156,7 @@ export class DocumentService {
     }
 
     public sendDiff(diff: any, chapterIndex: any) {
-        if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN){
+        if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
             var color = localStorage.getItem('id_color')
             if (color != null) {
                 diff.color = color;
@@ -205,10 +220,10 @@ export class DocumentService {
             callback(parsedHTML)
         })
     }
-    
-     public getFilesInDir(documentId, callback: (files: any) => void) {
-         console.log("2 OK"+documentId)
-        this.http.get('./getFilesInDir/'+documentId).map((res: Response) => res.json()).subscribe(res => {            
+
+    public getFilesInDir(documentId, callback: (files: any) => void) {
+        console.log("2 OK" + documentId)
+        this.http.get('./getFilesInDir/' + documentId).map((res: Response) => res.json()).subscribe(res => {
             console.log("we got files from dir: " + JSON.stringify(res, null, 2))
             callback(res);
         })
