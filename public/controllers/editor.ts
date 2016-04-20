@@ -226,6 +226,18 @@ export class EditorController implements AfterViewInit {
             this.parseWholeDocument();
         }
 
+        // ctrl + S ? other browsers?
+        if ($event.which == 115 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
+        }
+
+        // ctrl / CMD + S (firefox + chrome)
+        if ($event.which == 83 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
+        }
+
         if ($event.ctrlKey) {
             if (keyMap[$event.which]) {
                 $event.preventDefault();
@@ -276,7 +288,7 @@ export class EditorController implements AfterViewInit {
 
             doc2.output("dataurlnewwindow");
 
-            doc2.focus();
+            // doc2.focus();
 
             // done testing
 
@@ -293,6 +305,7 @@ export class EditorController implements AfterViewInit {
     }
 
     uploadClickedImage(file) {
+
         this.cmcomponent.insertImageWidget(file);
         this.showUploadDivToggle(false);
     }
