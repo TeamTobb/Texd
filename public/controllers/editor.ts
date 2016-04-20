@@ -11,8 +11,8 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
-import {FileUploaderClass} from './fileUpLoader.ts'
-import {PluginUploader} from './pluginUploader.ts'
+import {FileUploaderClass} from './fileUploader.ts'
+import {PluginUploader} from './pluginuploader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';

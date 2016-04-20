@@ -1,6 +1,17 @@
 /// <reference path="./typings/tsd.d.ts"/>​
 
 import express = require('express')
+var fs = require('fs');
+var https = require('https');
+var debug = require('debug')('SplineWeb:server');
+
+var key = fs.readFileSync('./key.pem');
+var cert = fs.readFileSync('./cert.pem')
+var https_options = {
+    key: key,
+    cert: cert
+};
+
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser');
 var jwt = require('jwt-simple')
@@ -14,7 +25,6 @@ var mongoose = require('mongoose');
 var http = require('http');
 var WebSocket = require('ws');
 var publicIp = require('public-ip');
-var fs = require('fs');
 
 import Diff = require('./server/domain/diff');
 
@@ -128,18 +138,18 @@ app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
 app.post('/plugins', (req, res) => {
     var filename = req.body.plugin.pluginname;
-    var body = req.body.plugin.pluginbody; 
-    
+    var body = req.body.plugin.pluginbody;
+
     console.log(JSON.stringify(filename, null, 2));
     console.log(JSON.stringify(body, null, 2));
 
-    fs.writeFile("./server/plugins/" + filename + ".json" , JSON.stringify(body, null, 2), (err) => {
+    fs.writeFile("./server/plugins/" + filename + ".json", JSON.stringify(body, null, 2), (err) => {
         if (err) {
-            res.jsonp({success: false})
+            res.jsonp({ success: false })
         } else {
             console.log("The file was saved!");
-            broadcast(JSON.stringify({newplugin: {name: filename, body: body}}))
-            res.jsonp({success: true})
+            broadcast(JSON.stringify({ newplugin: { name: filename, body: body } }))
+            res.jsonp({ success: true })
         }
     });
 })
@@ -168,6 +178,11 @@ app.get('/*', indexroutes.index);
 app.listen(httpPort, function () {
     console.log("Demo Express server listening on port %d", httpPort);
 });
+
+
+// var server = https.createServer(https_options, app).listen(httpPort, function(){
+    
+// }); 
 
 export var App = app;
 
