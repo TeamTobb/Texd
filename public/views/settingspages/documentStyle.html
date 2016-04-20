@@ -7,8 +7,7 @@
         <h2> Document style for: {{title}}</h2>
         <br>
         <button type="button" (click)="updateStyle()">Update style</button>
-        <a href="/docs/{{documentId}}" type="button">Go back to document</a>
-        
+        <a href="/docs/{{documentId}}" type="button">Go back to document</a>        
     </section>
 <br>
 
@@ -18,9 +17,7 @@
 
     <div class="scrollableview">
         <section *ngIf="noDocumentId">
-            <ul>
-                
-                
+            <ul>                
                 <li class="selectDocumentInSettings" id="select"  *ngFor="#doc of docs; #i = index">
                     <button style="width:20%;" (click)="setDocumentId(doc.id,i)" >{{doc.title}}</button>
                 </li>

@@ -10,7 +10,7 @@ export class SettingsPage {
     public test: string = "";
     public current_chapter = 0;
     private chapters: string[] = ["setting 0", "setting 1"];
-    private chaptersText: string[] = ["Not jet implemented", "Not jet implemented"];
+    private chaptersText: string[] = ["", "Not jet implemented"];
 
     constructor(private _router: Router, private _routeParams: RouteParams) {
         let id = + parseInt(this._routeParams.get('id'));

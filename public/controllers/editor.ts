@@ -39,6 +39,7 @@ export class EditorController implements AfterViewInit {
     private sizePicker = [];
     private choosenFont: string;
     private choosenSize: string;
+    private cleanDiv; 
 
     private globalListenFunc: Function;
 
@@ -180,6 +181,8 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
+        
+        
     }
 
     ngOnDestroy() {
@@ -201,18 +204,7 @@ export class EditorController implements AfterViewInit {
         var keyMap = {};
         keyMap[80] = () => {
             console.log("ctrl+p");
-            // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
-            this.documentService.updateLines();
-            this.documentService.parseChapter((parsedHTML) => {
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-                this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize;
-                this.documentService.changeStyle(this.document.id, this.document.style);
-                for (var key in this.document.style) {
-                    var value = this.document.style[key];
-                    document.getElementById('previewframe').style[key] = value;
-                }
-            })
+            this.parsePreviewFrame();
 
         }
         keyMap[67] = () => {
@@ -299,10 +291,10 @@ export class EditorController implements AfterViewInit {
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
     }
-    
-    uploadClickedImage(file){
+
+    uploadClickedImage(file) {
         this.cmcomponent.insertImageWidget(file);
-        this.showUploadDivToggle(false);        
+        this.showUploadDivToggle(false);
     }
 
     setFontPickerAndSizePicker() {
@@ -324,4 +316,31 @@ export class EditorController implements AfterViewInit {
             this.sizePicker.push(index)
         }
     }
+
+
+
+    // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
+
+    parsePreviewFrame() {
+        this.documentService.updateLines();
+        this.documentService.parseChapter((parsedHTML) => {
+            this.cleanDiv = $(".widget-templates .cleanDiv").clone();
+            
+            document.getElementById('rightInContainerForEditor').replaceChild(this.cleanDiv[0], document.getElementById('previewframe'));
+            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')            
+            newElement[0].innerHTML = parsedHTML;
+            newElement[0].id = 'previewframe'
+            
+            this.document.style["fontFamily"] = this.choosenFont;
+            this.document.style["fontSize"] = this.choosenSize;
+            this.documentService.changeStyle(this.document.id, this.document.style);
+
+            for (var key in this.document.style) {
+                var value = this.document.style[key];                
+                document.getElementById('previewframe').style[key] = value;
+            }
+        })
+    }
+
+
 }
