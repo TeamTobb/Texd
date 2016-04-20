@@ -61,6 +61,21 @@ export class PluginUploadModal implements ICustomModalComponent, AfterViewInit {
             autoIndent: true,
             autoCloseBrackets: true
         })
+        // this.editor.
+        // "tagname": "b",
+        // "html": "<b>$value</b>",
+        // "attr": [],
+        // "optattr": [],
+        // "description": "Bold text"
+        var arr = [];
+        arr.push('{');
+        arr.push('  "tagname" : "",');
+        arr.push('  "html" : "",');
+        arr.push('  "attr" : [],');
+        arr.push('  "optattr" : [],');
+        arr.push('  "description" : ""');
+        arr.push('}');
+        this.editor.getDoc().replaceRange(arr, { line: 0, ch: 0 }, { line: this.editor.getDoc().lastLine(), ch: 1000 });
     }
 
     onKeyUp(value) {
@@ -72,8 +87,10 @@ export class PluginUploadModal implements ICustomModalComponent, AfterViewInit {
         var pluginbody = {};
         try {
             pluginbody = JSON.parse(this.editor.getValue());
-
-            if (pluginbody["tagname"] && pluginbody["html"] && pluginbody["attr"] && pluginbody["optattr"]) {
+            console.log(pluginbody);
+            console.log(pluginbody.tagname);
+            console.log(pluginbody["tagname"]);
+            if (pluginbody["tagname"] && pluginbody["html"] && pluginbody["attr"] && pluginbody["optattr"] && pluginbody["description"] ) {
                 this.documentService.postPlugin({ pluginname: this.pluginname, pluginbody: pluginbody }, () => {
                     this.dialog.close();
                     this.modal.alert()
