@@ -40,6 +40,7 @@ export class EditorController implements AfterViewInit {
     private sizePicker = [];
     private choosenFont: string;
     private choosenSize: string;
+    private cleanDiv; 
 
     private globalListenFunc: Function;
 
@@ -182,6 +183,8 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
+        
+        
     }
 
     ngOnDestroy() {
@@ -203,18 +206,7 @@ export class EditorController implements AfterViewInit {
         var keyMap = {};
         keyMap[80] = () => {
             console.log("ctrl+p");
-            // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
-            this.documentService.updateLines();
-            this.documentService.parseChapter((parsedHTML) => {
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-                this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize;
-                this.documentService.changeStyle(this.document.id, this.document.style);
-                for (var key in this.document.style) {
-                    var value = this.document.style[key];
-                    document.getElementById('previewframe').style[key] = value;
-                }
-            })
+            this.parsePreviewFrame();
 
         }
         keyMap[67] = () => {
@@ -236,6 +228,18 @@ export class EditorController implements AfterViewInit {
             this.parseWholeDocument();
         }
 
+        // ctrl + S ? other browsers?
+        if ($event.which == 115 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
+        }
+
+        // ctrl / CMD + S (firefox + chrome)
+        if ($event.which == 83 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
+        }
+
         if ($event.ctrlKey) {
             if (keyMap[$event.which]) {
                 $event.preventDefault();
@@ -249,10 +253,10 @@ export class EditorController implements AfterViewInit {
             var total = "<html><body><head>";
             // should probably not add the whole stylesheet? make a simpler one just for parsing?
             total += "<base href='" + document.location.origin + "' />";
-            total += '<link rel="stylesheet" type="text/css" href="stylesheets/style.css">';
-            total += "<title>test</title></head><div id='content'>";
+            total += '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
+            total += "<title>test</title></head><div id='content'><div id='innercontent'";
             total += parsedHTML;
-            total += "</div></body></html>";
+            total += "</div></div></body></html>";
             // var d2 =
             var w = window.open("", "_blank", "");
             var doc = w.document;
@@ -263,7 +267,7 @@ export class EditorController implements AfterViewInit {
             for (var key in this.document.style) {
                 var value = this.document.style[key];
                 console.log(value);
-                doc.getElementById('content').style[key] = value;
+                doc.getElementById('innercontent').style[key] = value;
             }
             doc.close();
 
@@ -281,12 +285,12 @@ export class EditorController implements AfterViewInit {
                 15,
                 15,
                 {
-                  'width': 180
+                    'width': 180
                 });
 
             doc2.output("dataurlnewwindow");
 
-            doc2.focus();
+            // doc2.focus();
 
             // done testing
 
@@ -304,6 +308,12 @@ export class EditorController implements AfterViewInit {
 
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
+    }
+
+    uploadClickedImage(file) {
+
+        this.cmcomponent.insertImageWidget(file);
+        this.showUploadDivToggle(false);
     }
 
     setFontPickerAndSizePicker() {
@@ -325,4 +335,31 @@ export class EditorController implements AfterViewInit {
             this.sizePicker.push(index)
         }
     }
+
+
+
+    // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
+
+    parsePreviewFrame() {
+        this.documentService.updateLines();
+        this.documentService.parseChapter((parsedHTML) => {
+            this.cleanDiv = $(".widget-templates .cleanDiv").clone();
+            
+            document.getElementById('rightInContainerForEditor').replaceChild(this.cleanDiv[0], document.getElementById('previewframe'));
+            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')            
+            newElement[0].innerHTML = parsedHTML;
+            newElement[0].id = 'previewframe'
+            
+            this.document.style["fontFamily"] = this.choosenFont;
+            this.document.style["fontSize"] = this.choosenSize;
+            this.documentService.changeStyle(this.document.id, this.document.style);
+
+            for (var key in this.document.style) {
+                var value = this.document.style[key];                
+                document.getElementById('previewframe').style[key] = value;
+            }
+        })
+    }
+
+
 }

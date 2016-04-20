@@ -7,6 +7,7 @@
         <div id="buttonsContainer">
             <span id="buttonsContainerLeft">
                 <button id="sidebarbutton">></button>
+                R <input type="checkbox" id="richTextButton">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <button id="insertheader" style="font-style: bold">Header</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -17,8 +18,10 @@
                 <button id="inserttable">[][]</button>
                 <button id="insertmath">√π</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Upload Image</button>
-                <button id="uploadPluginButton" style="" (click)="showUploadPlugin(true)">Upload Plugin</button>
+
+                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Images</button>
+                <button id="uploadPluginButton" (click)="showUploadPlugin(true)">Upload Plugin</button>
+
                 <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
 
                 <select id="selectFont">
@@ -47,6 +50,7 @@
 <!-- widgets -->
 <div class="widget-templates">
     <span class="general-span-widget"></span>
+    <div class="cleanDiv"></div>
     <!-- <span class="bold-widget"></span> -->
     <!-- <span contenteditable="true" class="italic-widget"></span> -->
     <!-- <span contenteditable="true" class="underline-widget"></span> -->
@@ -64,10 +68,9 @@
 
 <section *ngIf="showUploadDiv">
     <div class="uploadDiv">
-        <button (click)="showUploadDivToggle(false)"> Close</button>
-        <fileuploader [docId]="document">
+        <button (click)="showUploadDivToggle(false)"> Close </button>
+        <fileuploader [docId]="document" (clickedImage)="uploadClickedImage($event)">
         </fileuploader>
-
     </div>
 </section>
 <pluginuploader>

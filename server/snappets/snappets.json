@@ -2,7 +2,7 @@
     {
         "name": "img",
         "description": "insert image",
-        "template": "#img \n\t@src ${docs/test.png} @width ${width} @height ${height} \n # \n ${cursor}"
+        "template": "#img @src \"${docs/test.png}\" @width \"${100%}\" @height \"${100%}\" # \n ${cursor}"
     }, 
     {
         "name": "h1", 

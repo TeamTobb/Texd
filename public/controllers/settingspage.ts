@@ -10,11 +10,10 @@ export class SettingsPage {
     public test: string = "";
     public current_chapter = 0;
     private chapters: string[] = ["setting 0", "setting 1"];
-    private chaptersText: string[] = ["", "text from chapter 1"];
+    private chaptersText: string[] = ["", "Not jet implemented"];
 
     constructor(private _router: Router, private _routeParams: RouteParams) {
         let id = + parseInt(this._routeParams.get('id'));
-        console.log("test");
         if (id) {
             console.log("chapter id: " + id);
             if (this.chapters[id]) {

@@ -1,6 +1,7 @@
-import {Component, NgZone, Input, AfterViewInit} from 'angular2/core';
+import {Component, NgZone, Input, Output, AfterViewInit} from 'angular2/core';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 import {DocumentService} from '../data_access/document.ts';
+import {EventEmitter} from "angular2/src/facade/async";
 
 //import {UPLOAD_DIRECTIVES} from '../utils/ng2-uploader/ng2-uploader.ts';
 
@@ -30,6 +31,8 @@ export class FileUploaderClass implements AfterViewInit {
     public dirFiles = [];
     public tests = [];
     @Input() docId;
+    @Output() clickedImage: EventEmitter<any> = new EventEmitter();
+    public imageToUploadToEditor;
 
     constructor(private documentService: DocumentService) {
         this.zone = new NgZone({ enableLongStackTrace: false });
@@ -52,11 +55,12 @@ export class FileUploaderClass implements AfterViewInit {
                 });
             }
         });
-
-
-
     }
 
+    photoClicked(file) {
+        console.log("clicked: " +file)
+        this.clickedImage.emit(file)
+    }
 
 
     handleMultipleUpload(data): void {
@@ -65,6 +69,11 @@ export class FileUploaderClass implements AfterViewInit {
         if (index === -1) {
             if (!data.error) {
                 this.selectedFileIsUploaded = true;
+                console.log(data);
+                setTimeout(() => {
+                    this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + data.originalName);
+                }, 1000)
+
             }
             this.multipleResp.push(data);
         }

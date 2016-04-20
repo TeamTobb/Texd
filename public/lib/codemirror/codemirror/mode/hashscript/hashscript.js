@@ -238,6 +238,7 @@ CodeMirror.defineMode("hashscript", function(config, parserConfig) {
   }
 
   function parseJS(state, style, type, content, stream) {
+    return "none";
     var cc = state.cc;
     // Communicate our context to the combinators.
     // (Less wasteful than consing up a hundred closures on every call.)
