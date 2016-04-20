@@ -5,6 +5,8 @@ import {EventEmitter} from "angular2/src/facade/async";
 
 import {FORM_PROVIDERS, FormBuilder, Validators} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
+import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
+
 
 import {DocumentService} from '../../data_access/document.ts';
 
@@ -13,12 +15,13 @@ import {DocumentService} from '../../data_access/document.ts';
 @Component({
     selector: 'documentStyle',
     providers: [],
-    templateUrl: 'views/settingspages/documentStyle.html'
+    templateUrl: 'views/settingspages/documentStyle.html',
+    directives: [Alert]
 })
 
 export class DocumentStyle {
+    public alerts: Array<Object> = [];
     styleForm: any;
-
     documentId: string;
     title: string = "loading";
     styleInput = {};
@@ -54,9 +57,9 @@ export class DocumentStyle {
                 }
                 this.styleInput = newStyleInput;
             })
-        }
+        }        
     }
-    createStyleInput() {       
+    createStyleInput() {
         this.styleItems.push("backgroundColor");
         this.styleItems.push("backgroundImage");
         this.styleItems.push("backgroundPosition");
@@ -142,6 +145,11 @@ export class DocumentStyle {
             }
         }
         this.documentService.changeStyle(this.documentId, newStyleInput);
+        this.alerts.push({
+            msg: 'Successfully saved',
+            type: 'success',
+            closeable: 'true'
+        })
     }
 
     setDocumentId(docId, docNumber) {

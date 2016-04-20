@@ -19,16 +19,16 @@ export class SettingsComponent implements AfterViewInit {
     private settingTypes: string[] = ["Style", "User", "Keymap"];
     private active = 0;
     constructor(private _router: Router) {
+        
     }
     ngAfterViewInit() {
         if (this.active == 0) {
-            //this.setSelectedSettingsTab(0)
+            this.changeChapter(0)
+            this.setSelectedSettingsTab(0)
         }       
     }
 
     public changeChapter(settingType: number) {
-        console.log("changing settingType to: " + settingType);
-
         switch (settingType) {
             case 0:
                 this.active = 0;
