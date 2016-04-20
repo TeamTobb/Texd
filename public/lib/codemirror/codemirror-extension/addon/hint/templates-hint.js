@@ -400,4 +400,16 @@
     }
   }
 
+  // test with replacing all templates
+   CodeMirror.templatesHint.replaceTemplates = function(templates) {
+    var context = templates.context;
+    if (context) {
+      var list = [];
+      templatesMap[context] = list;
+      templates.templates.forEach(function(template) {
+        list.push(new Template(template));
+      });
+    }
+  }
+
 })();

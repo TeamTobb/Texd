@@ -1,8 +1,6 @@
-<div>
-    child route coming below
+<div id="settingsContainer">
+    <div class="settingsLeftTable">
+        <div class="settingsLeftTableItem" id="settingType{{i}}" *ngFor="#settingType of settingTypes; #i = index" (click)="changeChapter(i)">{{settingType}}</div>
+    </div>
+    <router-outlet></router-outlet>   
 </div>
-<ul>
-    <li id="chapterLi" *ngFor="#settingType of settingTypes; #i = index" (click)="changeChapter(i)">{{settingType}}</li>
-</ul>
-<router-outlet></router-outlet>
-<br> 

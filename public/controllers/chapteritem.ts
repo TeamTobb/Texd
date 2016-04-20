@@ -8,8 +8,8 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 
 
 @Component({
-  selector: 'chapteritem',
-  templateUrl: 'views/components/chapteritem.html'
+    selector: 'chapteritem',
+    templateUrl: 'views/components/chapteritem.html'
 
 })
 export class ChapterItem implements OnChanges {
@@ -17,27 +17,35 @@ export class ChapterItem implements OnChanges {
     @Input() chapterNr: string;
     @Input() chapterId: string;
     @Input() documentId: string;
-    @Output() toBeDeleted : EventEmitter<any> = new EventEmitter();
+    @Output() toBeDeleted: EventEmitter<any> = new EventEmitter();
 
-    constructor(private documentService: DocumentService) {}
+    constructor(private documentService: DocumentService) { }
     // TODO Make alert, sure you want to delete this chapter?
-    delete(event, nr: any){
+    delete(event, nr: any) {
         event.stopPropagation();
         nr = this.chapterNr;
         this.toBeDeleted.emit(nr)
     }
 
-    rename($event, chapterId, documentId){
+    rename($event, chapterId, documentId) {
         var newchapterName: string = $event.target.innerHTML
-        this.documentService.sendDiff({newchapterName}, chapterId)
+        this.documentService.sendDiff({ newchapterName }, this.chapterNr)
         $event.target.setAttribute("contenteditable", "false");
     }
 
-    ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-        console.log("Something has Changed in chapterItem")
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+        // TODO: Find a better way to set the first item as selected
+        if (changes["chapterNr"] && this.chapterNr == 0+"") {
+            var selectedChapter = document.getElementById('chapter_item_' + this.chapterNr);
+            var otherChapters = document.getElementsByClassName('droptarget');
+            for (var i = 0; i < otherChapters.length; i++) {
+                otherChapters[i].className = "droptarget";
+            }
+            selectedChapter.className = "droptarget active";
+        }
     }
 
-    ondblclickChapter($event){
+    ondblclickChapter($event) {
         console.log("ondblclickChapter")
         $event.target.setAttribute("contenteditable", "true");
     }

@@ -14,12 +14,12 @@ export class DocumentService {
     documentIsUpdated = {};
 
     constructor() {
-       documentRoutes.getAllDocuments((documents) => {
+        documentRoutes.getAllDocuments((documents) => {
             for (var document of documents) {
                 this.documents[document["id"]] = document;
             }
             console.log(JSON.stringify(this.documents, null, 2));
-            this.documentIsUpdated[document["id"]] = false           
+            this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
@@ -44,16 +44,27 @@ export class DocumentService {
     getChapter(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             var documentid: string = req.params.documentid;
-            var chapterid: string = req.params.chapterid;
-            for (var chapter of this.documents[documentid]._chapters) {
-                if (chapter._id == chapterid) {
-                    res.jsonp(chapter);
-                    return;
-                }
-            }
+            var chapterIndex = req.params.chapterIndex;
+            var chapter = this.documents[documentid]._chapters[chapterIndex]
+            res.jsonp(this.documents[documentid]._chapters[chapterIndex]);
         }
     }
-    
+
+
+    getDocument(req: express.Request, res: express.Response) {
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.id;
+            res.jsonp(this.documents[documentid]);
+            console.log("Fant doc: " + req.params.id);
+        }
+    }
+    getDocuments(req: express.Request, res: express.Response) {
+        if (this.documents !== undefined) {
+            res.jsonp(this.documents);
+            console.log("Fant alle docs: ");
+        }
+    }   
+
     updateDocument(diff2) {
         var diff = JSON.parse(diff2);
         this.documentIsUpdated[diff.documentId] = true;
@@ -63,10 +74,14 @@ export class DocumentService {
             console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
-        }        
-        else if (diff.documentStyle){
-            document._style = diff.documentStyle;            
-        }        
+        }
+        if (diff.newtitle) {
+            document._title = diff.newtitle;
+        }
+
+        else if (diff.documentStyle) {
+            document._style = diff.documentStyle;
+        }
         else if (diff.deleteChapter) {
             console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
@@ -74,113 +89,119 @@ export class DocumentService {
 
         else if (diff.newchapterName) {
             console.log("Changing chapter name")
-
-            for (var chapter of document._chapters) {
-                if (chapter._id == diff.chapterId) {
-                    chapter._header = diff.newchapterName
-                    break;
-                }
+            if (document._chapters[diff.chapterIndex] != undefined) {
+                document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
         }
-        else if(diff.changeChapter) {
+        else if (diff.changeChapter) {
             console.log("changing position on chapters");
-            var fromChapter = document._chapters[diff.fromChapter];
-            document._chapters.splice(diff.fromChapter, 1);
-            document._chapters.splice(diff.toChapter, 0, fromChapter);
+            if (document._chapters[diff.fromChapter] != undefined && document._chapters[diff.toChapter] != undefined) {
+                var fromChapter = document._chapters[diff.fromChapter];
+                document._chapters.splice(diff.fromChapter, 1);
+                document._chapters.splice(diff.toChapter, 0, fromChapter);
+            }
         }
         else if (typeof (diff.from !== 'undefined')) {
             //TODO prevent fake ID
             var lines = []
 
-            for (var chapter of document._chapters) {
-                if (chapter._id == diff.chapterId) {
-                    lines = chapter._lines;
-                    break;
-                }
-            }
-            if (diff.origin == '+input') {
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
-                    var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
-                    var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
-                    var line = new lineModel({ _raw: raw, metadata: [] })
+            if (document._chapters[diff.chapterIndex] != undefined) {
+                lines = document._chapters[diff.chapterIndex]._lines;
 
-                    lines[diff.from.line]._raw = firstRaw
+                if (diff.origin == '+input') {
+                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
+                        var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
+                        var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
+                        var line = new lineModel({ _raw: raw, metadata: [] })
 
-                    lines.splice(diff.from.line + 1, 0, line)
-                } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
-                    console.log("Tekst erstattet med bokstaver")
+                        lines[diff.from.line]._raw = firstRaw
 
+                        lines.splice(diff.from.line + 1, 0, line)
+                    } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
+                        console.log("Tekst erstattet med bokstaver")
+
+                        var fromLine = diff.from.line;
+                        var fromCh = diff.from.ch;
+                        var toLine = diff.to.line;
+                        var toCh = diff.to.ch;
+
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+
+                        if (fromLine == toLine) {
+                            var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw;
+                        } else if (fromLine != toLine) {
+                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
+                            var lastRow = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRow + lastRow;
+                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                        }
+                    } else {  //ny bokstav
+                        var raw: any = lines[diff.from.line]["_raw"];
+                        lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
+                    }
+                } else if (diff.origin == '+delete' || diff.origin == 'cut') {
                     var fromLine = diff.from.line;
                     var fromCh = diff.from.ch;
                     var toLine = diff.to.line;
                     var toCh = diff.to.ch;
 
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-
-                    if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
-                    } else if (fromLine != toLine) {
-                        var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
-                        var lastRow = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRow + lastRow;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
+                    if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
+                        var endraw = lines[diff.to.line]._raw.slice(0);
+                        lines[diff.from.line]._raw += endraw;
+                        lines.splice(diff.to.line, 1)
+                    } else {
+                        var firstLine: String = lines[fromLine]._raw;
+                        var lastLine: String = lines[toLine]._raw;
+                        if (fromLine == toLine) {
+                            var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
+                            lines[fromLine]._raw = newraw;
+                        } else if (fromLine != toLine) {
+                            var firstRaw: any = firstLine.slice(0, fromCh);
+                            var lastRaw = lastLine.slice(toCh);
+                            lines[fromLine]._raw = firstRaw + lastRaw;
+                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                        }
                     }
-                } else {  //ny bokstav
-                    var raw: any = lines[diff.from.line]["_raw"];
-                    lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
-                }
-            } else if (diff.origin == '+delete' || diff.origin == 'cut') {
-                var fromLine = diff.from.line;
-                var fromCh = diff.from.ch;
-                var toLine = diff.to.line;
-                var toCh = diff.to.ch;
+                } else if (diff.origin == 'paste') {
+                    // TODO: Make sure this works 100% 
+                    var fromLine = diff.from.line;
+                    var fromCh = diff.from.ch;
+                    var toLine = diff.to.line;
+                    var toCh = diff.to.ch;
+                    var beginning = lines[fromLine]._raw.slice(0, fromCh);
+                    var end = lines[toLine]._raw.slice(toCh);
 
-                var query = { $set: {} };
-                var paragraphset = "_chapters.0._lines." + fromLine;
-
-
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                    var endraw = lines[diff.to.line]._raw.slice(0);
-                    lines[diff.from.line]._raw += endraw;
-                    lines.splice(diff.to.line, 1)
-                } else {
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
                     if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
+                        if (diff.text.length == 1) {
+                            lines[fromLine]._raw = beginning + diff.text[0] + end;
+                        } else {
+                            lines[fromLine]._raw = beginning + diff.text[0];
+                            for (var i = 1; i < diff.text.length - 1; i++) {
+                                lines.splice(fromLine + i, 0, { _raw: diff.text[i], _metadata: [] })
+                            }
+                            lines.splice(toLine + diff.text.length - 1, 0, { _raw: diff.text[diff.text.length - 1] + end, _metadata: [] })
+                        }
                     } else if (fromLine != toLine) {
-                        var firstRaw: any = firstLine.slice(0, fromCh);
-                        var lastRaw = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRaw + lastRaw;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
+                        lines.splice(fromLine + 1, (toLine - fromLine));
+                        lines[fromLine]._raw = beginning + diff.text[0];
+                        for (var i = 1; i < diff.text.length - 1; i++) {
+                            lines.splice(i, 0, { _raw: diff.text[i], _metadata: [] })
+                        }
+                        if (diff.text.length != 1) {
+                            lines.splice(fromLine + diff.text.length - 1, 0, { _raw: diff.text[diff.text.length - 1] + end, _metadata: [] })
+                        }
                     }
-                }
-            } else if (diff.origin == 'paste') {
-                var fromLine = diff.from.line;
-                var fromCh = diff.from.ch;
-                var toLine = diff.to.line;
-                var toCh = diff.to.ch;
-
-                if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "") {
-                    var endraw = lines[diff.to.line]._raw.slice(0);
-                    lines[diff.from.line]._raw += endraw;
-                    lines.splice(diff.to.line, 1)
-                } else if (diff.text.length > 1) {
-                    console.log("diff.text.length>1 = True")
-                } else {
-                    var firstLine: String = lines[fromLine]._raw;
-                    var lastLine: String = lines[toLine]._raw;
-                    if (fromLine == toLine) {
-                        var newraw: string = firstLine.slice(0, fromCh) + diff.text + firstLine.slice(toCh);
-                        lines[fromLine]._raw = newraw;
-                    } else if (fromLine != toLine) {
-                        var firstRaw: any = firstLine.slice(0, fromCh);
-                        var lastRaw = lastLine.slice(toCh);
-                        lines[fromLine]._raw = firstRaw + diff.text + lastRaw;
-                        lines.splice(fromLine + 1, diff.removed.length - 1);
+                } else if (diff.origin == '+snappet') {
+                    // TODO: add logic for handling snappets that are inserted on lines with text on them
+                    var linefrom: number = diff.from.line;
+                    for (var text in diff.text) {
+                        if (Number(text) == 0) {
+                            lines[linefrom]._raw = diff.text[text];
+                        } else {
+                            lines.splice(linefrom + Number(text), 0, { _raw: diff.text[text], _metadata: [] })
+                        }
                     }
                 }
             }

@@ -1,23 +1,16 @@
 <div id="cmcomponentwrapper">
     <div id="chapter_bar">
-        <!-- <ul> -->
-            <div id="chaptersContainer">
-                <div id="chaptersContainerScrollBox">
-                    <!-- <ul id="sortable"> -->
-                    <div *ngFor="#chapter of document.chapters; #i = index" id="chapter_item_{{i}}" draggable="true" class="droptarget">
-                        <chapteritem (toBeDeleted)="deleteChapterFromDB(i)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
-                    (click)="changeChapter($event, i)"></chapteritem>
-                    </div>
-                    <!-- </ul> -->
-                    <!-- <br><br><br><br>1qweqwe<br><br><br><br><br>2qweqwe<br><br><br><br><br>3qweqwe<br><br><br><br><br>4qweqwe<br> -->
-                    <!-- <br><br><br><br>5qweqwe<br><br><br><br><br>6qweqwe<br><br><br><br><br>7qweqwe<br><br><br><br><br>8qweqwe<br> -->
+        <div id="chaptersContainer">
+            <div id="chaptersContainerScrollBox">
+                <div *ngFor="#chapter of document.chapters; #i = index" id="chapter_item_{{i}}" draggable="true" class="droptarget">
+                    <chapteritem (toBeDeleted)="deleteChapterFromDB(i)" [(chapterId)]="chapter.id" [(documentId)]="document.id" [(chapterName)]="chapter.header"
+                        (click)="changeChapter($event, i)" [chapterNr]=i></chapteritem>
                 </div>
             </div>
-            <!-- <hr> -->
-            <div id="newchapter" (click)="createChapter()">
-                +
-            </div>
-        <!-- </ul> -->
+        </div>
+        <div id="newchapter" (click)="createChapter()">
+            +
+        </div>
     </div>
     <div id="containerForEditor">
         <div id="leftInContainerForEditor">
@@ -30,7 +23,6 @@
             <!-- Actual resize handle -->
             <div id="handle2">
             </div>
-            <!-- preview -->
             <div id="previewframe">Preview</div>
         </div>
     </div>

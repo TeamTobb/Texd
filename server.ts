@@ -13,6 +13,8 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var http = require('http');
 var WebSocket = require('ws');
+var publicIp = require('public-ip');
+var fs = require('fs');
 
 import Diff = require('./server/domain/diff');
 
@@ -39,7 +41,7 @@ var documentService = new DocumentService.DocumentService();
 
 
 server.on('connection', ws => {
-    ws.on('message', message => {        
+    ws.on('message', message => {
         documentService.updateDocument(message);
         broadcast(message)
     });
@@ -74,26 +76,24 @@ app.use(passport.initialize());
 var multer = require('multer')
 
 var storage = multer.diskStorage({
-    destination: function(req, file, callback) {
+    destination: function (req, file, callback) {
         var documentID: string = ""
         for (var index = 0; index < req.rawHeaders.length; index++) {
             var element = req.rawHeaders[index];
             if (element == "Referer") {
                 documentID = req.rawHeaders[index + 1].slice(req.rawHeaders[index + 1].length - 24, req.rawHeaders[index + 1].length);
                 console.log("Doc ID: " + documentID)
-
             }
         }
-        var documentDir = './public/uploads/document/'+ documentID.trim()// '/photos'
+        var documentDir = './public/uploads/document/' + documentID.trim()// '/photos'
         var photoDirForDocId = documentDir + '/photos'
-        var fs = require('fs');
         if (!fs.existsSync(documentDir)) {
             fs.mkdirSync(documentDir);
-            fs.mkdirSync(photoDirForDocId);           
+            fs.mkdirSync(photoDirForDocId);
         }
         callback(null, photoDirForDocId);
     },
-    filename: function(req, file, callback) {
+    filename: function (req, file, callback) {
         console.log(req.rawHeaders)
         var originalName: string = ""
         for (var index = 0; index < req.rawHeaders.length; index++) {
@@ -110,10 +110,10 @@ var upload = multer({ storage: storage }).single('photo');
 
 
 //TODO Change to app.use() Create one upload, with different paths for photo, JSON...
-app.post('/upload/photo', function(req, res) {
+app.post('/upload/photo', function (req, res) {
     console.log(req)
     console.log("POST POST POST ")
-    upload(req, res, function(err) {
+    upload(req, res, function (err) {
         if (err) {
             return res.end("Error uploading file.");
         }
@@ -126,16 +126,46 @@ app.post('/uploadFile', uploadRoutes.upload);
 //Routes
 app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
+app.post('/plugins', (req, res) => {
+    var filename = req.body.plugin.pluginname;
+    var body = req.body.plugin.pluginbody; 
+    
+    console.log(JSON.stringify(filename, null, 2));
+    console.log(JSON.stringify(body, null, 2));
+
+    fs.writeFile("./server/plugins/" + filename + ".json" , JSON.stringify(body, null, 2), (err) => {
+        if (err) {
+            res.jsonp({success: false})
+        } else {
+            console.log("The file was saved!");
+            broadcast(JSON.stringify({newplugin: {name: filename, body: body}}))
+            res.jsonp({success: true})
+        }
+    });
+})
 app.get('/snappets', snappetRoutes.read);
-app.get('/document/:id', documentRoutes.read);
+app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
+app.get('/document/:id', (req, res) => {
+    documentService.getDocument(req, res)
+})
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
-app.get('/documents', documentRoutes.getDocuments);
-app.get('/documents/:documentid/:chapterid', (req, res)=>{
+app.get('/documents', (req, res) => {
+    documentService.getDocuments(req, res)
+})
+
+app.get('/documents/:documentid/:chapterIndex', (req, res) => {
     documentService.getChapter(req, res)
 })
+
+app.get('/wsip', (req, res) => {
+    publicIp.v4((err, ip) => {
+        res.jsonp({ ip: ip })
+    });
+})
+
 app.get('/*', indexroutes.index);
 
-app.listen(httpPort, function() {
+app.listen(httpPort, function () {
     console.log("Demo Express server listening on port %d", httpPort);
 });
 

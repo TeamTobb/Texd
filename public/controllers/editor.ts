@@ -12,6 +12,7 @@ import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
 import {FileUploaderClass} from './fileUpLoader.ts'
+import {PluginUploader} from './pluginUploader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
@@ -25,13 +26,12 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES, PluginUploader]
 })
 
 export class EditorController implements AfterViewInit {
     public document: Document = new Document([], [], [], [], [{}, {}, {}]);
     public current_chapter: number = 0;
-    public current_paragraph: number = 0;
     public element: ElementRef;
     private snappetParser: SnappetParser;
     private showUploadDiv = false;
@@ -39,23 +39,30 @@ export class EditorController implements AfterViewInit {
     private fontPicker = [];
     private sizePicker = [];
     private choosenFont: string;
-    private choosenSize: string;  
-    //  TODO: Bjon check this
-    private style = {}; 
-    @Input() fontToBe: any;
+    private choosenSize: string;
+    private cleanDiv;
+
+    private globalListenFunc: Function;
+
     @ViewChild(CmComponent) cmcomponent: CmComponent;
-    
+    @ViewChild(PluginUploader) pluginuploader: PluginUploader; 
+
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
-        renderer.listenGlobal('document', 'keydown', ($event) => {
+        console.log("setting renderer! ");
+        console.log(renderer);
+        this.globalListenFunc = renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
         if (this._routeParams.get('id')) {
             this.documentService.getDocument(this._routeParams.get('id'), (document2) => {
                 this.document = document2;
-                this.style = document2.style;
+                this.current_chapter = 0;
+
                 this.choosenSize = this.document.style["fontSize"];
                 this.choosenFont = this.document.style["fontFamily"];
+                $("#selectFont").val(this.choosenFont);
+                $("#selectSize").val(this.choosenSize);
             })
             this.documentService.currentChapter = this.current_chapter;
         }
@@ -67,22 +74,17 @@ export class EditorController implements AfterViewInit {
             if (diff.cursorActivity || diff.ranges) {
                 this.cmcomponent.cursorActivity(diff);
             }
-            
+
             if (diff.from && diff.to && diff.text) {
                 this.cmcomponent.changeOrder(diff);
             }
 
             if (diff.newchapterName) {
-                for (var chapter of this.document.chapters) {
-                    if (chapter.id == diff.chapterId) {
-                        chapter.header = diff.newchapterName;
-                        break;
-                    }
-                }
+                this.document.chapters[diff.chapterIndex].header = diff.newchapterName;
             }
 
             if (diff.newchapter) {
-                var l = new Line("Text", []);
+                var l = new Line("...", []);
                 this.document.chapters.splice(diff.chapterIndex + 1, 0, new Chapter("New chapter", [l]))
             }
 
@@ -96,6 +98,10 @@ export class EditorController implements AfterViewInit {
                 this.document.chapters.splice(diff.toChapter, 0, fromChapter);
                 // here is a bug, if you are currently editing one of the moved chapters,
                 // u will automaticly also change chapter, as the index u are in is now a different chapter
+            }
+
+            if (diff.newtitle) {
+                this.document.title = diff.newtitle;
             }
         })
     }
@@ -130,11 +136,7 @@ export class EditorController implements AfterViewInit {
         });
 
         $("#updatePreview").click(() => {
-            this.documentService.updateLines();
-            this.documentService.parseChapter((parsedHTML) => {
-                console.log("done parsing.. inserting!");
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-            })
+            this.parsePreviewFrame();
         });
 
         var sidebarHidden = false;
@@ -177,6 +179,13 @@ export class EditorController implements AfterViewInit {
             this.choosenSize = $('#selectSize').val();
             console.log(this.choosenSize);
         });
+
+
+    }
+
+    ngOnDestroy() {
+        // Removs "listenGlobal" listener
+        this.globalListenFunc();
     }
 
     public changeChapter(i) {
@@ -185,7 +194,7 @@ export class EditorController implements AfterViewInit {
 
     public changeDocumentTitle($event) {
         if (!($event.target.innerHTML == this.document.title)) {
-            this.documentService.changeTitle(this.document.id, $event.target.innerHTML);
+            this.documentService.sendDiff({ newtitle: $event.target.innerHTML }, this.current_chapter);
         }
     }
 
@@ -193,25 +202,14 @@ export class EditorController implements AfterViewInit {
         var keyMap = {};
         keyMap[80] = () => {
             console.log("ctrl+p");
-            this.documentService.updateLines();
-            this.documentService.parseChapter((parsedHTML) => {
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-                this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize;
-                this.documentService.changeStyle(this.document.id, this.document.style);
-                for (var key in this.document.style) {
-                    var value = this.document.style[key];
-                    document.getElementById('previewframe').style[key] = value;
-                }
-            })
-
+            this.parsePreviewFrame();
         }
         keyMap[67] = () => {
             console.log("ctrl+c");
-            var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
+            var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
                 this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize+"px";
+                this.document.style["fontSize"] = this.choosenSize;
                 console.log(this.document.style)
 
                 for (var key in this.document.style) {
@@ -221,8 +219,20 @@ export class EditorController implements AfterViewInit {
             });
         }
         keyMap[69] = () => {
-            console.log("ctrl+c");
+            console.log("ctrl+e");
             this.parseWholeDocument();
+        }
+
+        // ctrl + S ? other browsers?
+        if ($event.which == 115 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
+        }
+
+        // ctrl / CMD + S (firefox + chrome)
+        if ($event.which == 83 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
+            $event.preventDefault();
+            return;
         }
 
         if ($event.ctrlKey) {
@@ -234,31 +244,71 @@ export class EditorController implements AfterViewInit {
     }
 
     public parseWholeDocument() {
-        var parsedDocument = this.documentService.parseDocument( (parsedHTML) => {
-            var total = "<html><body><head><title>test</title></head><div id='content'>";
+        var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
+            var total = "<html><body><head>";
+            // should probably not add the whole stylesheet? make a simpler one just for parsing?
+            total += "<base href='" + document.location.origin + "' />";
+            total += '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
+            total += "<title>test</title></head><div id='content'><div id='innercontent'";
             total += parsedHTML;
-            total += "</div></body></html>";
+            total += "</div></div></body></html>";
+            // var d2 =
             var w = window.open("", "_blank", "");
             var doc = w.document;
             doc.open();
             doc.write(total);
             this.document.style["fontFamily"] = this.choosenFont;
-            this.document.style["fontSize"] = this.choosenSize+"px";
+            this.document.style["fontSize"] = this.choosenSize;
             for (var key in this.document.style) {
                 var value = this.document.style[key];
-                doc.getElementById('content').style[key] = value;
+                console.log(value);
+                doc.getElementById('innercontent').style[key] = value;
             }
             doc.close();
-            w.focus();
+
+            // testing
+            var doc2 = new jsPDF();
+            console.log(doc2);
+            // var elementHandler = {
+            //   '#ignorePDF': function (element, renderer) {
+            //     return true;
+            //   }
+            // };
+            var source = w.document.getElementsByTagName("body")[0];
+            doc2.fromHTML(
+                source,
+                15,
+                15,
+                {
+                    'width': 180
+                });
+
+            doc2.output("dataurlnewwindow");
+
+            // doc2.focus();
+
+            // done testing
+
+            // w.focus();
         });
     }
 
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
     }
+    
+    public showUploadPlugin(){
+        this.pluginuploader.openModal();  
+    }
 
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
+    }
+
+    uploadClickedImage(file) {
+
+        this.cmcomponent.insertImageWidget(file);
+        this.showUploadDivToggle(false);
     }
 
     setFontPickerAndSizePicker() {
@@ -280,9 +330,30 @@ export class EditorController implements AfterViewInit {
             this.sizePicker.push(index)
         }
     }
-    
-    fontSelected(font) {
-        console.log(font)
-        console.log(this.fontToBe)
+
+
+
+    // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
+
+    parsePreviewFrame() {
+        this.documentService.parseChapter((parsedHTML) => {
+            this.cleanDiv = $(".widget-templates .cleanDiv").clone();
+
+            document.getElementById('rightInContainerForEditor').replaceChild(this.cleanDiv[0], document.getElementById('previewframe'));
+            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')
+            newElement[0].innerHTML = parsedHTML;
+            newElement[0].id = 'previewframe'
+
+            this.document.style["fontFamily"] = this.choosenFont;
+            this.document.style["fontSize"] = this.choosenSize;
+            this.documentService.changeStyle(this.document.id, this.document.style);
+
+            for (var key in this.document.style) {
+                var value = this.document.style[key];
+                document.getElementById('previewframe').style[key] = value;
+            }
+        })
     }
+
+
 }
