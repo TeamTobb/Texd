@@ -10,15 +10,12 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
-    /*margin:0 auto;*/
-    /*text-align:center;*/
 }
 .image-text {
     display: inline-block;
     padding:3px 0 4px;
     font-size:small;
     margin:0 auto;
-    /*text-align:center;*/
 }
 
 body {
@@ -28,10 +25,7 @@ body {
 
 #content {
     background-color: white;
-    /*margin-left: 40px;
-    margin-right: 40px;*/
     margin-top: 40px;
-    /*margin-bottom: 40px;*/
     margin-right: auto;
     margin-left: auto;
     width: 60%;
