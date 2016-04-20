@@ -5,6 +5,7 @@ import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {DocumentService} from '../data_access/document.ts';
 import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
 
+
 @Component({
     selector: 'login',
     templateUrl: 'views/register.html',
@@ -18,7 +19,7 @@ export class RegisterController {
     }
 
     public alerts: Array<Object> = [];
-    constructor(private http: Http) {
+    constructor(private http: Http, private router: Router) {
         this.user = { username: "", password: "" }
     }
 
@@ -27,19 +28,23 @@ export class RegisterController {
         headers.append('Content-Type', 'application/json');
         this.http.post('./register', JSON.stringify({ username: this.user.username, password: this.user.password }), { headers: headers }).map((res: Response) => res.json()).subscribe(res => {
             if (res.name == "BadRequestError") {
-                this.alerts.push({ 
-                    msg: res.message, 
-                    type: 'danger', 
-                    closable: 'true' 
+                this.alerts.push({
+                    msg: res.message,
+                    type: 'danger',
+                    closable: 'true'
                 })
             }
-            if(res.success==true){
+            if (res.success == true) {
                 this.alerts = [];
                 this.alerts.push({
-                    msg: 'User successfully created', 
-                    type: 'success', 
+                    msg: 'User successfully created',
+                    type: 'success',
                     closeable: 'true'
                 })
+                setTimeout(() => {
+                    this.router.navigate(['Login', {}]);
+
+                }, 1500)
             }
             console.log(JSON.stringify(res, null, 2));
         })
