@@ -45,7 +45,7 @@ export class EditorController implements AfterViewInit {
     private globalListenFunc: Function;
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
-    @ViewChild(PluginUploader) pluginuploader: PluginUploader; 
+    @ViewChild(PluginUploader) pluginuploader: PluginUploader;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
@@ -180,7 +180,6 @@ export class EditorController implements AfterViewInit {
             console.log(this.choosenSize);
         });
 
-
     }
 
     ngOnDestroy() {
@@ -266,7 +265,7 @@ export class EditorController implements AfterViewInit {
             }
             doc.close();
 
-            // testing
+            // testing for pdf
             var doc2 = new jsPDF();
             console.log(doc2);
             // var elementHandler = {
@@ -282,23 +281,16 @@ export class EditorController implements AfterViewInit {
                 {
                     'width': 180
                 });
-
             doc2.output("dataurlnewwindow");
-
-            // doc2.focus();
-
-            // done testing
-
-            // w.focus();
         });
     }
 
     public showUploadDivToggle(hide) {
         this.showUploadDiv = hide;
     }
-    
+
     public showUploadPlugin(){
-        this.pluginuploader.openModal();  
+        this.pluginuploader.openModal();
     }
 
     goToSettings() {
@@ -306,7 +298,6 @@ export class EditorController implements AfterViewInit {
     }
 
     uploadClickedImage(file) {
-
         this.cmcomponent.insertImageWidget(file);
         this.showUploadDivToggle(false);
     }
@@ -331,10 +322,6 @@ export class EditorController implements AfterViewInit {
         }
     }
 
-
-
-    // need to replace updateLines() function. This will set the cursor to the end of the document, as the whole thing is replaced.
-
     parsePreviewFrame() {
         this.documentService.parseChapter((parsedHTML) => {
             this.cleanDiv = $(".widget-templates .cleanDiv").clone();
@@ -354,6 +341,5 @@ export class EditorController implements AfterViewInit {
             }
         })
     }
-
 
 }

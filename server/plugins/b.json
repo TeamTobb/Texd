@@ -2,5 +2,6 @@
     "tagname": "b",
     "html": "<b>$value</b>",
     "attr": [],
-    "optattr": []
+    "optattr": [],
+    "description": "Bold text"
 }

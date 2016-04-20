@@ -2,5 +2,6 @@
     "tagname": "u",
     "html": "<u>$value</u>",
     "attr": [],
-    "optattr": []
+    "optattr": [],
+    "description": "Underline text"
 }

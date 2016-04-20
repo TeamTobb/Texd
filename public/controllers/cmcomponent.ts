@@ -186,7 +186,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         });
         $("#insertheader").click(() => {
             this.editor.focus();
-            new GeneralSpanWidget(this.editor, null, "header-widget", "#h1");
+            new GeneralSpanWidget(this.editor, null, "header-widget", "#h");
         });
         $("#insertitalic").click(() => {
             this.editor.focus();
@@ -288,7 +288,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var widgetMap = [];
         widgetMap["#b"] = true;
         widgetMap["#img"] = true;
-        widgetMap["#h1"] = true;
+        widgetMap["#h"] = true;
         widgetMap["#i"] = true;
         widgetMap["#u"] = true;
         WidgetParser.searchForWidgets(widgetMap, parseLines, (type, range) => {
@@ -307,8 +307,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
         else if (type == "#img") {
             new ImageWidget(this.editor, range, true);
         }
-        else if (type == "#h1") {
-            new GeneralSpanWidget(this.editor, range, "header-widget", "#h1");
+        else if (type == "#h") {
+            new GeneralSpanWidget(this.editor, range, "header-widget", "#h");
         }
         else if (type == "#i") {
             new GeneralSpanWidget(this.editor, range, "italic-widget", "#i");
@@ -332,9 +332,9 @@ export class CmComponent implements AfterViewInit, OnChanges {
         var to = cursor;
         to.line = cursor.line;
         console.log(cursor)
-        this.editor.getDoc().replaceRange('\n#img @src "'+file+'" @height "100%" @width "100%" #\n', cursor, to, "paste");                
+        this.editor.getDoc().replaceRange('\n#img @src "'+file+'" @height "100%" @width "100%" #\n', cursor, to, "paste");
     }
-   
+
     private setupCMAutocomplete() {
         this.documentService.getSnappets((snappets) => {
             var templates = {

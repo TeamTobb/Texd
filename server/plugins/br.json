@@ -2,5 +2,6 @@
 	"tagname" : "n",
 	"html" : "<br>",
 	"attr" : [],
-	"optattr" : []
+	"optattr" : [],
+	"description": "New line"
 }

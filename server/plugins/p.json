@@ -2,5 +2,6 @@
     "tagname": "p",
     "html": "<p>$value</p>",
     "attr": [],
-    "optattr": []
+    "optattr": [],
+    "description": "Paragraph"
 }

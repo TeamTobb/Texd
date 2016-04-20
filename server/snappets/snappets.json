@@ -3,10 +3,10 @@
         "name": "img",
         "description": "insert image",
         "template": "#img @src \"${docs/test.png}\" @width \"${100%}\" @height \"${100%}\" # \n ${cursor}"
-    }, 
+    },
     {
-        "name": "h1", 
-        "description": "insert header", 
-        "template": "#h1 ${header} #\n ${cursor}"
+        "name": "h",
+        "description": "insert header",
+        "template": "#h ${header} #\n ${cursor}"
     }
 ]

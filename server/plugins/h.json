@@ -1,0 +1,7 @@
+{
+    "tagname": "h",
+    "html": "<h2>$value</h2> ",
+    "attr": [],
+    "optattr": [],
+    "description": "Header, second layer header (below chapter header)"
+}
