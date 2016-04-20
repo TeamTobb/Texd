@@ -37,19 +37,28 @@ export class CmComponent implements AfterViewInit, OnChanges {
     cursorActivity(diff) {
         if ("" + this.current_chapter == "" + diff.chapterIndex) {
             if (diff.cursorActivity) {
-                if (this.cursorwidgets[diff.senderId] != undefined) {
-                    this.cursorwidgets[diff.senderId].clear()
+                var pos = {
+                    line: diff.cursorActivity.line,
+                    ch: diff.cursorActivity.ch
                 }
                 try {
                     if (this.cursorwidgets[diff.senderId] != undefined) {
-                        this.cursorwidgets[diff.senderId].clear()
+                        var element = document.getElementById('cursor' + diff.senderId)
+                    } else {
+                        console.log("creating cursor element");
+                        var node = $(".widget-templates .cursor-widget").clone();
+                        var element: HTMLElement = node[0];
+                        element.id = 'cursor' + diff.senderId;
+                        element.style.border = '1px solid ' + diff.color;
                     }
-                    this.cursorwidgets[diff.senderId] = CursorWidget(this.editor, null, false, diff.cursorActivity.line, diff.cursorActivity.ch, diff.color)
+                    this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
+                        widget: element
+                    })
+
                 } catch (error) {
                     console.log(error)
                 }
-
-                var element;
+                // TODO: Dont do this here. Show new user on chapter load, remove on chapter exit
                 if (document.getElementById('user' + diff.senderId)) {
                     element = document.getElementById('user' + diff.senderId)
                 } else {
@@ -197,8 +206,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
             new GeneralSpanWidget(this.editor, null, "underline-widget", "#u");
         });
 
-        $('#richTextButton').change(() =>{
-            if(this.disable_rich_text) {
+        $('#richTextButton').change(() => {
+            if (this.disable_rich_text) {
                 this.disable_rich_text = false;
                 this.parseWidgets();
             }
@@ -273,8 +282,8 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     parseWidgets() {
         // stop if new snappet, still a dirty fix
-        if(this.inside_new_snappet) return;
-        if(this.disable_rich_text) return;
+        if (this.inside_new_snappet) return;
+        if (this.disable_rich_text) return;
 
         // ... get cursor pos and reset the document before parsing new widgets.
         var cursorPos = this.editor.getCursor();
@@ -327,12 +336,12 @@ export class CmComponent implements AfterViewInit, OnChanges {
         }
     }
 
-    insertImageWidget(file){
+    insertImageWidget(file) {
         var cursor = this.editor.getCursor();
         var to = cursor;
         to.line = cursor.line;
         console.log(cursor)
-        this.editor.getDoc().replaceRange('\n#img @src "'+file+'" @height "100%" @width "100%" #\n', cursor, to, "paste");
+        this.editor.getDoc().replaceRange('\n#img @src "' + file + '" @height "100%" @width "100%" #\n', cursor, to, "paste");
     }
 
     private setupCMAutocomplete() {
@@ -346,7 +355,7 @@ export class CmComponent implements AfterViewInit, OnChanges {
             CodeMirror.commands.autocomplete = (cm) => {
                 CodeMirror.showHint(cm, (cm) => {
                     this.inside_new_snappet = true;
-                    setTimeout( () => {
+                    setTimeout(() => {
                         this.inside_new_snappet = false
                         this.parseWidgets();
                         // this timer should not just be set static like this.. currently u will have 8 seconds to insert into the widget
