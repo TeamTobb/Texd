@@ -198,10 +198,11 @@ export class DocumentService {
     public getDocuments(callback: (documents: Document[]) => void) {
         var documents: Document[] = Array<Document>();
         this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
-            res.forEach((document) => {
-                documents.push(new Document([], [], [], [], [], document));
-                callback(documents);
-            })
+            console.log(res);   
+            for (var doc in res) {
+                documents.push(new Document([], [], [], [], [], res[doc]))
+            }     
+            callback(documents);                     
         });
     }
 
