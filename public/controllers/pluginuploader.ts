@@ -3,6 +3,7 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 import {Modal, ModalConfig, ModalDialogInstance, YesNoModal, ICustomModal, YesNoModalContent, ICustomModalComponent} from 'angular2-modal/angular2-modal';
 import {Http, Headers, HTTP_BINDINGS, Response} from 'angular2/http';
 import {DocumentService} from '../data_access/document.ts';
+import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
 
 
 @Component({
@@ -21,7 +22,7 @@ export class PluginUploader {
         let resolvedBindings = Injector.resolve([provide(ICustomModal, {
             useValue: new AdditionCalculateWindowData(2, 3)
         })]),
-            dialog = this.modal.open(
+            dialog: ModalDialogInstance = this.modal.open(
                 <any>PluginUploadModal,
                 resolvedBindings,
                 new ModalConfig('lg', false, 27)
@@ -32,16 +33,18 @@ export class PluginUploader {
 @Component({
     selector: 'modal-content',
     templateUrl: 'views/pluginmodal.html',
-    providers: [DocumentService]
+    providers: [Modal, DocumentService],
+    directives: [Alert]
 })
 export class PluginUploadModal implements ICustomModalComponent, AfterViewInit {
+    public alerts: Array<Object> = [];
     public editor = {};
     dialog: ModalDialogInstance;
     context: AdditionCalculateWindowData;
     public pluginname = "";
 
 
-    constructor(dialog: ModalDialogInstance, modelContentData: ICustomModal, private documentService: DocumentService) {
+    constructor(private modal: Modal, dialog: ModalDialogInstance, modelContentData: ICustomModal, private documentService: DocumentService) {
         this.dialog = dialog;
         this.context = <AdditionCalculateWindowData>modelContentData;
     }
@@ -63,20 +66,44 @@ export class PluginUploadModal implements ICustomModalComponent, AfterViewInit {
     onKeyUp(value) {
         this.dialog.close();
     }
-    
+
     submit() {
+        this.alerts = [];
         var pluginbody = {};
         try {
             pluginbody = JSON.parse(this.editor.getValue());
-            this.documentService.postPlugin({ pluginname: this.pluginname, pluginbody: pluginbody }, () => {
-                console.log("successssss")
-            })
+
+            if (pluginbody["tagname"] && pluginbody["html"] && pluginbody["attr"] && pluginbody["optattr"]) {
+                this.documentService.postPlugin({ pluginname: this.pluginname, pluginbody: pluginbody }, () => {
+                    this.dialog.close();
+                    this.modal.alert()
+                        .size('sm')
+                        .isBlocking(false)
+                        .keyboard(27)
+                        .title('Sucess')
+                        .body('Plugin created')
+                        .open();
+                })
+            } else {
+                //Valid JSON, but not the required elements for a complete pluginbody
+                this.alerts.push({
+                    msg: 'Missing required elements in the plugin',
+                    type: 'danger',
+                    closeable: 'true'
+                })
+            }
+
         } catch (error) {
-            // Couldnt parse - invalid json
+            // Couldnt parse - invalid json. Alert+
+            this.alerts.push({
+                msg: 'Invalid JSON',
+                type: 'danger',
+                closeable: 'true'
+            })
             console.log(error);
         }
     }
-    
+
     close() {
         this.dialog.close();
     }

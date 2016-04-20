@@ -96,14 +96,24 @@ body {
 .plugin-uploader-container{
     margin-left: auto; 
     margin-right: auto;
-    /*height: auto;*/
-    /*width: auto;*/
-    width: 100%;
+    width: 90%;
     height: 60%;
 }
 
 .modal-lg {
-    height: 500px;
+    height: 550px;
+    position: relative;
+    margin-left: auto; 
+    margin-right: auto;
+    margin-top: 50px;
+}
+
+.modal-sm {
+    /*height: 500px;*/
+    position: relative;
+    margin-left: auto; 
+    margin-right: auto;
+    margin-top: 50px;
 }
 
 #chaptersContainer {
