@@ -28,6 +28,7 @@
         "controllers/login.ts",
         "controllers/mainview.ts",
         "controllers/ng2-uploader.ts",
+        "controllers/pluginpage.ts",
         "controllers/pluginuploader.ts",
         "controllers/register.ts",
         "controllers/settings.ts",
