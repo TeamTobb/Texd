@@ -8,7 +8,7 @@ export class KeyMap {
 
     private setupStandardKeySettings() {
         this.keys["parseCurrentChapter"] = new KeyItem("parseCurrentChapter", 80, "ctrl/cmd+p", "Parses the current chapter and set it in preview");
-        this.keys["parseWholeDocument"] = new KeyItem("parseWholeDocument", 67, "ctrl/cmd+c", "Parses the entire document and set it in preview");
+        this.keys["parseWholeDocument"] = new KeyItem("parseWholeDocument", 73, "ctrl/cmd+i", "Parses the entire document and set it in preview");
         this.keys["test"] = new KeyItem("test", 69, "ctrl/cmd+e", "testing..");
 
         for(var k in this.keys) {

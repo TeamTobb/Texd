@@ -39,3 +39,12 @@ body {
     margin-right: 1in;
     margin-left: 1in;
 }
+
+.table-plugin {
+    margin: auto;
+    border: 1px solid gray;
+}
+
+td {
+    border: 1px solid gray;
+}
