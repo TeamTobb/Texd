@@ -1,4 +1,4 @@
-import {Component, NgZone, Input, Output, AfterViewInit} from 'angular2/core';
+/*import {Component, NgZone, Input, Output, AfterViewInit} from 'angular2/core';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
@@ -115,3 +115,4 @@ export class FileUploaderClass implements AfterViewInit {
 
     }
 }
+*/

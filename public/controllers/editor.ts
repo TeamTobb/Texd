@@ -11,7 +11,7 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
-import {FileUploaderClass} from './fileUploader.ts'
+import {FileUploadModal} from './fileUploadPage.ts'
 import {PluginUploader} from './pluginuploader.ts'
 import {FileUploadPage} from './fileUploadPage.ts'
 import {CmComponent} from './cmcomponent.ts'
@@ -27,7 +27,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES, PluginUploader, FileUploadPage]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploadModal, CORE_DIRECTIVES, PluginUploader, FileUploadPage]
 })
 
 export class EditorController implements AfterViewInit {

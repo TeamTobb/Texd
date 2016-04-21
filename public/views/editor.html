@@ -66,15 +66,16 @@
 
 </div>
 
-<section *ngIf="showUploadDiv">
+<!--<section *ngIf="showUploadDiv">
     <div class="uploadDiv">
         <button (click)="showUploadDivToggle(false)"> Close </button>
-        <fileuploader [docId]="document" (clickedImage)="uploadClickedImage($event)">
+        <fileuploader [document]="document" (clickedImage)="uploadClickedImage($event)">
         </fileuploader>
     </div>
-</section>
+</section>-->
 <pluginuploader>
 </pluginuploader>
 
-<fileuploaderpage>
+
+<fileuploaderpage [doc]=document >
 </fileuploaderpage>
