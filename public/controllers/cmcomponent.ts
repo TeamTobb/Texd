@@ -39,7 +39,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     ngOnDestroy() {
         console.log("ON DESTROY")
-        this.documentService.sendDiff({ removeCursor: true }, this.current_chapter);
+        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
     }
 
     addCursor(diff) {
@@ -56,23 +56,19 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     removeCursor(diff) {
-        if (diff.chapterIndex == this.current_chapter) {
+        if (diff.removeUser) {
             if (document.getElementById('user' + diff.senderId)) {
-                console.log("Removing user " + diff.senderId);
                 var element = document.getElementById('user' + diff.senderId);
                 document.getElementById('buttonsContainer').removeChild(element);
             }
+        }
+        if (this.cursorwidgets[diff.senderId]) {
+            this.cursorwidgets[diff.senderId].clear();
+        }
 
-            if (this.cursorwidgets[diff.senderId]) {
-                console.log("removing cursor: " + diff.senderId);
-                this.cursorwidgets[diff.senderId].clear();
-                this.cursorwidgets[diff.senderId] = undefined;
-            }
-            
-            if(this.selections[diff.senderId]){
-                this.selections[diff.senderId].clear();
-                this.selections[diff.senderId] = undefined;  
-            }
+        if (this.selections[diff.senderId]) {
+            this.selections[diff.senderId].clear();
+            this.selections[diff.senderId] = undefined;
         }
     }
 
@@ -91,9 +87,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                         element.style.color = diff.color
                         document.getElementById('buttonsContainer').appendChild(element)
                     }
-                    
+
                     if (this.cursorwidgets[diff.senderId] != undefined) {
                         var element = document.getElementById('cursor' + diff.senderId)
+                        this.cursorwidgets[diff.senderId].clear();
                     } else {
                         var node = $(".widget-templates .cursor-widget").clone();
                         var element: HTMLElement = node[0];
@@ -103,13 +100,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
                         widget: element
                     })
-
                 } catch (error) {
                     console.log(error)
                 }
-            }
-
-            else if (diff.ranges) {
+            } else if (diff.ranges) {
                 var from = {
                     line: diff.ranges[0].anchor.line,
                     ch: diff.ranges[0].anchor.ch
@@ -120,26 +114,29 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     ch: diff.ranges[0].head.ch
                 }
 
-                if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
-                    //  Oneliner to swap variables
-                    to = [from, from = to][0];
-                }
-
-                if (this.selections[diff.senderId]) {
-                    this.selections[diff.senderId].clear()
-                }
-
-                var css = ".selectionRange { background-color: " + diff.color + ";}";
-                var htmlDiv = document.createElement('div');
-                htmlDiv.innerHTML = '<p>foo</p><style>' + css + '</style>';
-                document.getElementsByTagName('head')[0].appendChild(htmlDiv.childNodes[1]);
-
-                try {
-                    this.selections[diff.senderId] = this.editor.markText(from, to, {
-                        className: "selectionRange"
-                    })
-                } catch (error) {
-                    console.log(error)
+                if (from.line != to.line || (from.line == to.line && from.ch != to.ch)) {
+                    if (from.line > to.line || (from.line == to.line && from.ch > to.ch)) {
+                        //  Oneliner to swap variables
+                        to = [from, from = to][0];
+                    }
+                    if (this.selections[diff.senderId]) {
+                        this.selections[diff.senderId].clear()
+                        this.selections[diff.senderId] = undefined;
+                    }
+                    var style = document.getElementById('selectionstyle');
+                    style.innerHTML = ".selectionRange { background-color: " + diff.color + ";}";
+                    try {
+                        this.selections[diff.senderId] = this.editor.markText(from, to, {
+                            className: "selectionRange"
+                        })
+                    } catch (error) {
+                        console.log(error)
+                    }
+                } else {
+                    if (this.selections[diff.senderId]) {
+                        this.selections[diff.senderId].clear();
+                        this.selections[diff.senderId] = undefined;
+                    }
                 }
             }
         }
@@ -181,6 +178,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngAfterViewInit() {
+        var selectionStyle = document.createElement('style');
+        selectionStyle.id = 'selectionstyle';
+        document.body.appendChild(selectionStyle);
+
         this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
             mode: "hashscript",
             lineNumbers: true,
