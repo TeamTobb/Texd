@@ -40,7 +40,8 @@ body {
     margin-left: 1in;
 }
 
-table {
+.table-plugin {
+    margin: auto;
     border: 1px solid gray;
 }
 
