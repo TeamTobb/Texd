@@ -1,7 +1,7 @@
 import {Component} from 'angular2/core';
 
-import {DocumentService} from '../data_access/document.ts';
-import {PluginItem} from '../utils/parseMap';
+import {DocumentService} from '../../data_access/document.ts';
+import {PluginItem} from '../../utils/parseMap';
 
 
 @Component({

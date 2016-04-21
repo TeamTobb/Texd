@@ -4,7 +4,7 @@ import {EditorController} from './editor';
 import {LoginController} from './login';
 import {RegisterController} from './register';
 import {DashboardComponent} from './dashboard';
-import {SettingsComponent} from './settings';
+import {SettingsComponent} from './settings/settings';
 import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import {CORE_DIRECTIVES} from 'angular2/common';
 
@@ -23,18 +23,18 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 export class MainView{
     public title = 'Main view';
     public loggedIn = false;
-    public notLoggedIn = !this.loggedIn; 
-    
+    public notLoggedIn = !this.loggedIn;
+
     constructor(private _router: Router) {
         if (localStorage.getItem('id_token') != undefined) {
             this.loggedIn = true;
-            this.notLoggedIn = !this.loggedIn;   
+            this.notLoggedIn = !this.loggedIn;
         }
     }
-    
+
     logOut(){
-        localStorage.removeItem('id_token');  
-        this.loggedIn = false; 
+        localStorage.removeItem('id_token');
+        this.loggedIn = false;
         this.notLoggedIn = !this.loggedIn;
     }
 
