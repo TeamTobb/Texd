@@ -50,8 +50,6 @@ export class FileUploaderClass implements AfterViewInit {
             if (!files.errno) {
                 files.forEach(file => {
                     this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + file);
-                    //console.log(this.dirFiles);
-
                 });
             }
         });
@@ -73,7 +71,6 @@ export class FileUploaderClass implements AfterViewInit {
                 setTimeout(() => {
                     this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + data.originalName);
                 }, 1000)
-
             }
             this.multipleResp.push(data);
         }
