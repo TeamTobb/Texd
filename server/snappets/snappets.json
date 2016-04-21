@@ -8,5 +8,10 @@
         "name": "h",
         "description": "insert header",
         "template": "#h ${header} #\n ${cursor}"
+    },
+    {
+        "name": "t",
+        "description": "insert table",
+        "template": "#t @id \"${table1}\" [1|2|3][4|5|6] # \n ${cursor}"
     }
 ]
