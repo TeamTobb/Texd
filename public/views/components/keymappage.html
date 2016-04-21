@@ -1,0 +1,22 @@
+<div class="settingsPagerightPlugin">
+    <div id="pluginpageheader">
+        <h1>Keymap</h1>
+    </div>
+    <div id="scrollableviewplugin">
+        <div id="pluginTableWrapper">
+            <!-- test -->
+            <table id="pluginpagetable">
+                <tr class="pluginpagetabletr1">
+                    <td class="pluginpagetabletd1">Shortcut</td>
+                    <td class="pluginpagetabletd2">Description</td>
+                </tr>
+                <tr class="pluginpagetabletr2" *ngFor="#k of keys();">
+                    <td class="pluginpagetabletd1">{{keymap.keys[k].shortcut}}</td>
+                    <td class="pluginpagetabletd2">{{keymap.keys[k].description}}</td>
+                </tr>
+            </table>
+            <!-- current dirty fix to prevent last item to get below view -->
+            <br><br>
+        </div>
+    </div>
+</div>
