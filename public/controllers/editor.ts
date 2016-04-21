@@ -103,6 +103,14 @@ export class EditorController implements AfterViewInit {
             if (diff.newtitle) {
                 this.document.title = diff.newtitle;
             }
+            
+            if(diff.removeCursor){
+                this.cmcomponent.removeCursor(diff); 
+            } 
+            
+            if(diff.addCursor){
+                this.cmcomponent.addCursor(diff); 
+            }
         })
     }
 

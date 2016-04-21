@@ -1,12 +1,12 @@
 import {ChapterItem} from "./chapteritem";
-import {Component, OnInit, Input, Output, AfterViewInit, ElementRef, OnChanges, SimpleChange} from 'angular2/core';
+import {Component, OnInit, Input, Output, AfterViewInit, ElementRef, OnChanges, SimpleChange, OnDestroy} from 'angular2/core';
 import {NgIf} from 'angular2/common';
 import {Router} from 'angular2/router';
 import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {EventEmitter} from "angular2/src/facade/async";
-import {Widget, BoldWidget, HeaderWidget, ItalicWidget, UnderlineWidget, ImageWidget, CursorWidget, GeneralSpanWidget} from "./widget.ts";
+import {Widget, ImageWidget, CursorWidget, GeneralSpanWidget} from "./widget.ts";
 import {WidgetParser} from "../utils/widgetParser.ts";
 
 function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
@@ -16,7 +16,7 @@ function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
     templateUrl: 'views/components/cmcomponent.html',
     directives: [ChapterItem]
 })
-export class CmComponent implements AfterViewInit, OnChanges {
+export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() lines: Line[];
     @Input() document: Document;
     @Input() current_chapter: number;
@@ -32,6 +32,48 @@ export class CmComponent implements AfterViewInit, OnChanges {
 
     constructor(private element: ElementRef, private documentService: DocumentService) {
         this.setupCMAutocomplete();
+        if (localStorage.getItem('id_color') == null && sessionStorage.getItem('id_color') == null) {
+            sessionStorage.setItem('id_color', '#' + Math.floor(Math.random() * 16777215).toString(16));
+        }
+    }
+
+    ngOnDestroy() {
+        console.log("ON DESTROY")
+        this.documentService.sendDiff({ removeCursor: true }, this.current_chapter);
+    }
+
+    addCursor(diff) {
+        if (diff.chapterIndex == this.current_chapter) {
+            if (!document.getElementById('user' + diff.senderId)) {
+                console.log("adding cursor :" + diff.senderId);
+                var element = document.createElement('span');
+                element.id = "user" + diff.senderId
+                element.innerHTML = diff.senderId
+                element.style.color = diff.color
+                document.getElementById('buttonsContainer').appendChild(element)
+            }
+        }
+    }
+
+    removeCursor(diff) {
+        if (diff.chapterIndex == this.current_chapter) {
+            if (document.getElementById('user' + diff.senderId)) {
+                console.log("Removing user " + diff.senderId);
+                var element = document.getElementById('user' + diff.senderId);
+                document.getElementById('buttonsContainer').removeChild(element);
+            }
+
+            if (this.cursorwidgets[diff.senderId]) {
+                console.log("removing cursor: " + diff.senderId);
+                this.cursorwidgets[diff.senderId].clear();
+                this.cursorwidgets[diff.senderId] = undefined;
+            }
+            
+            if(this.selections[diff.senderId]){
+                this.selections[diff.senderId].clear();
+                this.selections[diff.senderId] = undefined;  
+            }
+        }
     }
 
     cursorActivity(diff) {
@@ -42,10 +84,17 @@ export class CmComponent implements AfterViewInit, OnChanges {
                     ch: diff.cursorActivity.ch
                 }
                 try {
+                    if (!document.getElementById('user' + diff.senderId)) {
+                        var element = document.createElement('span');
+                        element.id = "user" + diff.senderId
+                        element.innerHTML = diff.senderId
+                        element.style.color = diff.color
+                        document.getElementById('buttonsContainer').appendChild(element)
+                    }
+                    
                     if (this.cursorwidgets[diff.senderId] != undefined) {
                         var element = document.getElementById('cursor' + diff.senderId)
                     } else {
-                        console.log("creating cursor element");
                         var node = $(".widget-templates .cursor-widget").clone();
                         var element: HTMLElement = node[0];
                         element.id = 'cursor' + diff.senderId;
@@ -58,17 +107,6 @@ export class CmComponent implements AfterViewInit, OnChanges {
                 } catch (error) {
                     console.log(error)
                 }
-                // TODO: Dont do this here. Show new user on chapter load, remove on chapter exit
-                if (document.getElementById('user' + diff.senderId)) {
-                    element = document.getElementById('user' + diff.senderId)
-                } else {
-                    element = document.createElement('span');
-                }
-
-                element.id = "user" + diff.senderId
-                element.innerHTML = diff.senderId
-                element.style.color = diff.color
-                document.getElementById('buttonsContainer').appendChild(element)
             }
 
             else if (diff.ranges) {
@@ -259,7 +297,18 @@ export class CmComponent implements AfterViewInit, OnChanges {
     }
 
     public changeChapter(event, chapter_number: number) {
+        console.log("Change cphapter");
+
+        this.documentService.sendDiff({
+            removeCursor: true
+        }, this.current_chapter)
+
         this.current_chapter = chapter_number;
+
+        this.documentService.sendDiff({
+            addCursor: true
+        }, this.current_chapter)
+
         this.changeActiveChapter();
         this.emitChangeChapter.emit(chapter_number)
     }
