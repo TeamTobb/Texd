@@ -15,11 +15,14 @@ export class DocumentService {
 
     constructor() {
         documentRoutes.getAllDocuments((documents) => {
-            for (var document of documents) {
-                this.documents[document["id"]] = document;
+            if (documents.length > 0) {
+                console.log(JSON.stringify(documents, null, 2));
+                for (var document of documents) {
+                    this.documents[document["id"]] = document;
+                }
+                console.log(JSON.stringify(this.documents, null, 2));
+                this.documentIsUpdated[document["id"]] = false
             }
-            console.log(JSON.stringify(this.documents, null, 2));
-            this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
@@ -63,7 +66,7 @@ export class DocumentService {
             res.jsonp(this.documents);
             console.log("Fant alle docs: ");
         }
-    }   
+    }
 
     updateDocument(diff2) {
         var diff = JSON.parse(diff2);
