@@ -15,14 +15,12 @@ export class DocumentService {
 
     constructor() {
         documentRoutes.getAllDocuments((documents) => {
-            if (documents.length > 0) {
                 console.log(JSON.stringify(documents, null, 2));
                 for (var document of documents) {
                     this.documents[document["id"]] = document;
                 }
                 console.log(JSON.stringify(this.documents, null, 2));
                 this.documentIsUpdated[document["id"]] = false
-            }
         })
 
         setInterval(() => {

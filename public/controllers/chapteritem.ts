@@ -33,15 +33,17 @@ export class ChapterItem implements OnChanges {
         $event.target.setAttribute("contenteditable", "false");
     }
 
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {        
         // TODO: Find a better way to set the first item as selected
-        if (changes["chapterNr"] && this.chapterNr == 0+"") {
+        if (changes["chapterNr"] && this.chapterNr == 0 + "") {
             var selectedChapter = document.getElementById('chapter_item_' + this.chapterNr);
             var otherChapters = document.getElementsByClassName('droptarget');
             for (var i = 0; i < otherChapters.length; i++) {
                 otherChapters[i].className = "droptarget";
             }
-            selectedChapter.className = "droptarget active";
+            if (selectedChapter !== null) {
+                selectedChapter.className = "droptarget active";
+            }
         }
     }
 

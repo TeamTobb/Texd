@@ -79,6 +79,30 @@ export function getAllDocuments(callback) {
     })
 }
 
+// export function getDocuments(req: express.Request, res: express.Response) {
+//     console.log("getDocuments()");
+
+//     repository.find({}, (error, documents) => {
+//         if (error) {
+//             console.log(error);
+//             res.jsonp(error);
+//         } else if (!documents.length) {
+//             console.log("No documents found");
+//             repository.create((documentArray), (error, document2) => {
+//                 if (error) {
+//                     console.log(error);
+//                 } else {
+//                     getDocuments(req, res);
+//                 }
+//             });
+//         } else {
+//             console.log("We found documents");
+//             res.jsonp(documents);
+//         }
+//     });
+// }
+
+
 export function saveDocument(document, callback) {
     repository.update({ _id: document._id }, document, (error, document2) => {
         if (error) {
