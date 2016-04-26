@@ -43,6 +43,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     addCursor(diff) {
+        console.log("addCursor()");
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
                 console.log("adding cursor :" + diff.senderId);
@@ -79,7 +80,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     line: diff.cursorActivity.line,
                     ch: diff.cursorActivity.ch
                 }
-                try {
+                // try {
                     if (!document.getElementById('user' + diff.senderId)) {
                         var element = document.createElement('span');
                         element.id = "user" + diff.senderId
@@ -100,9 +101,9 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
                         widget: element
                     })
-                } catch (error) {
-                    console.log(error)
-                }
+                // } catch (error) {
+                //     console.log(error)
+                // }
             } else if (diff.ranges) {
                 var from = {
                     line: diff.ranges[0].anchor.line,
@@ -125,13 +126,13 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     }
                     var style = document.getElementById('selectionstyle');
                     style.innerHTML = ".selectionRange { background-color: " + diff.color + ";}";
-                    try {
+                    // try {
                         this.selections[diff.senderId] = this.editor.markText(from, to, {
                             className: "selectionRange"
                         })
-                    } catch (error) {
-                        console.log(error)
-                    }
+                    // } catch (error) {
+                    //     console.log(error)
+                    // }
                 } else {
                     if (this.selections[diff.senderId]) {
                         this.selections[diff.senderId].clear();
@@ -143,13 +144,13 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeOrder(diff) {
-        try {
+        // try {
             if (this.current_chapter == diff.chapterIndex) {
                 this.editor.getDoc().replaceRange(diff.text, diff.from, diff.to)
             }
-        } catch (error) {
-            console.log(error)
-        }
+        // } catch (error) {
+        //     console.log(error)
+        // }
     }
 
     getChapter() {

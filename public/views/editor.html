@@ -19,8 +19,10 @@
                 <button id="insertmath">√π</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+
                 <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Images</button>
-                <button id="uploadPluginButton" (click)="showUploadPlugin(true)">Upload Plugin</button>
+                <pluginuploader>
+                </pluginuploader>
 
                 <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
 
@@ -73,5 +75,3 @@
         </fileuploader>
     </div>
 </section>
-<pluginuploader>
-</pluginuploader>
