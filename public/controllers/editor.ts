@@ -1,3 +1,4 @@
+import {KeyMap} from "../utils/keymap.ts";
 import {ParseMap} from "../utils/parseMap.ts";
 import {Component, ElementRef, Renderer, Input, ViewChild, AfterViewInit, OnChanges, SimpleChange} from 'angular2/core';
 import {Http, HTTP_BINDINGS, Response} from 'angular2/http';
@@ -42,6 +43,7 @@ export class EditorController implements AfterViewInit {
     private choosenFont: string;
     private choosenSize: string;
     private cleanDiv;
+    private keymap : KeyMap;
 
     private globalListenFunc: Function;
 
@@ -69,6 +71,8 @@ export class EditorController implements AfterViewInit {
             this.documentService.currentChapter = this.current_chapter;
         }
         this.setFontPickerAndSizePicker();
+        this.keymap = new KeyMap();
+        this.setupKeyCallbacks();
     }
 
     ngOnInit() {
@@ -104,6 +108,14 @@ export class EditorController implements AfterViewInit {
 
             if (diff.newtitle) {
                 this.document.title = diff.newtitle;
+            }
+            
+            if(diff.removeCursor){
+                this.cmcomponent.removeCursor(diff); 
+            } 
+            
+            if(diff.addCursor){
+                this.cmcomponent.addCursor(diff); 
             }
         })
     }
@@ -185,7 +197,6 @@ export class EditorController implements AfterViewInit {
     }
 
     ngOnDestroy() {
-        // Removs "listenGlobal" listener
         this.globalListenFunc();
     }
 
@@ -199,14 +210,12 @@ export class EditorController implements AfterViewInit {
         }
     }
 
-    public globalKeyEvent($event) {
-        var keyMap = {};
-        keyMap[80] = () => {
-            console.log("ctrl+p");
+    public setupKeyCallbacks() {
+        this.keymap.keys["parseCurrentChapter"].callback = () => {
             this.parsePreviewFrame();
         }
-        keyMap[67] = () => {
-            console.log("ctrl+c");
+        this.keymap.keys["parseWholeDocument"].callback = () => {
+            // this should be an own function
             var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
                 this.document.style["fontFamily"] = this.choosenFont;
@@ -219,27 +228,26 @@ export class EditorController implements AfterViewInit {
                 }
             });
         }
-        keyMap[69] = () => {
-            console.log("ctrl+e");
-            this.parseWholeDocument();
+        this.keymap.keys["test"].callback = () => {
+            console.log("test");
         }
+    }
 
+    public globalKeyEvent($event) {
         // ctrl + S ? other browsers?
         if ($event.which == 115 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
             $event.preventDefault();
             return;
         }
-
         // ctrl / CMD + S (firefox + chrome)
         if ($event.which == 83 && ($event.ctrlKey||$event.metaKey)|| ($event.which == 19)) {
             $event.preventDefault();
             return;
         }
-
-        if ($event.ctrlKey) {
-            if (keyMap[$event.which]) {
+        if ($event.ctrlKey || $event.metaKey) {
+            if (this.keymap.referenceKeyList[$event.which]) {
                 $event.preventDefault();
-                keyMap[$event.which]();
+                this.keymap.keys[this.keymap.referenceKeyList[$event.which]].doCallback();
             }
         }
     }

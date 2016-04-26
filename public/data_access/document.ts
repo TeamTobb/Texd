@@ -22,7 +22,6 @@ export class DocumentService {
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
     private jwthelper;
-    public currentChapter: number;
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
@@ -47,7 +46,7 @@ export class DocumentService {
                 var parsed = JSON.parse(message.data)
 
                 if (parsed.newplugin) {
-                    this.getPlugins();
+                    this.getPlugins(() => { });
                 } else if (parsed.senderId != this._senderId) {
                     if (parsed.documentId == this.document.id) {
                         this.diff = parsed;
@@ -79,7 +78,7 @@ export class DocumentService {
         this.http.post('./plugins', JSON.stringify({ plugin: plugin }), { headers: headers }).map((res: Response) => res.json()).subscribe(
             (res) => {
                 if (res.success == true) {
-                    this.getPlugins();
+                    this.getPlugins(() => { });
                     callback();
                 }
             }, (err) => {
@@ -135,9 +134,9 @@ export class DocumentService {
         });
     }
 
-    public getCurrentChapterLines() : Line[] {
+    public getCurrentChapterLines(): Line[] {
         if (this.cm == null) return;
-        var lineList : Line[] = [];
+        var lineList: Line[] = [];
         for (var i = 0; i < this.cm.lineCount(); i++) {
             var text: string = this.cm.getLine(i);
             lineList.push(new Line(text, []));
@@ -156,7 +155,7 @@ export class DocumentService {
 
     public sendDiff(diff: any, chapterIndex: any) {
         if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
-            var color = localStorage.getItem('id_color')
+            var color = localStorage.getItem('id_color') == null ? sessionStorage.getItem('id_color') : localStorage.getItem('id_color')
             if (color != null) {
                 diff.color = color;
             } else {

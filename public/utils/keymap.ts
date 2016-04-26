@@ -1,28 +1,37 @@
 export class KeyMap {
-    public keys: { [name: string]: number };
+    public keys: { [name: string]: KeyItem } = {};
+    public referenceKeyList : { [key : number] : string} = {};
 
     constructor() {
-        // first get standard key settings
-        this.getStandardKeySettings;
-        // then replace those saved by user previously
-        this.getKeysFromUserSettings;
+        this.setupStandardKeySettings();
     }
 
-    private getStandardKeySettings() {
-        this.keys["parseCurrentChapter"] = 80; // p
-        this.keys["createNewChapter"] = 67; // c
-        this.keys["createNewParagraph"] = 78 // n
+    private setupStandardKeySettings() {
+        this.keys["parseCurrentChapter"] = new KeyItem("parseCurrentChapter", 80, "ctrl/cmd+p", "Parses the current chapter and set it in preview");
+        this.keys["parseWholeDocument"] = new KeyItem("parseWholeDocument", 73, "ctrl/cmd+i", "Parses the entire document and set it in preview");
+        this.keys["test"] = new KeyItem("test", 69, "ctrl/cmd+e", "testing..");
+
+        for(var k in this.keys) {
+            this.referenceKeyList[this.keys[k].key] = this.keys[k].name;
+        }
+    }
+}
+
+export class KeyItem {
+    public name: string;
+    public key: number;
+    public shortcut : string;
+    public description: string;
+    public callback : Function;
+
+    constructor(name : string, key : number, shortcut: string, description : string) {
+        this.name = name;
+        this.key = key;
+        this.shortcut = shortcut;
+        this.description = description;
     }
 
-    private getKeysFromUserSettings() {
-        // mock implementation
-        // should get from DB
-        this.keys["parseCurrentChapter"] = 80;
-    }
-
-    // user should have validation by some sort (?) in db?
-    public saveNewUserKeySetting(user: string, keyName: string, keyNumber: number) {
-        this.keys[keyName] = keyNumber;
-        // save to db
+    public doCallback() {
+        if (this.callback) this.callback();
     }
 }
