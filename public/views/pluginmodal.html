@@ -9,14 +9,13 @@
             <input type="text" class="form-control" id="pluginname" [(ngModel)]="pluginname" />
 
             <textarea id="uploadTextArea"></textarea>
-            <button (click)="submit()" class="btn btn-primary">Submit</button>
-            <button (click)="close()" class="btn btn-danger">Cancel</button>
             <alert *ngFor="#alert of alerts;#i = index" [type]="alert.type" dismissible="true" (close)="closeAlert(i)">
                 {{ alert?.msg }}
             </alert>
         </div>
     </modal-content>
     <modal-footer>
-        <button class="btn btn-primary" (click)="pluginModal.close()">Close</button>
+        <button (click)="submit()" class="btn btn-primary">Submit</button>
+        <button (click)="pluginModal.close()" class="btn btn-danger" >Close</button>
     </modal-footer>
 </modal>
