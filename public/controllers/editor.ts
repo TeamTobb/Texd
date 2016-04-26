@@ -12,9 +12,8 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
-import {FileUploadModal} from './fileUploadPage.ts'
+import {FileUpload} from './fileUploadPage.ts'
 import {PluginUploader} from './pluginuploader.ts'
-import {FileUploadPage} from './fileUploadPage.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
@@ -28,7 +27,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploadModal, CORE_DIRECTIVES, PluginUploader, FileUploadPage]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, CORE_DIRECTIVES, PluginUploader, FileUpload]
 })
 
 export class EditorController implements AfterViewInit {
@@ -49,7 +48,7 @@ export class EditorController implements AfterViewInit {
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
     @ViewChild(PluginUploader) pluginuploader: PluginUploader;
-    @ViewChild(FileUploadPage) fileUpload: FileUploadPage;
+    @ViewChild(FileUpload) fileUpload: FileUpload;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
@@ -295,7 +294,7 @@ export class EditorController implements AfterViewInit {
         });
     }
 
-    public showUploadDivToggle(hide) {
+    /*public showUploadDivToggle(hide) {
         //this.showUploadDiv = hide;
         console.log("this.fileUpload.openModal();");
         
@@ -305,15 +304,15 @@ export class EditorController implements AfterViewInit {
 
     public showUploadPlugin(){
         this.pluginuploader.openModal();
-    }
+    }*/
 
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
     }
 
-    uploadClickedImage(file) {
+    uploadClickedImage(file) {        
         this.cmcomponent.insertImageWidget(file);
-        this.showUploadDivToggle(false);
+        //this.showUploadDivToggle(false);
     }
 
     setFontPickerAndSizePicker() {

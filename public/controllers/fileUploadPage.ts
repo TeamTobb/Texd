@@ -1,6 +1,5 @@
 import {Component, NgZone, Injector, provide, AfterViewInit, ViewChild, AfterContentInit, Input, Output, OnChanges, SimpleChange} from 'angular2/core';
 import {CORE_DIRECTIVES} from 'angular2/common';
-import {Modal, ModalConfig, ModalDialogInstance, YesNoModal, ICustomModal, YesNoModalContent, ICustomModalComponent} from 'angular2-modal/angular2-modal';
 import {Http, Headers, HTTP_BINDINGS, Response} from 'angular2/http';
 import {DocumentService} from '../data_access/document.ts';
 import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
@@ -8,50 +7,15 @@ import {Document} from '../domain/document.ts';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 import {EventEmitter} from "angular2/src/facade/async";
 
-import {Router, RouteParams} from 'angular2/router';
-
-
-@Component({
-    selector: 'fileuploaderpage',
-    template: '<fileuploader ></fileuploader>',
-    providers: [Modal]
-})
-export class FileUploadPage {
-    @ViewChild(FileUploadModal) uploadmodal: FileUploadModal;
-    @Input() doc: Document;
-
-    constructor(private routeParams: RouteParams, private modal: Modal) { }
-
-    uploadClickedImage(file) {
-        console.log('image clicked: ' + file)
-    }
-    openModal() {
-        console.log("openModal() NÅ ER DOCUMENT: 1")
-        console.log(this.doc);
-        
-        
-        let resolvedBindings = Injector.resolve([provide(ICustomModal, {
-            useValue: new AdditionCalculateWindowData(2, 3)
-        })]),
-            dialog: ModalDialogInstance = this.modal.open(
-                <any>FileUploadModal,
-                resolvedBindings,
-                new ModalConfig('lg', false, 27)
-            );          
-    }
-}
+import {Modal} from "ng2-modal/Modal";
 
 @Component({
-    selector: 'fileuploader',
-    templateUrl: 'views/fileuploader.html',
-    styleUrls: ['stylesheets/style.css'],
-    providers: [Modal, DocumentService],
-    directives: [Alert, UPLOAD_DIRECTIVES]
+    selector: 'imageUploader',
+    templateUrl: 'views/imageModal.html',
+    providers: [DocumentService],
+    directives: [Modal, UPLOAD_DIRECTIVES, Alert]
 })
-
-export class FileUploadModal implements ICustomModalComponent, AfterViewInit {
-    dialog: ModalDialogInstance;
-    context: AdditionCalculateWindowData;
+export class FileUpload implements AfterViewInit {
     zone: NgZone;
     options: Object = {
         url: './upload/photo'
@@ -69,36 +33,28 @@ export class FileUploadModal implements ICustomModalComponent, AfterViewInit {
     public dirFiles = [];
     public tests = [];
     public currentDoc;
-    //@Output() clickedImage: EventEmitter<any> = new EventEmitter();
+    @Output() clickedImage: EventEmitter<any> = new EventEmitter();
     public imageToUploadToEditor;
-    
+    @Input() doc: Document;
 
-    constructor(private modal: Modal, dialog: ModalDialogInstance, modelContentData: ICustomModal, private documentService: DocumentService) {
-        this.dialog = dialog;
-        this.context = <AdditionCalculateWindowData>modelContentData;
+
+    constructor(private documentService: DocumentService) {
         this.zone = new NgZone({ enableLongStackTrace: false });
-        
-        
-        
-        
+
     }
 
     ngAfterViewInit() {
-        console.log("FileUploadModal to'ern - OK?")
-        console.log(this.currentDoc);
-        
-        var url = window.location.href;
-        var splittedURL = url.split('/')
-        var docID = splittedURL[splittedURL.length-1];
-        
-        this.documentService.getDocument2(docID,(document)=>{
-            this.currentDoc = document
+        setTimeout(() => {
+            console.log("FileUploadModal to'ern - OK?")
+            this.currentDoc = this.doc
             this.findAllPhotos()
-        })
-           
-        
-    }       
-    
+        }, 100)
+
+    }
+
+    onModalOpen() {
+        console.log("on modal open");
+    }
     private findAllPhotos() {
         console.log("1 OK")
         this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
@@ -111,7 +67,7 @@ export class FileUploadModal implements ICustomModalComponent, AfterViewInit {
     }
 
     photoClicked(file) {
-        console.log("clicked: " +file)
+        console.log("clicked: " + file)
         this.clickedImage.emit(file)
     }
 
@@ -169,26 +125,4 @@ export class FileUploadModal implements ICustomModalComponent, AfterViewInit {
         this.dropProgress = Math.floor(uploaded / (total / 100));
 
     }
-
-    onKeyUp(value) {
-        this.dialog.close();
-    }
-
-    close() {
-        this.dialog.close();
-    }
-
-    uploadClickedImage(file) {
-        console.log('image clicked: ' + file)
-    }
-
-
-
-}
-
-class AdditionCalculateWindowData {
-    constructor(
-        public num1: number,
-        public num2: number
-    ) { }
 }

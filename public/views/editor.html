@@ -18,12 +18,13 @@
                 <button id="inserttable">[][]</button>
                 <button id="insertmath">√π</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-                <button (click)="showUploadDivToggle(true)" id="uploadImageButton" style="">Images</button>
+                
+                <imageUploader [doc]=document (clickedImage)="uploadClickedImage($event)">                    
+                </imageUploader>
+                
                 <pluginuploader>
                 </pluginuploader>
-
+                
                 <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
 
                 <select id="selectFont">
@@ -67,16 +68,3 @@
     </div>
 
 </div>
-
-<!--<section *ngIf="showUploadDiv">
-    <div class="uploadDiv">
-        <button (click)="showUploadDivToggle(false)"> Close </button>
-        <fileuploader [document]="document" (clickedImage)="uploadClickedImage($event)">
-        </fileuploader>
-    </div>
-</section>-->
-
-
-<fileuploaderpage [doc]=document >
-</fileuploaderpage>
-
