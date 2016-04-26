@@ -8,7 +8,7 @@ import {Document} from '../domain/document.ts';
 import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 import {EventEmitter} from "angular2/src/facade/async";
 
-
+import {Router, RouteParams} from 'angular2/router';
 
 
 @Component({
@@ -20,7 +20,7 @@ export class FileUploadPage {
     @ViewChild(FileUploadModal) uploadmodal: FileUploadModal;
     @Input() doc: Document;
 
-    constructor(private modal: Modal) { }
+    constructor(private routeParams: RouteParams, private modal: Modal) { }
 
     uploadClickedImage(file) {
         console.log('image clicked: ' + file)
@@ -49,7 +49,7 @@ export class FileUploadPage {
     directives: [Alert, UPLOAD_DIRECTIVES]
 })
 
-export class FileUploadModal implements ICustomModalComponent, AfterViewInit, OnChanges {
+export class FileUploadModal implements ICustomModalComponent, AfterViewInit {
     dialog: ModalDialogInstance;
     context: AdditionCalculateWindowData;
     zone: NgZone;
@@ -71,24 +71,33 @@ export class FileUploadModal implements ICustomModalComponent, AfterViewInit, On
     public currentDoc;
     //@Output() clickedImage: EventEmitter<any> = new EventEmitter();
     public imageToUploadToEditor;
+    
 
     constructor(private modal: Modal, dialog: ModalDialogInstance, modelContentData: ICustomModal, private documentService: DocumentService) {
         this.dialog = dialog;
         this.context = <AdditionCalculateWindowData>modelContentData;
         this.zone = new NgZone({ enableLongStackTrace: false });
-        this.currentDoc = this.documentService.document
+        
+        
+        
+        
     }
 
     ngAfterViewInit() {
         console.log("FileUploadModal to'ern - OK?")
         console.log(this.currentDoc);
-        //this.findAllPhotos()
-    }
-    
-    ngOnChanges(changes: { [propertyName: string]: SimpleChange }){
-        console.log(changes)
         
-    }
+        var url = window.location.href;
+        var splittedURL = url.split('/')
+        var docID = splittedURL[splittedURL.length-1];
+        
+        this.documentService.getDocument2(docID,(document)=>{
+            this.currentDoc = document
+            this.findAllPhotos()
+        })
+           
+        
+    }       
     
     private findAllPhotos() {
         console.log("1 OK")
