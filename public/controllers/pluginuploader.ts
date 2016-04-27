@@ -8,7 +8,6 @@ import {Modal} from "ng2-modal/Modal";
 @Component({
     selector: 'pluginuploader',
     templateUrl: 'views/pluginmodal.html',
-    providers: [DocumentService],
     directives: [Modal, Alert]
 })
 export class PluginUploader{

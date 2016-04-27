@@ -3,7 +3,6 @@ import {Component} from 'angular2/core';
 
 @Component({
     selector: 'keymapPage',
-    providers: [],
     templateUrl: 'views/components/keymappage.html',
     directives: []
 })

@@ -6,8 +6,7 @@ import {DocumentService} from '../data_access/document.ts';
 //<docview *ngFor="#document of documents; #i = index" [title]="documents[i].name" [preview]="documents[i].chapters[0].text" />
 @Component({
   selector: 'docview',
-  templateUrl: 'views/components/docview.html',
-  providers: [DocumentService]
+  templateUrl: 'views/components/docview.html'
 })
 export class DocView implements AfterViewInit {
   @Input() title: string;

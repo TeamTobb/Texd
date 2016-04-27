@@ -3,7 +3,6 @@ import {Router, RouteParams} from 'angular2/router';
 
 @Component({
     selector: 'settingspage',
-    providers: [],
     template: '<div>{{test}}<br> {{chaptersText[current_chapter]}}<br></div>'
 })
 export class SettingsPage {

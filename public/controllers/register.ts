@@ -9,7 +9,6 @@ import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
 @Component({
     selector: 'login',
     templateUrl: 'views/register.html',
-    providers: [HTTP_BINDINGS],
     directives: [Alert]
 })
 export class RegisterController {

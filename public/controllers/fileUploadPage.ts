@@ -12,7 +12,6 @@ import {Modal} from "ng2-modal/Modal";
 @Component({
     selector: 'imageUploader',
     templateUrl: 'views/imageModal.html',
-    providers: [DocumentService],
     directives: [Modal, UPLOAD_DIRECTIVES, Alert]
 })
 export class FileUpload implements AfterViewInit {
