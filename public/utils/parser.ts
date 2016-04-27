@@ -2,9 +2,14 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 
 export class Parser {
     private hashMap: { [id: string]: Plugin } = {};
+    private ip: string;
+    private port: string;
 
-    constructor(hashMap: any) {
+
+    constructor(hashMap: any, ip : string, port : string) {
         this.hashMap = hashMap;
+        this.ip = ip;
+        this.port = port;
     }
 
     public getParsedJSON(inputText: Line[]): string {
@@ -76,8 +81,14 @@ export class Parser {
             }
             else {
                 if (list[elem].startsWith("@")) {
-                    refStack[refStack.length - 1][0].attributes[list[elem].trim()] = list[parseInt(elem) + 1].trim();
-                    list.splice(parseInt(elem) + 1, 1);
+                    if (list[elem].trim() == "@src") {
+                        refStack[refStack.length - 1][0].attributes[list[elem].trim()] = "http://" + this.ip + ":" + this.port + "/" + list[parseInt(elem) + 1].trim();
+                        list.splice(parseInt(elem) + 1, 1);
+                    }
+                    else {
+                        refStack[refStack.length - 1][0].attributes[list[elem].trim()] = list[parseInt(elem) + 1].trim();
+                        list.splice(parseInt(elem) + 1, 1);
+                    }
                 }
                 else {
                     tempText += list[elem];

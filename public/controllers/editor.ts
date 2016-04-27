@@ -305,7 +305,7 @@ export class EditorController implements AfterViewInit {
 
     public parseWholeDocument() {
         var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-            var cssFileLink = '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
+            var cssFileLink = 'stylesheets/htmlview.css';
             var w = window.open("", "_blank", "");
             var docElement = w.document;
             this.writeContentHTML(docElement, cssFileLink, parsedHTML);
@@ -314,8 +314,7 @@ export class EditorController implements AfterViewInit {
 
     public writeContentHTML(docElement, cssFileLink, parsedHTML) {
         var total = "<html><head>";
-        total += "<base href='" + document.location.origin + "' />";
-        total += cssFileLink;
+        total += '<link rel="stylesheet" type="text/css" href="http://' + this.documentService.ip + ":" + this.documentService.port + "/" + cssFileLink + '">';
         total += "</head><body><div id='content'><div id='innercontent'>";
         total += parsedHTML;
         total += "</div></div></body></html>";
@@ -366,7 +365,7 @@ export class EditorController implements AfterViewInit {
             var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanIframe');
             newElement[0].id = 'previewframe';
             var docElement = jQuery(this.element.nativeElement).find('#previewframe')[0].contentWindow.document;
-            var cssFileLink = '<link rel="stylesheet" type="text/css" href="stylesheets/htmlviewsmall.css">'
+            var cssFileLink = 'stylesheets/htmlviewsmall.css'
             this.writeContentHTML(docElement, cssFileLink, parsedHTML);
             this.initializeHandleDragEvents();
         })

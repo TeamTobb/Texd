@@ -26,6 +26,8 @@ export class DocumentService {
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
     public diff: any = {};
+    public ip: string;
+    public port: string;
 
     constructor(private http: Http, private authHttp: AuthHttp) {
         this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
@@ -39,9 +41,14 @@ export class DocumentService {
             this._senderId = "" + Math.random();
         }
 
-
         this.http.get('./wsip').map((res: Response) => res.json()).subscribe(res => {
-            this._socket = new WebSocket('ws://' + res.ip + ':3001');
+            this.ip = res.ip;
+            this.port = res.httpPort;
+            // getting plugins after getting ip and port
+            this.getPlugins(() => {
+                console.log("Plugins loaded");
+            });
+            this._socket = new WebSocket('ws://' + res.ip + ':' + res.wsPort);
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
 
@@ -58,15 +65,12 @@ export class DocumentService {
                 }
             }
         })
-        this.getPlugins(() => {
-            console.log("Plugins loaded");
-        });
     }
 
     public getPlugins(callback) {
         this.http.get('./plugins').map((res: Response) => res.json()).subscribe(res => {
             this.parseMap.generateParseMap(res);
-            this._textParser = new Parser(this.parseMap.parseMap);
+            this._textParser = new Parser(this.parseMap.parseMap, this.ip, this.port);
             this._jsonParser = new jsonToHtml(this.parseMap.parseMap);
             callback();
         });
