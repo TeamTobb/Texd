@@ -21,6 +21,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() document: Document;
     @Input() current_chapter: number;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
+    @Output() emitDoneLoading: EventEmitter<any> = new EventEmitter();
 
     public editor;
     public widgetTest;
@@ -38,7 +39,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter); 
+        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
     }
 
     addCursor(diff) {
@@ -68,10 +69,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.selections[diff.senderId].clear();
             this.selections[diff.senderId] = undefined;
         }
-        
+
         if (this.cursorelements[diff.senderId] != undefined && this.cursorelements[diff.senderId] != null) {
             this.cursorelements[diff.senderId] = null;
-            delete this.cursorelements[diff.senderId];    
+            delete this.cursorelements[diff.senderId];
         }
     }
 
@@ -178,7 +179,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var selectionStyle = document.createElement('style');
         selectionStyle.id = 'selectionstyle';
         document.body.appendChild(selectionStyle);
-        
+
             this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
                 mode: "hashscript",
                 lineNumbers: true,
@@ -186,7 +187,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                 extraKeys: {
                     "Ctrl-Space": "autocomplete"
                 }
-            })
+            });
             this.documentService.cm = this.editor;
             this.editor.on("change", (cm, change) => {
                 if (change.origin != "setValue" && change.origin != "+onParse") {
@@ -222,7 +223,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.editor.on("beforeSelectionChange", (cm, obj) => {
                 this.documentService.sendDiff(obj, this.current_chapter)
             })
-            
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             this.editor.focus();
@@ -279,6 +280,12 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
             else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
         });
+
+        // static timeout, hopefully the document is loaded. else the preview will not be updated and need to be done manually.
+        setTimeout( () => {
+            this.emitDoneLoading.emit(true);
+        }, 500);
+
     }
 
     public changeChapterPositions(from, to) {
@@ -294,6 +301,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeChapter(event, chapter_number: number) {
+        console.log("welrwer");
         this.documentService.sendDiff({
             removeCursor: true
         }, this.current_chapter)

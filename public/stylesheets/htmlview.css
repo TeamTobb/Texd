@@ -38,6 +38,7 @@ body {
     margin-bottom: 1in;
     margin-right: 1in;
     margin-left: 1in;
+    min-height: 600px;
 }
 
 .table-plugin {

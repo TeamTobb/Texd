@@ -246,6 +246,10 @@ export class EditorController implements AfterViewInit {
         this.globalListenFunc();
     }
 
+    public doneLoadingCmComponent(done) {
+        this.parsePreviewFrame();
+    }
+
     public changeChapter(i) {
         this.current_chapter = i;
     }
