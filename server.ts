@@ -169,7 +169,7 @@ app.get('/documents/:documentid/:chapterIndex', (req, res) => {
 
 app.get('/wsip', (req, res) => {
     publicIp.v4((err, ip) => {
-        res.jsonp({ ip: ip })
+        res.jsonp({ ip: ip, httpPort: httpPort, wsPort: wsPort })
     });
 })
 
@@ -181,8 +181,8 @@ app.listen(httpPort, function () {
 
 
 // var server = https.createServer(https_options, app).listen(httpPort, function(){
-    
-// }); 
+
+// });
 
 export var App = app;
 
