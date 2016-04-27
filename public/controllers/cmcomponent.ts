@@ -39,15 +39,12 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        console.log("ON DESTROY")
         this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
     }
 
     addCursor(diff) {
-        console.log("addCursor()");
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
-                console.log("adding cursor :" + diff.senderId);
                 var element = document.createElement('span');
                 element.id = "user" + diff.senderId
                 element.innerHTML = diff.senderId
@@ -294,8 +291,6 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeChapter(event, chapter_number: number) {
-        console.log("Change chapter");
-
         this.documentService.sendDiff({
             removeCursor: true
         }, this.current_chapter)
@@ -386,7 +381,6 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var cursor = this.editor.getCursor();
         var to = cursor;
         to.line = cursor.line;
-        console.log(cursor)
         this.editor.getDoc().replaceRange('\n#img @src "' + file + '" @height "100%" @width "100%" #\n', cursor, to, "paste");
     }
 

@@ -61,8 +61,6 @@ export class EditorController implements AfterViewInit {
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
-        console.log("setting renderer! ");
-        console.log(renderer);
         this.globalListenFunc = renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
@@ -237,12 +235,10 @@ export class EditorController implements AfterViewInit {
 
         $('#selectFont').change(() => {
             this.choosenFont = $('#selectFont').val();
-            console.log(this.choosenFont);
         });
 
         $('#selectSize').change(() => {
             this.choosenSize = $('#selectSize').val();
-            console.log(this.choosenSize);
         });
 
     }
@@ -271,17 +267,13 @@ export class EditorController implements AfterViewInit {
                 document.getElementById('previewframe').innerHTML = parsedHTML;
                 this.document.style["fontFamily"] = this.choosenFont;
                 this.document.style["fontSize"] = this.choosenSize;
-                console.log(this.document.style)
 
                 for (var key in this.document.style) {
                     var value = this.document.style[key];
                     document.getElementById('previewframe').style[key] = value;
                 }
             });
-        }
-        this.keymap.keys["test"].callback = () => {
-            console.log("test");
-        }
+        }       
     }
 
     public globalKeyEvent($event) {

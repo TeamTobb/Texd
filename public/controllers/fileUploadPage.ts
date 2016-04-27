@@ -45,7 +45,6 @@ export class FileUpload implements AfterViewInit {
 
     ngAfterViewInit() {
         setTimeout(() => {
-            console.log("FileUploadModal to'ern - OK?")
             this.currentDoc = this.doc
             this.findAllPhotos()
         }, 100)
@@ -53,10 +52,8 @@ export class FileUpload implements AfterViewInit {
     }
 
     onModalOpen() {
-        console.log("on modal open");
     }
     private findAllPhotos() {
-        console.log("1 OK")
         this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
             if (!files.errno) {
                 files.forEach(file => {
@@ -67,7 +64,6 @@ export class FileUpload implements AfterViewInit {
     }
 
     photoClicked(file) {
-        console.log("clicked: " + file)
         this.clickedImage.emit(file)
     }
 
@@ -78,7 +74,6 @@ export class FileUpload implements AfterViewInit {
         if (index === -1) {
             if (!data.error) {
                 this.selectedFileIsUploaded = true;
-                console.log(data);
                 setTimeout(() => {
                     this.dirFiles.push("uploads/document/" + this.currentDoc._id + "/photos/" + data.originalName);
                 }, 1000)

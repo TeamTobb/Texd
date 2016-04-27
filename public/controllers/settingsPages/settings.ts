@@ -28,7 +28,6 @@ export class SettingsComponent implements AfterViewInit {
     }
 
     public changeChapter(settingType: number) {
-        console.log(settingType);
         switch (settingType) {
             case 0:
                 this.active = 0;

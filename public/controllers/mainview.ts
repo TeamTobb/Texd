@@ -39,13 +39,11 @@ export class MainView{
     }
 
     public goToDashboard() {
-        console.log("Go to dashboard function");
         this.title = "Dashboard";
         this._router.navigate(['Dashboard', 'Documents', {}]);
     }
 
     public goToSettings() {
-        console.log("Go to settings function");
         this.title = "Settings";
         this._router.navigate(['Settings', 'Main', {}]);
     }
