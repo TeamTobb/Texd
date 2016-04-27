@@ -1,7 +1,11 @@
-<br><button (click)="createNewDocument()"> 
+<div class="dashboard">
+    <button style="position: absolute; float: right; top: 0px; right: 40px;" (click)="createNewDocument()"> 
     New document
 </button>
 
-<div *ngFor="#doc of documents; #i = index">
-    <docview (click)="goToDocument(doc._id)" [title]="doc.title" [preview]="doc"></docview>
+    <docview  (click)="createNewDocument()" [title]="newDocument.title" [preview]="newDocument"></docview>
+
+    <div *ngFor="#doc of documents; #i = index">
+        <docview (click)="goToDocument(doc._id)" [title]="doc.title" [preview]="doc"></docview>
+    </div>
 </div>

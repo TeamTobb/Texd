@@ -17,16 +17,23 @@ export class DocView implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.documentService.parseSingleDocument(this.preview._id, (parsedHTML) => {
-      document.getElementById('previewframe' + this.preview._id).innerHTML = parsedHTML;
+    console.log(this.title);
 
-      for (var key in this.preview.style) {
-        var value = this.preview.style[key];
-        document.getElementById('previewframe' + this.preview._id).style[key] = value;
-      }
-    })
+    if (this.preview._id == "newDocument") {
+      document.getElementById('previewframenewDocument').innerHTML = "<div ><br><h1> + </h1><br> <h3> Click to get a new document</h3></div>";
+        
+    } else {
+      this.documentService.parseSingleDocument(this.preview._id, (parsedHTML) => {
+        document.getElementById('previewframe' + this.preview._id).innerHTML = parsedHTML;
+
+        for (var key in this.preview.style) {
+          var value = this.preview.style[key];
+          document.getElementById('previewframe' + this.preview._id).style[key] = value;
+        }
+      })
+    }
   }
-  
+
 }
 
 

@@ -469,6 +469,12 @@ body {
     text-decoration: none;
 }
 
+.dashboard{
+    width: 100%;
+    height: 90%;
+    overflow-x: scroll;
+}
+
 .docView{
     background-color: white;
     border: 2px solid black;
@@ -481,6 +487,15 @@ body {
     overflow: scroll;
     float:left;
     margin: 3%;
+}
+
+.docDelete{
+    float: right;
+    top: 0px; 
+    right: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    
 }
 
 #pluginpageheader {

@@ -18,8 +18,11 @@ export class DashboardComponent {
     private documents: Document[];
     private maxColumns = 3;
     private documentGrid: Document[] = [];
+    newDocument = {_id: "hey", title: "title"};
 
     constructor(private _router: Router, private _documentService: DocumentService) {
+        this.newDocument._id = "newDocument";
+        this.newDocument.title = "New document"
         this._documentService.getDocuments((documents) => {
             this.documents = documents;
         });
@@ -27,7 +30,7 @@ export class DashboardComponent {
 
     ngOnInit() {
         this._documentService.newDocObserver.subscribe((newDoc) => {
-            this.documents.push(newDoc)
+            this.documents.unshift(newDoc)
         })
     }
 
@@ -39,5 +42,10 @@ export class DashboardComponent {
         this._documentService.createNewDocument((res) => {
                         
         });
+    }
+    
+    deleteDocument(document){
+        
+        
     }
 }          
