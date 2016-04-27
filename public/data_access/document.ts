@@ -111,10 +111,33 @@ export class DocumentService {
                 var lines: Line[] = tempDoc.chapters[c].lines;
                 var parsedJSON = this._textParser.getParsedJSON(lines);
                 var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-                totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                totalHTML += "<h1 id=\"" + tempDoc.chapters[c].header + "\">" + tempDoc.chapters[c].header + "</h1>";
                 totalHTML += parsedHTML;
             }
-            callback(totalHTML);
+            var el = document.createElement('html');
+            el.innerHTML = totalHTML;
+            var contentHTML = "";
+            contentHTML += "<ol>";
+            for (var i = 0; i < el.children[1].children.length; i++) {
+                if (el.children[1].children[i].tagName == "H1") {
+                    contentHTML += "<li><a href=\"#" + el.children[1].children[i].textContent + "\">" + el.children[1].children[i].textContent + "</a></li>";
+                    contentHTML += "<ol>";
+                    for (var j = i + 1; j < el.children[1].children.length; ++j) {
+                        if (el.children[1].children[j].tagName == "H2") {
+                            el.children[1].children[j].id = el.children[1].children[j].textContent;
+                            contentHTML += "<li><a href=\"#" + el.children[1].children[j].textContent + "\">" + el.children[1].children[j].textContent + "</a></li>";
+                        }
+                        if (el.children[1].children[j].tagName == "H1") {
+                            i = j - 1;
+                            break;
+                        }
+                    }
+                    contentHTML += "</ol>";
+                }
+            }
+            contentHTML += "</ol>"
+            contentHTML += el.innerHTML; 
+            callback(contentHTML);
         })
     }
 
