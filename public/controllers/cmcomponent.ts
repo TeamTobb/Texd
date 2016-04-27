@@ -42,6 +42,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
     }
 
+// not used currently.. remove ?
     addCursor(diff) {
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
@@ -58,7 +59,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (diff.removeUser) {
             if (document.getElementById('user' + diff.senderId)) {
                 var element = document.getElementById('user' + diff.senderId);
-                document.getElementById('buttonsContainer').removeChild(element);
+                document.getElementById('userSpanBox').removeChild(element);
             }
         }
         if (this.cursorwidgets[diff.senderId]) {
@@ -85,10 +86,11 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                 }
                 if (!document.getElementById('user' + diff.senderId)) {
                     var element = document.createElement('span');
-                    element.id = "user" + diff.senderId
-                    element.innerHTML = diff.senderId
-                    element.style.color = diff.color
-                    document.getElementById('buttonsContainer').appendChild(element)
+                    element.id = "user" + diff.senderId;
+                    element.className = "userSpanElement";
+                    element.innerHTML = diff.senderId;
+                    element.style.color = diff.color;
+                    document.getElementById('userSpanBox').appendChild(element);
                 }
 
                 // If not already created, create a HTML element for the cursor, bound to senderId

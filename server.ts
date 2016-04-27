@@ -53,7 +53,7 @@ var documentService = new DocumentService.DocumentService();
 server.on('connection', ws => {
     ws.on('message', message => {
         var parsedMessage = JSON.parse(message);
-           
+
        if (parsedMessage.newDocument) {
             documentService.createNew(parsedMessage.document, (doc) => {
                 broadcast(JSON.stringify({ newDocument: true, document: doc }))
@@ -116,6 +116,8 @@ var storage = multer.diskStorage({
             var element = req.rawHeaders[index];
             if (element == "originalName") {
                 originalName = req.rawHeaders[index + 1];
+                // replace all whitespace with nothing
+                originalName = originalName.replace(/\s/g, "");
             }
         }
         callback(null, originalName);
