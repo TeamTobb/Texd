@@ -59,8 +59,6 @@
     <!-- bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- testing with jspdf -->
-    <script src="lib/jspdf.debug.js"></script>
     <!--<script src="node_modules/systemjs/dist/system.src.js"></script>-->
 
 
@@ -77,7 +75,7 @@
                 },
                  "angular2-jwt": {
                     defaultExtension: "js"
-                }, 
+                },
                 'angular2-modal': {
                     defaultExtension: 'js'
                 },
@@ -88,9 +86,9 @@
             map: {
                 "angular2": "/angular2",
                 "moment": "moment/moment.js",
-                "angular2-jwt": "angular2-jwt", 
-                "angular2-modal": "/angular2-modal/dist/commonjs", 
-                "ng2-bootstrap": "/ng2-bootstrap/bundles" 
+                "angular2-jwt": "angular2-jwt",
+                "angular2-modal": "/angular2-modal/dist/commonjs",
+                "ng2-bootstrap": "/ng2-bootstrap/bundles"
             }
       });
       System.import('controllers/index')

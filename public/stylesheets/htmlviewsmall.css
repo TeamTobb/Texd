@@ -1,0 +1,50 @@
+.image-widget {
+    padding:10px 0;
+    background-color:#f4f4f4;
+    box-shadow:2px 2px 2px #DEDEDE;
+    width:96%;
+    text-align: center;
+    margin: 0 auto;
+}
+.image-frame {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.image-text {
+    display: inline-block;
+    padding:3px 0 4px;
+    font-size:small;
+    margin:0 auto;
+}
+
+body {
+    background-color: gray;
+    margin: auto;
+}
+
+#content {
+    background-color: white;
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    width: 90%;
+    overflow-x: hidden;
+    word-wrap: break-word;
+}
+
+#innercontent {
+    margin-top: 0.5in;
+    margin-bottom: 0.5in;
+    margin-right: 0.5in;
+    margin-left: 0.5in;
+}
+
+.table-plugin {
+    margin: auto;
+    border: 1px solid gray;
+}
+
+td {
+    border: 1px solid gray;
+}

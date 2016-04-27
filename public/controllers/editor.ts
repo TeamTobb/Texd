@@ -44,6 +44,15 @@ export class EditorController implements AfterViewInit {
     private cleanDiv;
     private keymap : KeyMap;
 
+    // drag event variables
+    private offsetRight;
+    private isResizing;
+    private lastDownX;
+    private container;
+    private left;
+    private right;
+    private handle;
+
     private globalListenFunc: Function;
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
@@ -107,13 +116,13 @@ export class EditorController implements AfterViewInit {
             if (diff.newtitle) {
                 this.document.title = diff.newtitle;
             }
-            
+
             if(diff.removeCursor){
-                this.cmcomponent.removeCursor(diff); 
-            } 
-            
+                this.cmcomponent.removeCursor(diff);
+            }
+
             if(diff.addCursor){
-                this.cmcomponent.addCursor(diff); 
+                this.cmcomponent.addCursor(diff);
             }
         })
     }
@@ -122,29 +131,72 @@ export class EditorController implements AfterViewInit {
         this.cmcomponent.cursorActivity(diff);
     }
 
-    ngAfterViewInit() {
-        // initialize jquery functions
-        var offsetRight = "40%";
-        var isResizing = false,
-            lastDownX = 0;
-        var container = $('#containerForEditor'),
-            left = $('#leftInContainerForEditor'),
-            right = $('#rightInContainerForEditor'),
-            handle = $('#handle2');
-        handle.on('mousedown', function (e) {
-            isResizing = true;
-            lastDownX = e.clientX;
+    initializeHandleDragEvents() {
+        $("#previewframe").each( () => {
+            var iframe = $("#previewframe");
+            iframe.on("load", () => {
+                iframe.contents().on('mousemove', (e) => {
+                    if (!this.isResizing)
+                        return;
+                    var iframeX = window.parent.document.getElementById('previewframe').getBoundingClientRect().left;
+                    this.offsetRight = this.container.width() - (e.clientX + iframeX - this.container.offset().left);
+                    this.left.css('right', this.offsetRight);
+                    this.right.css('width', this.offsetRight);
+                }).on('mouseup', (e) => {
+                    this.isResizing = false;
+                });
+            });
         });
-        $(document).on('mousemove', function (e) {
-            // we don't want to do anything if we aren't resizing.
-            if (!isResizing)
+    }
+
+    ngAfterViewInit() {
+        this.offsetRight = "40%";
+        this.isResizing = false,
+        this.lastDownX = 0;
+        this.container = $('#containerForEditor');
+        this.left = $('#leftInContainerForEditor');
+        this.right = $('#rightInContainerForEditor');
+        this.handle = $('#handle2');
+        this.handle.on('mousedown', (e) => {
+            this.isResizing = true;
+            this.lastDownX = e.clientX;
+        });
+        $(document).on('mousemove', (e) => {
+            if (!this.isResizing)
                 return;
-            offsetRight = container.width() - (e.clientX - container.offset().left);
-            left.css('right', offsetRight);
-            right.css('width', offsetRight);
-        }).on('mouseup', function (e) {
-            // stop resizing
-            isResizing = false;
+            this.offsetRight = this.container.width() - (e.clientX - this.container.offset().left);
+            this.left.css('right', this.offsetRight);
+            this.right.css('width', this.offsetRight);
+        }).on('mouseup', (e) => {
+            this.isResizing = false;
+        });
+
+        $("#previewframe").each( () => {
+            var iframe = $("#previewframe");
+            iframe.on("load", () => {
+                iframe.contents().on('mousemove', (e) => {
+                    if (!this.isResizing)
+                        return;
+                    var iframeX = window.parent.document.getElementById('previewframe').getBoundingClientRect().left;
+                    this.offsetRight = this.container.width() - (e.clientX + iframeX - this.container.offset().left);
+                    this.left.css('right', this.offsetRight);
+                    this.right.css('width', this.offsetRight);
+                }).on('mouseup', (e) => {
+                    this.isResizing = false;
+                });;
+            });
+        });
+
+        $('#previewframe').contents().find('html').on('mousemove', (e) => {
+            if (!this.isResizing)
+                return;
+            var iframeX = window.parent.document.getElementById('previewframe');
+            var rect = iframeX.getBoundingClientRect().left;
+            this.offsetRight = this.container.width() - (e.clientX + rect - this.container.offset().left);
+            this.left.css('right', this.offsetRight);
+            this.right.css('width', this.offsetRight);
+        }).on('mouseup', (e) => {
+            this.isResizing = false;
         });
 
         $("#updatePreview").click(() => {
@@ -168,7 +220,7 @@ export class EditorController implements AfterViewInit {
         $("#hidePreview").click(() => {
             if (previewHidden) {
                 $("#rightInContainerForEditor").show(650);
-                $("#leftInContainerForEditor").animate({ "right": offsetRight }, "slow");
+                $("#leftInContainerForEditor").animate({ "right": this.offsetRight }, "slow");
                 previewHidden = false;
             }
             else {
@@ -252,45 +304,30 @@ export class EditorController implements AfterViewInit {
 
     public parseWholeDocument() {
         var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-            var total = "<html><body><head>";
-            // should probably not add the whole stylesheet? make a simpler one just for parsing?
-            total += "<base href='" + document.location.origin + "' />";
-            total += '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
-            total += "<title>test</title></head><div id='content'><div id='innercontent'";
-            total += parsedHTML;
-            total += "</div></div></body></html>";
-            // var d2 =
+            var cssFileLink = '<link rel="stylesheet" type="text/css" href="stylesheets/htmlview.css">';
             var w = window.open("", "_blank", "");
-            var doc = w.document;
-            doc.open();
-            doc.write(total);
-            this.document.style["fontFamily"] = this.choosenFont;
-            this.document.style["fontSize"] = this.choosenSize;
-            for (var key in this.document.style) {
-                var value = this.document.style[key];
-                console.log(value);
-                doc.getElementById('innercontent').style[key] = value;
-            }
-            doc.close();
-
-            // testing for pdf
-            var doc2 = new jsPDF();
-            console.log(doc2);
-            // var elementHandler = {
-            //   '#ignorePDF': function (element, renderer) {
-            //     return true;
-            //   }
-            // };
-            var source = w.document.getElementsByTagName("body")[0];
-            doc2.fromHTML(
-                source,
-                15,
-                15,
-                {
-                    'width': 180
-                });
-            doc2.output("dataurlnewwindow");
+            var docElement = w.document;
+            this.writeContentHTML(docElement, cssFileLink, parsedHTML);
         });
+    }
+
+    public writeContentHTML(docElement, cssFileLink, parsedHTML) {
+        var total = "<html><head>";
+        total += "<base href='" + document.location.origin + "' />";
+        total += cssFileLink;
+        total += "</head><body><div id='content'><div id='innercontent'>";
+        total += parsedHTML;
+        total += "</div></div></body></html>";
+        var doc = docElement;
+        doc.open();
+        doc.write(total);
+        this.document.style["fontFamily"] = this.choosenFont;
+        this.document.style["fontSize"] = this.choosenSize;
+        for (var key in this.document.style) {
+            var value = this.document.style[key];
+            doc.getElementById('innercontent').style[key] = value;
+        }
+        doc.close();
     }
 
     public showUploadDivToggle(hide) {
@@ -332,21 +369,14 @@ export class EditorController implements AfterViewInit {
 
     parsePreviewFrame() {
         this.documentService.parseChapter((parsedHTML) => {
-            this.cleanDiv = $(".widget-templates .cleanDiv").clone();
-
-            document.getElementById('rightInContainerForEditor').replaceChild(this.cleanDiv[0], document.getElementById('previewframe'));
-            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanDiv')
-            newElement[0].innerHTML = parsedHTML;
-            newElement[0].id = 'previewframe'
-
-            this.document.style["fontFamily"] = this.choosenFont;
-            this.document.style["fontSize"] = this.choosenSize;
-            this.documentService.changeStyle(this.document.id, this.document.style);
-
-            for (var key in this.document.style) {
-                var value = this.document.style[key];
-                document.getElementById('previewframe').style[key] = value;
-            }
+            var cleanIframe = $(".widget-templates .cleanIframe").clone();
+            document.getElementById('rightInContainerForEditor').replaceChild(cleanIframe[0], document.getElementById('previewframe'));
+            var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanIframe');
+            newElement[0].id = 'previewframe';
+            var docElement = jQuery(this.element.nativeElement).find('#previewframe')[0].contentWindow.document;
+            var cssFileLink = '<link rel="stylesheet" type="text/css" href="stylesheets/htmlviewsmall.css">'
+            this.writeContentHTML(docElement, cssFileLink, parsedHTML);
+            this.initializeHandleDragEvents();
         })
     }
 
