@@ -25,9 +25,6 @@ export class DocView implements AfterViewInit {
         var value = this.preview.style[key];
         document.getElementById('previewframe' + this.preview._id).style[key] = value;
       }
-
-      console.log("DONE with ;" + this.preview._id)
-
     })
   }
   

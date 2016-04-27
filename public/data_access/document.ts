@@ -60,9 +60,11 @@ export class DocumentService {
                 var parsed = JSON.parse(message.data)
                 console.log(message);                
                 
-                if (parsed.newDoc){                    
+                if (parsed.newDocument){                    
                     console.log("you can now update"+this.newDoc)  
                     this.newDoc = parsed.document;
+                    console.log("Parsed.doc i public/access");                    
+                    console.log(parsed.document);                    
                     this._newDocObserver.next(this.newDoc);                                                          
                 }                
                 if (parsed.newplugin) {

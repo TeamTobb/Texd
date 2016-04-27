@@ -51,25 +51,19 @@ var documentService = new DocumentService.DocumentService();
 
 
 server.on('connection', ws => {
-    ws.on('message', message2 => {
-        var message = JSON.parse(message2);
-        
-         documentService.updateDocument(message);
-           broadcast(message)
-        /*
-        if (message.diff) {
-            documentService.updateDocument(message);
-            broadcast(message)
-
-        } else if (message.newDocument) {
-            console.log("Server Mottatt");
-            documentService.createNew(message, (doc) => {
+    ws.on('message', message => {
+        var parsedMessage = JSON.parse(message);
+           
+       if (parsedMessage.newDocument) {
+            console.log("ws newDocument");
+            documentService.createNew(parsedMessage.document, (doc) => {
                 broadcast(JSON.stringify({ newDocument: true, document: doc }))
             })
         } else {
+            console.log("ws diff")
+            documentService.updateDocument(parsedMessage);
             broadcast(message)
-
-        }*/
+        }
     });
 });
 

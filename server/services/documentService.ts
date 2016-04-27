@@ -76,7 +76,7 @@ export class DocumentService {
         }
     }
 
-    updateDocument(diff) {
+    updateDocument(diff) {       
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
