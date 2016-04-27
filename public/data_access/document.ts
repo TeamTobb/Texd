@@ -109,7 +109,7 @@ export class DocumentService {
             var totalHTML: string = "";
             for (var c in tempDoc.chapters) {
                 var lines: Line[] = tempDoc.chapters[c].lines;
-                var parsedJSON = this._textParser.getParsedJSON(lines);
+                var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
                 var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
                 totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
                 totalHTML += parsedHTML;
@@ -128,7 +128,7 @@ export class DocumentService {
                 var totalHTML: string = "";
                 for (var c in tempDoc.chapters) {
                     var lines: Line[] = tempDoc.chapters[c].lines;
-                    var parsedJSON = this._textParser.getParsedJSON(lines);
+                    var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
                     var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
                     totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
                     totalHTML += parsedHTML;
@@ -151,7 +151,7 @@ export class DocumentService {
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
             var lines: Line[] = this.getCurrentChapterLines();
-            var parsedJSON = this._textParser.getParsedJSON(lines);
+            var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
             callback(parsedHTML);
         }
