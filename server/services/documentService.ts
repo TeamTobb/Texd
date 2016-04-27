@@ -15,24 +15,20 @@ export class DocumentService {
 
     constructor() {
         documentRoutes.getAllDocuments((documents) => {
-            console.log(JSON.stringify(documents, null, 2));
             for (var document of documents) {
                 this.documents[document["id"]] = document;
             }
-            console.log(JSON.stringify(this.documents, null, 2));
             this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
-                    console.log(key + "is getting updated...: ");
                     documentRoutes.saveDocument(this.documents[key], (error, updatedDocumentId) => {
                         var documentId: string = key;
                         if (error) {
                             console.log(error)
                         } else {
-                            console.log("just updated doc: " + updatedDocumentId + " to Databse")
                             this.documentIsUpdated[updatedDocumentId] = false;
                         }
                     })
@@ -40,7 +36,6 @@ export class DocumentService {
             }
         }, 5000);
     }
-
 
     createNew(newDocument, callback) {
         var lines = [new Line(" ", []), new Line("", []), new Line("", [])];
@@ -92,18 +87,15 @@ export class DocumentService {
             document._style = diff.documentStyle;
         }
         else if (diff.deleteChapter) {
-            console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
         }
 
         else if (diff.newchapterName) {
-            console.log("Changing chapter name")
             if (document._chapters[diff.chapterIndex] != undefined) {
                 document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
         }
         else if (diff.changeChapter) {
-            console.log("changing position on chapters");
             if (document._chapters[diff.fromChapter] != undefined && document._chapters[diff.toChapter] != undefined) {
                 var fromChapter = document._chapters[diff.fromChapter];
                 document._chapters.splice(diff.fromChapter, 1);
@@ -127,8 +119,6 @@ export class DocumentService {
 
                         lines.splice(diff.from.line + 1, 0, line)
                     } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
-                        console.log("Tekst erstattet med bokstaver")
-
                         var fromLine = diff.from.line;
                         var fromCh = diff.from.ch;
                         var toLine = diff.to.line;

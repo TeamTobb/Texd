@@ -43,17 +43,14 @@ var documentArray = [];
 documentArray.push(document1, document2, document3, document4, document5, document6, document7);
 
 export function getFilesInDir(req: express.Request, res: express.Response) {
-    console.log("getFilesInDir" + req.params.id);
     var docIdDir = {}
     docIdDir["photos"] = {}
     var fs = require('fs');
     var result = fs.readdir("./public/uploads/document/" + req.params.id + "/photos/", (err, files) => {
         if (err) {
             console.log(err)
-            console.log("Error in getFilesInDir");
             res.jsonp(err)
         } else {
-            console.log("File Success");
             res.jsonp(files);
         }
     })
@@ -89,30 +86,6 @@ export function createNewDocument(document, callback) {
         }
     });
 }
-
-// export function getDocuments(req: express.Request, res: express.Response) {
-//     console.log("getDocuments()");
-
-//     repository.find({}, (error, documents) => {
-//         if (error) {
-//             console.log(error);
-//             res.jsonp(error);
-//         } else if (!documents.length) {
-//             console.log("No documents found");
-//             repository.create((documentArray), (error, document2) => {
-//                 if (error) {
-//                     console.log(error);
-//                 } else {
-//                     getDocuments(req, res);
-//                 }
-//             });
-//         } else {
-//             console.log("We found documents");
-//             res.jsonp(documents);
-//         }
-//     });
-// }
-
 
 export function saveDocument(document, callback) {
     repository.update({ _id: document._id }, document, (error, document2) => {

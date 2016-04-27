@@ -16,7 +16,6 @@ import { ACCORDION_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
     directives: [DocView, ACCORDION_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
 export class DashboardComponent {
-    public text: string = "test string in dashboard";
     private documents: Document[];
     private maxColumns = 3;
     private documentGrid: Document[] = [];
@@ -29,18 +28,15 @@ export class DashboardComponent {
 
     ngOnInit() {
         this._documentService.newDocObserver.subscribe((newDoc) => {
-            console.log("NÅ SKJER DET! ");
             this.documents.push(newDoc)
         })
     }
 
     public goToDocument(documentId: string) {
-        console.log("passing id " + documentId);
         this._router.navigate(['Editor', { id: documentId }]);
     }
 
     createNewDocument() {
-        console.log("CreateNewDocfrom dashbaord");
         this._documentService.createNewDocument((res) => {
                         
         });

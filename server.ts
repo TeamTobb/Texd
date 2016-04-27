@@ -55,12 +55,10 @@ server.on('connection', ws => {
         var parsedMessage = JSON.parse(message);
            
        if (parsedMessage.newDocument) {
-            console.log("ws newDocument");
             documentService.createNew(parsedMessage.document, (doc) => {
                 broadcast(JSON.stringify({ newDocument: true, document: doc }))
             })
         } else {
-            console.log("ws diff")
             documentService.updateDocument(parsedMessage);
             broadcast(message)
         }

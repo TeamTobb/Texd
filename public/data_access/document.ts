@@ -53,18 +53,13 @@ export class DocumentService {
             this.port = res.httpPort;
             // getting plugins after getting ip and port
             this.getPlugins(() => {
-                console.log("Plugins loaded");
             });
             this._socket = new WebSocket('ws://' + res.ip + ':' + res.wsPort);
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
-                console.log(message);                
                 
                 if (parsed.newDocument){                    
-                    console.log("you can now update"+this.newDoc)  
                     this.newDoc = parsed.document;
-                    console.log("Parsed.doc i public/access");                    
-                    console.log(parsed.document);                    
                     this._newDocObserver.next(this.newDoc);                                                          
                 }                
                 if (parsed.newplugin) {
@@ -202,7 +197,6 @@ export class DocumentService {
     }
 
     public getChapter(chapterIndex: number, callback: (chapter: any) => any) {
-        console.log("get chapter")
         this.http.get('/documents/' + this.document.id + '/' + chapterIndex).map((res: Response) => res.json()).subscribe(res => {
             callback(res);
         })
@@ -219,7 +213,6 @@ export class DocumentService {
     public getDocuments(callback: (documents: Document[]) => void) {
         var documents: Document[] = Array<Document>();
         this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
-            console.log(res);
             for (var doc in res) {
                 documents.push(new Document([], [], [], [], [], res[doc]))
             }
@@ -229,7 +222,6 @@ export class DocumentService {
 
     public getSnappets(callback: (snappets: any) => void) {
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
-            console.log("we got snappets: " + JSON.stringify(res, null, 2))
             callback(res);
         })
     }
@@ -240,16 +232,13 @@ export class DocumentService {
     }
 
     public getFilesInDir(documentId, callback: (files: any) => void) {
-        console.log("2 OK" + documentId)
         this.http.get('./getFilesInDir/' + documentId).map((res: Response) => res.json()).subscribe(res => {
-            console.log("we got files from dir: " + JSON.stringify(res, null, 2))
             callback(res);
         })
     }
 
     public createNewDocument(callback: (files: any) => void) {
         if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
-            console.log("IF OK");
             this._socket.send(JSON.stringify({newDocument:true}));
         }        
     }
