@@ -26,7 +26,6 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 @Component({
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
-    providers: [DocumentService, HTTP_BINDINGS],
     directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, CORE_DIRECTIVES, PluginUploader, FileUpload]
 })
 

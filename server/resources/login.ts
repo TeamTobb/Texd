@@ -40,8 +40,11 @@ passport.use(new BearerStrategy(
 router.post('/login', passport.authenticate('local'), (req, res, next) => {
     findUser(req.user.username, (user) => {
         if (user) {
-            console.log('login: ' + req.user)
-            var token = jwt.encode(req.user, secret);
+            console.log('login: ' + req.user); 
+            var token = jwt.encode({
+                username: req.user.username, 
+                id: req.user._id
+            }, secret); 
             res.json({ success: true, token: token });
         } else {
             res.json({ success: false })

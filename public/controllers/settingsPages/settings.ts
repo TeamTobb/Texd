@@ -3,12 +3,10 @@ import {Component, OnInit, AfterViewInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {SettingsPage} from './settingspage';
 import {DocumentStyle} from './settingsPages/documentStyle';
-import {DocumentService} from '../data_access/document.ts';
 
 @Component({
     selector: 'settings',
     templateUrl: 'views/settings.html',
-    providers: [DocumentService],
     directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([

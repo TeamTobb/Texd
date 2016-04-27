@@ -9,7 +9,6 @@ import {KeymapPage} from './keymappage';
 @Component({
     selector: 'settings',
     templateUrl: 'views/settings.html',
-    providers: [DocumentService],
     directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([

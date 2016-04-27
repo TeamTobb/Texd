@@ -6,7 +6,6 @@ import {PluginItem} from '../../utils/parseMap';
 
 @Component({
     selector: 'pluginPage',
-    providers: [],
     templateUrl: 'views/components/pluginpage.html',
     directives: []
 })

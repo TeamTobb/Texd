@@ -14,7 +14,6 @@ import {DocumentService} from '../../data_access/document.ts';
 
 @Component({
     selector: 'documentStyle',
-    providers: [],
     templateUrl: 'views/settingspages/documentStyle.html',
     directives: [Alert]
 })

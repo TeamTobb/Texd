@@ -12,7 +12,6 @@ import { ACCORDION_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 @Component({
     selector: 'dashboard',
     templateUrl: 'views/documents.html',
-    providers: [DocumentService, HTTP_BINDINGS],
     directives: [DocView, ACCORDION_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
 export class DashboardComponent {

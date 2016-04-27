@@ -26,8 +26,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     public widgetTest;
     public cursorwidgets = {};
     public selections = {};
-    public cursorelements = {};
-
+    public cursorelements: { [senderId: string]: HTMLElement } = {};
     public inside_new_snappet = false;
     public disable_rich_text = false;
 
@@ -39,12 +38,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        console.log("ON DESTROY")
-        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
+        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter); 
     }
 
     addCursor(diff) {
-        console.log("addCursor()");
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
                 console.log("adding cursor :" + diff.senderId);
@@ -72,6 +69,11 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.selections[diff.senderId].clear();
             this.selections[diff.senderId] = undefined;
         }
+        
+        if (this.cursorelements[diff.senderId] != undefined && this.cursorelements[diff.senderId] != null) {
+            this.cursorelements[diff.senderId] = null;
+            delete this.cursorelements[diff.senderId];    
+        }
     }
 
     cursorActivity(diff) {
@@ -90,23 +92,23 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                 }
 
                 // If not already created, create a HTML element for the cursor, bound to senderId
-                if (this.cursorelements[diff.senderId] == undefined) {
+                if (this.cursorelements[diff.senderId] == null || this.cursorelements[diff.senderId] == undefined) {
                     var node = $(".widget-templates .cursor-widget").clone();
                     element = node[0];
                     element.id = 'cursor' + diff.senderId;
                     element.style.border = '1px solid ' + diff.color;
-                    this.cursorelements[diff.senderId] = element; 
+                    this.cursorelements[diff.senderId] = element;
                 }
-                
+
                 // Clear the existing widget
                 if (this.cursorwidgets[diff.senderId] != undefined) {
                     this.cursorwidgets[diff.senderId].clear();
-                } 
-                
+                }
+
                 // Create a cursor with the HTML element
                 this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
                     widget: this.cursorelements[diff.senderId]
-                })                
+                })
             } else if (diff.ranges) {
                 var from = {
                     line: diff.ranges[0].anchor.line,
@@ -177,52 +179,51 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var selectionStyle = document.createElement('style');
         selectionStyle.id = 'selectionstyle';
         document.body.appendChild(selectionStyle);
-
-        this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
-            mode: "hashscript",
-            lineNumbers: true,
-            lineWrapping: true,
-            extraKeys: {
-                "Ctrl-Space": "autocomplete"
-            }
-        })
-        this.documentService.cm = this.editor;
-        this.editor.on("change", (cm, change) => {
-            if (change.origin != "setValue" && change.origin != "+onParse") {
-                for (var r in change.removed) {
-                    if (change.removed[r].indexOf("#") != -1) {
-                        this.parseWidgets();
-                        break;
-                    }
+        
+            this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
+                mode: "hashscript",
+                lineNumbers: true,
+                lineWrapping: true,
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete"
                 }
-                for (var r in change.text) {
-                    if (change.text[r].indexOf("#") != -1) {
-                        this.parseWidgets();
-                        break;
-                    }
-                }
-            }
-            if (typeof (change.origin) !== 'undefined') {
+            })
+            this.documentService.cm = this.editor;
+            this.editor.on("change", (cm, change) => {
                 if (change.origin != "setValue" && change.origin != "+onParse") {
-                    this.documentService.sendDiff(change, this.current_chapter);
+                    for (var r in change.removed) {
+                        if (change.removed[r].indexOf("#") != -1) {
+                            this.parseWidgets();
+                            break;
+                        }
+                    }
+                    for (var r in change.text) {
+                        if (change.text[r].indexOf("#") != -1) {
+                            this.parseWidgets();
+                            break;
+                        }
+                    }
                 }
-            }
-        });
+                if (typeof (change.origin) !== 'undefined') {
+                    if (change.origin != "setValue" && change.origin != "+onParse") {
+                        this.documentService.sendDiff(change, this.current_chapter);
+                    }
+                }
+            });
+            this.editor.on("keypress", (cm, e) => {
+                this.onKeyPressEvent(cm, e);
+            });
 
-        this.editor.on("keypress", (cm, e) => {
-            this.onKeyPressEvent(cm, e);
-        });
+            this.editor.on("cursorActivity", (cm, change) => {
+                this.documentService.sendDiff({
+                    cursorActivity: this.editor.getCursor(),
+                }, this.current_chapter)
+            })
 
-        this.editor.on("cursorActivity", (cm, change) => {
-            this.documentService.sendDiff({
-                cursorActivity: this.editor.getCursor(),
-            }, this.current_chapter)
-        })
-
-        this.editor.on("beforeSelectionChange", (cm, obj) => {
-            this.documentService.sendDiff(obj, this.current_chapter)
-        })
-
+            this.editor.on("beforeSelectionChange", (cm, obj) => {
+                this.documentService.sendDiff(obj, this.current_chapter)
+            })
+            
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             this.editor.focus();
