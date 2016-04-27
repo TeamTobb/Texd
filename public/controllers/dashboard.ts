@@ -27,8 +27,22 @@ export class DashboardComponent {
         });
     }
 
+    ngOnInit() {
+        this._documentService.newDocObserver.subscribe((newDoc) => {
+            console.log("NÅ SKJER DET! ");
+            this.documents.push(newDoc)
+        })
+    }
+
     public goToDocument(documentId: string) {
         console.log("passing id " + documentId);
         this._router.navigate(['Editor', { id: documentId }]);
+    }
+
+    createNewDocument() {
+        console.log("CreateNewDocfrom dashbaord");
+        this._documentService.createNewDocument((res) => {
+                        
+        });
     }
 }          

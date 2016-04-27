@@ -15,16 +15,15 @@ export class DocumentService {
 
     constructor() {
         documentRoutes.getAllDocuments((documents) => {
-                console.log(JSON.stringify(documents, null, 2));
-                for (var document of documents) {
-                    this.documents[document["id"]] = document;
-                }
-                console.log(JSON.stringify(this.documents, null, 2));
-                this.documentIsUpdated[document["id"]] = false
+            console.log(JSON.stringify(documents, null, 2));
+            for (var document of documents) {
+                this.documents[document["id"]] = document;
+            }
+            console.log(JSON.stringify(this.documents, null, 2));
+            this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
-            // console.log("DB tick")
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
                     console.log(key + "is getting updated...: ");
@@ -42,6 +41,20 @@ export class DocumentService {
         }, 5000);
     }
 
+
+    createNew(newDocument, callback) {
+        var lines = [new Line(" ", []), new Line("", []), new Line("", [])];
+        var chapters = [new Chapter("Chapter1", lines)];
+        var style1 = {}
+        style1["fontSize"] = "12px";
+        style1["fontFamily"] = "\"Times New Roman\", Times, serif";
+        var document = new Document(9, "new", "Name 1", ["nil", "nil2"], chapters, style1);
+        documentRoutes.createNewDocument(document, (doc) => {            
+            this.documents[doc._id] = doc;
+            callback(doc)
+        })
+    }
+
     getChapter(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             var documentid: string = req.params.documentid;
@@ -51,28 +64,23 @@ export class DocumentService {
         }
     }
 
-
     getDocument(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             var documentid: string = req.params.id;
             res.jsonp(this.documents[documentid]);
-            console.log("Fant doc: " + req.params.id);
         }
     }
     getDocuments(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             res.jsonp(this.documents);
-            console.log("Fant alle docs: ");
         }
     }
 
-    updateDocument(diff2) {
-        var diff = JSON.parse(diff2);
+    updateDocument(diff) {
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
         if (diff.newchapter) {
-            console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
         }

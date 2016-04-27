@@ -1,3 +1,7 @@
+<br><button (click)="createNewDocument()"> 
+    New document
+</button>
+
 <div *ngFor="#doc of documents; #i = index">
     <docview (click)="goToDocument(doc._id)" [title]="doc.title" [preview]="doc"></docview>
 </div>

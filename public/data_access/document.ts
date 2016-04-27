@@ -25,10 +25,16 @@ export class DocumentService {
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
+    
+    public newDocObserver: Observable<any>;
+    private _newDocObserver: Observer<any>;
+    private refreshDocuments = false
     public diff: any = {};
+    public newDoc: any ={};
 
     constructor(private http: Http, private authHttp: AuthHttp) {
         this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
+        this.newDocObserver = new Observable(observer => this._newDocObserver = observer);
         this.jwthelper = new JwtHelper()
         var token = localStorage.getItem('id_token')
 
@@ -39,15 +45,20 @@ export class DocumentService {
             this._senderId = "" + Math.random();
         }
 
-
         this.http.get('./wsip').map((res: Response) => res.json()).subscribe(res => {
             this._socket = new WebSocket('ws://' + res.ip + ':3001');
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
-
+                console.log(message);                
+                
+                if (parsed.newDoc){                    
+                    console.log("you can now update"+this.newDoc)  
+                    this.newDoc = parsed.document;
+                    this._newDocObserver.next(this.newDoc);                                                          
+                }                
                 if (parsed.newplugin) {
                     this.getPlugins(() => { });
-                } else if (parsed.senderId != this._senderId) {
+                } else if (parsed.senderId != this._senderId) {                    
                     if (parsed.documentId == this.document.id) {
                         this.diff = parsed;
                         this._todosObserver.next(this.diff);
@@ -220,7 +231,6 @@ export class DocumentService {
         })
     }
 
-
     public getFilesInDir(documentId, callback: (files: any) => void) {
         console.log("2 OK" + documentId)
         this.http.get('./getFilesInDir/' + documentId).map((res: Response) => res.json()).subscribe(res => {
@@ -229,4 +239,10 @@ export class DocumentService {
         })
     }
 
+    public createNewDocument(callback: (files: any) => void) {
+        if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
+            console.log("IF OK");
+            this._socket.send(JSON.stringify({newDocument:true}));
+        }        
+    }
 }

@@ -51,9 +51,25 @@ var documentService = new DocumentService.DocumentService();
 
 
 server.on('connection', ws => {
-    ws.on('message', message => {
-        documentService.updateDocument(message);
-        broadcast(message)
+    ws.on('message', message2 => {
+        var message = JSON.parse(message2);
+        
+         documentService.updateDocument(message);
+           broadcast(message)
+        /*
+        if (message.diff) {
+            documentService.updateDocument(message);
+            broadcast(message)
+
+        } else if (message.newDocument) {
+            console.log("Server Mottatt");
+            documentService.createNew(message, (doc) => {
+                broadcast(JSON.stringify({ newDocument: true, document: doc }))
+            })
+        } else {
+            broadcast(message)
+
+        }*/
     });
 });
 
@@ -158,6 +174,11 @@ app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {
     documentService.getDocument(req, res)
 })
+app.get('/document/createNew', (req, res) => {
+    documentService.createNew(req, res)
+})
+
+
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', (req, res) => {
     documentService.getDocuments(req, res)
@@ -181,7 +202,7 @@ app.listen(httpPort, function () {
 
 
 // var server = https.createServer(https_options, app).listen(httpPort, function(){
-    
+
 // }); 
 
 export var App = app;

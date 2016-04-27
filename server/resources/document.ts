@@ -72,11 +72,22 @@ export function getAllDocuments(callback) {
                         getAllDocuments(callback);
                     }
                 });
-            } else if (document.length > 0){
+            } else if (document.length > 0) {
                 callback(document);
             }
         }
     })
+}
+
+
+export function createNewDocument(document, callback) {
+    repository.create(document, (error, document) => {
+        if (error) {
+            console.log(error);
+        } else {
+            callback(document);
+        }
+    });
 }
 
 // export function getDocuments(req: express.Request, res: express.Response) {
