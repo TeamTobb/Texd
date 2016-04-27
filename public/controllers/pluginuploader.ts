@@ -11,7 +11,7 @@ import {Modal} from "ng2-modal/Modal";
     providers: [DocumentService],
     directives: [Modal, Alert]
 })
-export class PluginUploader implements AfterViewInit {
+export class PluginUploader{
     private lastResult;
     private editor;
     public alerts = [];
@@ -70,7 +70,6 @@ export class PluginUploader implements AfterViewInit {
                     closeable: 'true'
                 })
             }
-
         } catch (error) {
             // Couldnt parse - invalid json. Alert+
             this.alerts.push({

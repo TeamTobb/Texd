@@ -15,17 +15,14 @@
                 <button id="insertitalic" style="font-style: italic">i</button>
                 <button id="insertunderline" style="text-decoration: underline;">u</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button id="inserttable">[][]</button>
-                <button id="insertmath">√π</button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                
-                <imageUploader [doc]=document (clickedImage)="uploadClickedImage($event)">                    
+
+                <imageUploader [doc]=document (clickedImage)="uploadClickedImage($event)">
                 </imageUploader>
-                
+
                 <pluginuploader>
                 </pluginuploader>
-                
-                <button id="styleSettings" (click)="goToSettings()" style="">Style settings</button>
+
+                <button id="styleSettings" (click)="goToSettings()" style="">Style</button>
 
                 <select id="selectFont">
                     <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
@@ -37,10 +34,10 @@
 
             </span>
             <span id="buttonsContainerRight" style="float: right; padding-right: 30px">
-                <button id="hidePreview">Hide Preview</button>
+                <button id="hidePreview">Hide</button>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button id="viewDocument">View Document</button>
-                <button id="updatePreview">Update Preview</button>
+                <button id="viewDocument">Download</button>
+                <button id="updatePreview">Update</button>
             </span>
         </div>
     </div>
@@ -53,18 +50,12 @@
 <!-- widgets -->
 <div class="widget-templates">
     <span class="general-span-widget"></span>
-    <div class="cleanDiv"></div>
-    <!-- <span class="bold-widget"></span> -->
-    <!-- <span contenteditable="true" class="italic-widget"></span> -->
-    <!-- <span contenteditable="true" class="underline-widget"></span> -->
+    <iframe class="cleanIframe"></iframe>
     <span contenteditable="true" class="image-edit"></span>
     <span contenteditable="false" class="cursor-widget"></span>
-    <!-- <h1 contenteditable="true" class="header-widget"></h1> -->
-
     <div class="image-widget" style="background-color: #EEE">
         <img class="image-frame" src="test.jpg" height="100px" width="100px">
         <br>
         <span class="image-text">This is some text</span>
     </div>
-
 </div>
