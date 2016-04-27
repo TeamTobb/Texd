@@ -2,8 +2,8 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 
 export class Parser {
     private hashMap: { [id: string]: Plugin } = {};
-    private ip: string;
-    private port: string;
+    private ip: string = "";
+    private port: string = "";
 
 
     constructor(hashMap: any, ip : string, port : string) {
@@ -12,8 +12,9 @@ export class Parser {
         this.port = port;
     }
 
-    public getParsedJSON(inputText: Line[]): string {
-
+    public getParsedJSON(inputText: Line[], ip : string, port : string): string {
+        this.ip = ip;
+        this.port = port;
         var mergedParas = "";
         for (var para in inputText) {
             mergedParas += " #p ";
@@ -109,7 +110,6 @@ export class Parser {
             if (err) {
                 return console.log(err);
             }
-            console.log("The file was saved!");
         });
     }
 

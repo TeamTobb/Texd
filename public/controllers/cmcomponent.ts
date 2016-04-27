@@ -21,6 +21,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() document: Document;
     @Input() current_chapter: number;
     @Output() emitChangeChapter: EventEmitter<any> = new EventEmitter();
+    @Output() emitDoneLoading: EventEmitter<any> = new EventEmitter();
 
     public editor;
     public widgetTest;
@@ -38,13 +39,13 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter); 
+        this.documentService.sendDiff({ removeCursor: true, removeUser: true }, this.current_chapter);
     }
 
+// not used currently.. remove ?
     addCursor(diff) {
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
-                console.log("adding cursor :" + diff.senderId);
                 var element = document.createElement('span');
                 element.id = "user" + diff.senderId
                 element.innerHTML = diff.senderId
@@ -58,7 +59,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (diff.removeUser) {
             if (document.getElementById('user' + diff.senderId)) {
                 var element = document.getElementById('user' + diff.senderId);
-                document.getElementById('buttonsContainer').removeChild(element);
+                document.getElementById('userSpanBox').removeChild(element);
             }
         }
         if (this.cursorwidgets[diff.senderId]) {
@@ -69,10 +70,10 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.selections[diff.senderId].clear();
             this.selections[diff.senderId] = undefined;
         }
-        
+
         if (this.cursorelements[diff.senderId] != undefined && this.cursorelements[diff.senderId] != null) {
             this.cursorelements[diff.senderId] = null;
-            delete this.cursorelements[diff.senderId];    
+            delete this.cursorelements[diff.senderId];
         }
     }
 
@@ -85,10 +86,11 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                 }
                 if (!document.getElementById('user' + diff.senderId)) {
                     var element = document.createElement('span');
-                    element.id = "user" + diff.senderId
-                    element.innerHTML = diff.senderId
-                    element.style.color = diff.color
-                    document.getElementById('buttonsContainer').appendChild(element)
+                    element.id = "user" + diff.senderId;
+                    element.className = "userSpanElement";
+                    element.innerHTML = diff.senderId;
+                    element.style.color = diff.color;
+                    document.getElementById('userSpanBox').appendChild(element);
                 }
 
                 // If not already created, create a HTML element for the cursor, bound to senderId
@@ -179,7 +181,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var selectionStyle = document.createElement('style');
         selectionStyle.id = 'selectionstyle';
         document.body.appendChild(selectionStyle);
-        
+
             this.editor = CodeMirror.fromTextArea(document.getElementById("linesEditor"), {
                 mode: "hashscript",
                 lineNumbers: true,
@@ -187,7 +189,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                 extraKeys: {
                     "Ctrl-Space": "autocomplete"
                 }
-            })
+            });
             this.documentService.cm = this.editor;
             this.editor.on("change", (cm, change) => {
                 if (change.origin != "setValue" && change.origin != "+onParse") {
@@ -223,7 +225,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.editor.on("beforeSelectionChange", (cm, obj) => {
                 this.documentService.sendDiff(obj, this.current_chapter)
             })
-            
+
         // should probably be defined somewhere else
         $("#insertbold").click(() => {
             this.editor.focus();
@@ -280,6 +282,12 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
             else if (c2 == d) this.changeChapterPositions(dragged_id, grandpar[0].id);
             else if (c3 == d) this.changeChapterPositions(dragged_id, grandgrandpar[0].id);
         });
+
+        // static timeout, hopefully the document is loaded. else the preview will not be updated and need to be done manually.
+        setTimeout( () => {
+            this.emitDoneLoading.emit(true);
+        }, 500);
+
     }
 
     public changeChapterPositions(from, to) {
@@ -295,8 +303,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeChapter(event, chapter_number: number) {
-        console.log("Change chapter");
-
+        console.log("welrwer");
         this.documentService.sendDiff({
             removeCursor: true
         }, this.current_chapter)
@@ -387,7 +394,6 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var cursor = this.editor.getCursor();
         var to = cursor;
         to.line = cursor.line;
-        console.log(cursor)
         this.editor.getDoc().replaceRange('\n#img @src "' + file + '" @height "100%" @width "100%" #\n', cursor, to, "paste");
     }
 

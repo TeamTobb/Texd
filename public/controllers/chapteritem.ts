@@ -48,7 +48,6 @@ export class ChapterItem implements OnChanges {
     }
 
     ondblclickChapter($event) {
-        console.log("ondblclickChapter")
         $event.target.setAttribute("contenteditable", "true");
     }
 }

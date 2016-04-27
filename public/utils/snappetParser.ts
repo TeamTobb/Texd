@@ -21,30 +21,22 @@ export class SnappetParser {
 
     public parseSnappet(element: Node) {
         // var childNode = 
-        console.log("parsing snappet");
         var end = element.childNodes["1"].selectionStart;
         var value: String = element.childNodes["1"].value
-        console.log("end is: " + end); 
-        console.log("value is; " + value);
+      
 
         var tempPrefix = "";
         for (var i = end - 1; i >= 0; i--) {
-            console.log("prefix is: " + tempPrefix); 
             if (!(value[i] == " " || value[i] == undefined || value[i] == "#")) {
                 tempPrefix += value[i];
             } else {
                 break;
             }
         }
-        console.log("tempPrefix: " + tempPrefix); 
         var prefix = tempPrefix.split('').reverse().join('');
-
-        console.log("we have snippets: " + JSON.stringify(this.snippets, null, 2));
-        console.log("our snippet is: " + prefix); 
-        
+  
         if (this.snippets.img) {
 
-            console.log("we have snippets for this tag");
             var beforestring = value.substring(0, end - prefix.length);
             var afterString = value.substring(end, value.length);
 

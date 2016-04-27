@@ -60,8 +60,6 @@ export class EditorController implements AfterViewInit {
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
-        console.log("setting renderer! ");
-        console.log(renderer);
         this.globalListenFunc = renderer.listenGlobal('document', 'keydown', ($event) => {
             this.globalKeyEvent($event);
         });
@@ -236,18 +234,20 @@ export class EditorController implements AfterViewInit {
 
         $('#selectFont').change(() => {
             this.choosenFont = $('#selectFont').val();
-            console.log(this.choosenFont);
         });
 
         $('#selectSize').change(() => {
             this.choosenSize = $('#selectSize').val();
-            console.log(this.choosenSize);
         });
 
     }
 
     ngOnDestroy() {
         this.globalListenFunc();
+    }
+
+    public doneLoadingCmComponent(done) {
+        this.parsePreviewFrame();
     }
 
     public changeChapter(i) {
@@ -267,19 +267,15 @@ export class EditorController implements AfterViewInit {
         this.keymap.keys["parseWholeDocument"].callback = () => {
             // this should be an own function
             var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-                this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize;
-                console.log(this.document.style)
-
-                for (var key in this.document.style) {
-                    var value = this.document.style[key];
-                    document.getElementById('previewframe').style[key] = value;
-                }
+                var cleanIframe = $(".widget-templates .cleanIframe").clone();
+                document.getElementById('rightInContainerForEditor').replaceChild(cleanIframe[0], document.getElementById('previewframe'));
+                var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanIframe');
+                newElement[0].id = 'previewframe';
+                var docElement = jQuery(this.element.nativeElement).find('#previewframe')[0].contentWindow.document;
+                var cssFileLink = 'stylesheets/htmlviewsmall.css'
+                this.writeContentHTML(docElement, cssFileLink, parsedHTML);
+                this.initializeHandleDragEvents();
             });
-        }
-        this.keymap.keys["test"].callback = () => {
-            console.log("test");
         }
     }
 

@@ -41,10 +41,8 @@ export class ParseMap {
                             if (temp_tag == "value") {
                                 html += value;
                             } else if (legalAttributes[temp_tag]) {
-                                // console.log("@" + temp_tag);
-                                // console.log(attributeList);
+                                
                                 if (attributeList["@" + temp_tag]) {
-                                    // console.log("works??");
                                     html += attributeList["@" + temp_tag];
                                 } else {
                                     // attribute is not present in the raw paragraph

@@ -17,7 +17,6 @@ export class PluginPage {
     }
 
     setupPluginItems() {
-        console.log("test fujnction in pluginpage.ts");
         this.documentService.getPlugins(() => {
             var parseMap = this.documentService.parseMap.parseMap;
             for (var item in parseMap) {

@@ -25,12 +25,19 @@ export class DocumentService {
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
+
+    public newDocObserver: Observable<any>;
+    private _newDocObserver: Observer<any>;
+    private refreshDocuments = false
     public diff: any = {};
+    public newDoc: any = {};
     public ip: string;
     public port: string;
 
+
     constructor(private http: Http, private authHttp: AuthHttp) {
         this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
+        this.newDocObserver = new Observable(observer => this._newDocObserver = observer);
         this.jwthelper = new JwtHelper()
         var token = localStorage.getItem('id_token')
 
@@ -46,12 +53,15 @@ export class DocumentService {
             this.port = res.httpPort;
             // getting plugins after getting ip and port
             this.getPlugins(() => {
-                console.log("Plugins loaded");
             });
             this._socket = new WebSocket('ws://' + res.ip + ':' + res.wsPort);
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
 
+                if (parsed.newDocument) {
+                    this.newDoc = parsed.document;
+                    this._newDocObserver.next(this.newDoc);
+                }
                 if (parsed.newplugin) {
                     this.getPlugins(() => { });
                 } else if (parsed.senderId != this._senderId) {
@@ -108,24 +118,33 @@ export class DocumentService {
         this.getDocument2(this.document.id, (tempDoc: Document) => {
             var totalHTML: string = "";
             for (var c in tempDoc.chapters) {
+                if (c == "0") {
+                    totalHTML += "<h1 id='firstpage'>" + tempDoc.chapters[c].header + "</h1>";
+                } else if(c == "1"){
+                    totalHTML += "<div class=\"toc\"></div>";                    
+                    totalHTML += "<h1 id=\"" + tempDoc.chapters[c].header.replace(/\s+/g, '-').toLowerCase() + "\">" + tempDoc.chapters[c].header + "</h1>";
+                }
+                else {
+                    totalHTML += "<h1 id=\"" + tempDoc.chapters[c].header.replace(/\s+/g, '-').toLowerCase() + "\">" + tempDoc.chapters[c].header + "</h1>";
+                }
                 var lines: Line[] = tempDoc.chapters[c].lines;
-                var parsedJSON = this._textParser.getParsedJSON(lines);
+                var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
                 var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-                totalHTML += "<h1 id=\"" + tempDoc.chapters[c].header + "\">" + tempDoc.chapters[c].header + "</h1>";
                 totalHTML += parsedHTML;
             }
+            
             var el = document.createElement('html');
             el.innerHTML = totalHTML;
             var contentHTML = "";
             contentHTML += "<ol>";
             for (var i = 0; i < el.children[1].children.length; i++) {
                 if (el.children[1].children[i].tagName == "H1") {
-                    contentHTML += "<li><a href=\"#" + el.children[1].children[i].textContent + "\">" + el.children[1].children[i].textContent + "</a></li>";
+                    contentHTML += "<li><a href=\"#" + el.children[1].children[i].textContent.replace(/\s+/g, '-').toLowerCase() + "\">" + el.children[1].children[i].textContent + "</a></li>";
                     contentHTML += "<ol>";
                     for (var j = i + 1; j < el.children[1].children.length; ++j) {
                         if (el.children[1].children[j].tagName == "H2") {
-                            el.children[1].children[j].id = el.children[1].children[j].textContent;
-                            contentHTML += "<li><a href=\"#" + el.children[1].children[j].textContent + "\">" + el.children[1].children[j].textContent + "</a></li>";
+                            el.children[1].children[j].id = el.children[1].children[j].textContent.replace(/\s+/g, '-').toLowerCase();
+                            contentHTML += "<li><a href=\"#" + el.children[1].children[j].textContent.replace(/\s+/g, '-').toLowerCase() + "\">" + el.children[1].children[j].textContent + "</a></li>";
                         }
                         if (el.children[1].children[j].tagName == "H1") {
                             i = j - 1;
@@ -136,8 +155,8 @@ export class DocumentService {
                 }
             }
             contentHTML += "</ol>"
-            contentHTML += el.innerHTML; 
-            callback(contentHTML);
+            el.getElementsByClassName('toc')[0].innerHTML = contentHTML; 
+            callback(el.innerHTML);
         })
     }
 
@@ -151,7 +170,7 @@ export class DocumentService {
                 var totalHTML: string = "";
                 for (var c in tempDoc.chapters) {
                     var lines: Line[] = tempDoc.chapters[c].lines;
-                    var parsedJSON = this._textParser.getParsedJSON(lines);
+                    var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
                     var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
                     totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
                     totalHTML += parsedHTML;
@@ -174,7 +193,7 @@ export class DocumentService {
     public parseChapter(callback: (parsedHTML: string) => void) {
         if (this._textParser != null && this._jsonParser != null) {
             var lines: Line[] = this.getCurrentChapterLines();
-            var parsedJSON = this._textParser.getParsedJSON(lines);
+            var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
             var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
             callback(parsedHTML);
         }
@@ -210,7 +229,6 @@ export class DocumentService {
     }
 
     public getChapter(chapterIndex: number, callback: (chapter: any) => any) {
-        console.log("get chapter")
         this.http.get('/documents/' + this.document.id + '/' + chapterIndex).map((res: Response) => res.json()).subscribe(res => {
             callback(res);
         })
@@ -227,7 +245,6 @@ export class DocumentService {
     public getDocuments(callback: (documents: Document[]) => void) {
         var documents: Document[] = Array<Document>();
         this.http.get('./documents').map((res: Response) => res.json()).subscribe(res => {
-            console.log(res);
             for (var doc in res) {
                 documents.push(new Document([], [], [], [], [], res[doc]))
             }
@@ -237,7 +254,6 @@ export class DocumentService {
 
     public getSnappets(callback: (snappets: any) => void) {
         this.http.get('./snappets').map((res: Response) => res.json()).subscribe(res => {
-            console.log("we got snappets: " + JSON.stringify(res, null, 2))
             callback(res);
         })
     }
@@ -247,13 +263,15 @@ export class DocumentService {
         })
     }
 
-
     public getFilesInDir(documentId, callback: (files: any) => void) {
-        console.log("2 OK" + documentId)
         this.http.get('./getFilesInDir/' + documentId).map((res: Response) => res.json()).subscribe(res => {
-            console.log("we got files from dir: " + JSON.stringify(res, null, 2))
             callback(res);
         })
     }
 
+    public createNewDocument(callback: (files: any) => void) {
+        if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
+            this._socket.send(JSON.stringify({ newDocument: true }));
+        }
+    }
 }

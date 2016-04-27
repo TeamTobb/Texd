@@ -45,7 +45,6 @@ export class RegisterController {
 
                 }, 1500)
             }
-            console.log(JSON.stringify(res, null, 2));
         })
     }
     public closeAlert(i: number): void {
