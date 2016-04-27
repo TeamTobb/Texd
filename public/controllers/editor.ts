@@ -263,16 +263,16 @@ export class EditorController implements AfterViewInit {
         this.keymap.keys["parseWholeDocument"].callback = () => {
             // this should be an own function
             var parsedDocument = this.documentService.parseDocument((parsedHTML) => {
-                document.getElementById('previewframe').innerHTML = parsedHTML;
-                this.document.style["fontFamily"] = this.choosenFont;
-                this.document.style["fontSize"] = this.choosenSize;
-
-                for (var key in this.document.style) {
-                    var value = this.document.style[key];
-                    document.getElementById('previewframe').style[key] = value;
-                }
+                var cleanIframe = $(".widget-templates .cleanIframe").clone();
+                document.getElementById('rightInContainerForEditor').replaceChild(cleanIframe[0], document.getElementById('previewframe'));
+                var newElement = document.getElementById('rightInContainerForEditor').getElementsByClassName('cleanIframe');
+                newElement[0].id = 'previewframe';
+                var docElement = jQuery(this.element.nativeElement).find('#previewframe')[0].contentWindow.document;
+                var cssFileLink = 'stylesheets/htmlviewsmall.css'
+                this.writeContentHTML(docElement, cssFileLink, parsedHTML);
+                this.initializeHandleDragEvents();
             });
-        }       
+        }
     }
 
     public globalKeyEvent($event) {

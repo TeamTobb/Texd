@@ -25,7 +25,7 @@ export class DocumentService {
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
-    
+
     public newDocObserver: Observable<any>;
     private _newDocObserver: Observer<any>;
     private refreshDocuments = false
@@ -57,14 +57,14 @@ export class DocumentService {
             this._socket = new WebSocket('ws://' + res.ip + ':' + res.wsPort);
             this._socket.onmessage = message => {
                 var parsed = JSON.parse(message.data)
-                
-                if (parsed.newDocument){                    
+
+                if (parsed.newDocument){
                     this.newDoc = parsed.document;
-                    this._newDocObserver.next(this.newDoc);                                                          
-                }                
+                    this._newDocObserver.next(this.newDoc);
+                }
                 if (parsed.newplugin) {
                     this.getPlugins(() => { });
-                } else if (parsed.senderId != this._senderId) {                    
+                } else if (parsed.senderId != this._senderId) {
                     if (parsed.documentId == this.document.id) {
                         this.diff = parsed;
                         this._todosObserver.next(this.diff);
@@ -118,10 +118,15 @@ export class DocumentService {
         this.getDocument2(this.document.id, (tempDoc: Document) => {
             var totalHTML: string = "";
             for (var c in tempDoc.chapters) {
+                if (c == "0") {
+                    totalHTML += "<h1 id='firstpage'>" + tempDoc.chapters[c].header + "</h1>";
+                }
+                else {
+                    totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
+                }
                 var lines: Line[] = tempDoc.chapters[c].lines;
                 var parsedJSON = this._textParser.getParsedJSON(lines, this.ip, this.port);
                 var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
-                totalHTML += "<h1>" + tempDoc.chapters[c].header + "</h1>";
                 totalHTML += parsedHTML;
             }
             callback(totalHTML);
@@ -240,6 +245,6 @@ export class DocumentService {
     public createNewDocument(callback: (files: any) => void) {
         if (this._socket !== undefined && this._socket.readyState == this._socket.OPEN) {
             this._socket.send(JSON.stringify({newDocument:true}));
-        }        
+        }
     }
 }
