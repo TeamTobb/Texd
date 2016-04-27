@@ -18,7 +18,7 @@ export class DashboardComponent {
     private documents: Document[];
     private maxColumns = 3;
     private documentGrid: Document[] = [];
-    newDocument = {_id: "hey", title: "title"};
+    newDocument = { _id: "hey", title: "title" };
 
     constructor(private _router: Router, private _documentService: DocumentService) {
         this.newDocument._id = "newDocument";
@@ -40,12 +40,21 @@ export class DashboardComponent {
 
     createNewDocument() {
         this._documentService.createNewDocument((res) => {
-                        
+
         });
     }
-    
-    deleteDocument(document){
-        
-        
+
+    deleteDocument(document) {
+        for (var key in this.documents) {
+            var element = this.documents[key];
+            if (element.id == document){
+                console.log(key);                               
+                this.documents.splice( +key, 1)
+            }
+
+
+        }
     }
+
+
 }          
