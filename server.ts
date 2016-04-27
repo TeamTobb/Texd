@@ -52,8 +52,16 @@ var documentService = new DocumentService.DocumentService();
 
 server.on('connection', ws => {
     ws.on('message', message => {
-        documentService.updateDocument(message);
-        broadcast(message)
+        var parsedMessage = JSON.parse(message);
+           
+       if (parsedMessage.newDocument) {
+            documentService.createNew(parsedMessage.document, (doc) => {
+                broadcast(JSON.stringify({ newDocument: true, document: doc }))
+            })
+        } else {
+            documentService.updateDocument(parsedMessage);
+            broadcast(message)
+        }
     });
 });
 
@@ -92,7 +100,6 @@ var storage = multer.diskStorage({
             var element = req.rawHeaders[index];
             if (element == "Referer") {
                 documentID = req.rawHeaders[index + 1].slice(req.rawHeaders[index + 1].length - 24, req.rawHeaders[index + 1].length);
-                console.log("Doc ID: " + documentID)
             }
         }
         var documentDir = './public/uploads/document/' + documentID.trim()// '/photos'
@@ -104,7 +111,6 @@ var storage = multer.diskStorage({
         callback(null, photoDirForDocId);
     },
     filename: function (req, file, callback) {
-        console.log(req.rawHeaders)
         var originalName: string = ""
         for (var index = 0; index < req.rawHeaders.length; index++) {
             var element = req.rawHeaders[index];
@@ -121,8 +127,6 @@ var upload = multer({ storage: storage }).single('photo');
 
 //TODO Change to app.use() Create one upload, with different paths for photo, JSON...
 app.post('/upload/photo', function (req, res) {
-    console.log(req)
-    console.log("POST POST POST ")
     upload(req, res, function (err) {
         if (err) {
             return res.end("Error uploading file.");
@@ -139,15 +143,10 @@ app.get('/plugins', pluginsRoutes.read);
 app.post('/plugins', (req, res) => {
     var filename = req.body.plugin.pluginname;
     var body = req.body.plugin.pluginbody;
-
-    console.log(JSON.stringify(filename, null, 2));
-    console.log(JSON.stringify(body, null, 2));
-
     fs.writeFile("./server/plugins/" + filename + ".json", JSON.stringify(body, null, 2), (err) => {
         if (err) {
             res.jsonp({ success: false })
         } else {
-            console.log("The file was saved!");
             broadcast(JSON.stringify({ newplugin: { name: filename, body: body } }))
             res.jsonp({ success: true })
         }
@@ -158,6 +157,11 @@ app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {
     documentService.getDocument(req, res)
 })
+app.get('/document/createNew', (req, res) => {
+    documentService.createNew(req, res)
+})
+
+
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', (req, res) => {
     documentService.getDocuments(req, res)

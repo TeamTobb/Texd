@@ -14,16 +14,13 @@ export class SettingsPage {
     constructor(private _router: Router, private _routeParams: RouteParams) {
         let id = + parseInt(this._routeParams.get('id'));
         if (id) {
-            console.log("chapter id: " + id);
             if (this.chapters[id]) {
                 this.current_chapter = id;
             }
             else {
-                console.log("No chapter with id: " + id);
             }
         }
         else {
-            console.log("no chapter id provided");
         }
     }
 

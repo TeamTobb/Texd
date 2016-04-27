@@ -19,19 +19,15 @@ passport.use(new BearerStrategy(
             var decoded = jwt.decode(token, secret);
             Account.findOne({ username: decoded.username }, function (err, user) {
                 if (err) {
-                    console.log("error")
                     return done(err);
                 }
                 if (!user) {
-                    console.log("no user")
                     return done(null, false);
                 }
-                console.log("correct! :D")
                 return done(null, user, { scope: 'all' });
             });
         }
         catch (error) {
-            console.log("catch error: " + error)
             return done(null, false)
         }
     }
@@ -40,7 +36,6 @@ passport.use(new BearerStrategy(
 router.post('/login', passport.authenticate('local'), (req, res, next) => {
     findUser(req.user.username, (user) => {
         if (user) {
-            console.log('login: ' + req.user); 
             var token = jwt.encode({
                 username: req.user.username, 
                 id: req.user._id

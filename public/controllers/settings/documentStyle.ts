@@ -135,7 +135,6 @@ export class DocumentStyle {
     }
 
     updateStyle() {
-        console.log("Sender style til Sever")
         var newStyleInput = {};
         for (var key in this.styleInput) {
             var value = this.styleInput[key];

@@ -15,31 +15,39 @@ export class DocumentService {
 
     constructor() {
         documentRoutes.getAllDocuments((documents) => {
-                console.log(JSON.stringify(documents, null, 2));
-                for (var document of documents) {
-                    this.documents[document["id"]] = document;
-                }
-                console.log(JSON.stringify(this.documents, null, 2));
-                this.documentIsUpdated[document["id"]] = false
+            for (var document of documents) {
+                this.documents[document["id"]] = document;
+            }
+            this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
-            // console.log("DB tick")
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
-                    console.log(key + "is getting updated...: ");
                     documentRoutes.saveDocument(this.documents[key], (error, updatedDocumentId) => {
                         var documentId: string = key;
                         if (error) {
                             console.log(error)
                         } else {
-                            console.log("just updated doc: " + updatedDocumentId + " to Databse")
                             this.documentIsUpdated[updatedDocumentId] = false;
                         }
                     })
                 }
             }
         }, 5000);
+    }
+
+    createNew(newDocument, callback) {
+        var lines = [new Line(" ", []), new Line("", []), new Line("", [])];
+        var chapters = [new Chapter("Chapter1", lines)];
+        var style1 = {}
+        style1["fontSize"] = "12px";
+        style1["fontFamily"] = "\"Times New Roman\", Times, serif";
+        var document = new Document(9, "new", "Name 1", ["nil", "nil2"], chapters, style1);
+        documentRoutes.createNewDocument(document, (doc) => {            
+            this.documents[doc._id] = doc;
+            callback(doc)
+        })
     }
 
     getChapter(req: express.Request, res: express.Response) {
@@ -51,28 +59,23 @@ export class DocumentService {
         }
     }
 
-
     getDocument(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             var documentid: string = req.params.id;
             res.jsonp(this.documents[documentid]);
-            console.log("Fant doc: " + req.params.id);
         }
     }
     getDocuments(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             res.jsonp(this.documents);
-            console.log("Fant alle docs: ");
         }
     }
 
-    updateDocument(diff2) {
-        var diff = JSON.parse(diff2);
+    updateDocument(diff) {       
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
         if (diff.newchapter) {
-            console.log("NEW CHAPTER...");
             var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
         }
@@ -84,18 +87,15 @@ export class DocumentService {
             document._style = diff.documentStyle;
         }
         else if (diff.deleteChapter) {
-            console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
         }
 
         else if (diff.newchapterName) {
-            console.log("Changing chapter name")
             if (document._chapters[diff.chapterIndex] != undefined) {
                 document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
         }
         else if (diff.changeChapter) {
-            console.log("changing position on chapters");
             if (document._chapters[diff.fromChapter] != undefined && document._chapters[diff.toChapter] != undefined) {
                 var fromChapter = document._chapters[diff.fromChapter];
                 document._chapters.splice(diff.fromChapter, 1);
@@ -119,8 +119,6 @@ export class DocumentService {
 
                         lines.splice(diff.from.line + 1, 0, line)
                     } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
-                        console.log("Tekst erstattet med bokstaver")
-
                         var fromLine = diff.from.line;
                         var fromCh = diff.from.ch;
                         var toLine = diff.to.line;
