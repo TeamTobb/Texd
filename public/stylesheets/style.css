@@ -100,8 +100,19 @@ body {
     height: 60%;
 }
 
+.modal-body{
+    width:100%;
+    height: 100%;   
+}
+
+.images-uploader-container{
+    width: 100%;
+    height: 60%;
+}
+
 .modal-lg {
-    height: 550px;
+    height: 80%;
+    width: 100%;
     position: relative;
     margin-left: auto;
     margin-right: auto;
@@ -307,19 +318,6 @@ body {
     overflow: scroll;
     word-wrap: break-word;
 }
-.uploadDiv{
-    z-index: 999;
-    background-color: lightsteelblue;
-    width: 80%;
-    height: 90%;
-    position: absolute;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-}
 
 .uploadPluginDiv{
     z-index: 999;
@@ -337,7 +335,7 @@ body {
 
 .photosInUploadDiv{
     width: 100%;
-    height: 30%;
+    height: 60%;
     top:0;
     overflow-y: scroll;
     overflow-x: scroll;
@@ -345,8 +343,8 @@ body {
 
 .singlePhotoInDivUpload{
     margin: 1%;
-    width:200px;
-    height:200px;
+    width:150px;
+    height:150px;
     float:left;
 }
 
@@ -361,7 +359,6 @@ body {
     margin: 10%;
     height: 80%;
     width: 80%;
-
 }
 
 .headerForUpload{

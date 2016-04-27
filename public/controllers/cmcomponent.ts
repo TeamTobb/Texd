@@ -26,6 +26,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     public widgetTest;
     public cursorwidgets = {};
     public selections = {};
+    public cursorelements = {};
 
     public inside_new_snappet = false;
     public disable_rich_text = false;
@@ -43,6 +44,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     addCursor(diff) {
+        console.log("addCursor()");
         if (diff.chapterIndex == this.current_chapter) {
             if (!document.getElementById('user' + diff.senderId)) {
                 console.log("adding cursor :" + diff.senderId);
@@ -79,30 +81,32 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     line: diff.cursorActivity.line,
                     ch: diff.cursorActivity.ch
                 }
-                try {
-                    if (!document.getElementById('user' + diff.senderId)) {
-                        var element = document.createElement('span');
-                        element.id = "user" + diff.senderId
-                        element.innerHTML = diff.senderId
-                        element.style.color = diff.color
-                        document.getElementById('buttonsContainer').appendChild(element)
-                    }
-
-                    if (this.cursorwidgets[diff.senderId] != undefined) {
-                        var element = document.getElementById('cursor' + diff.senderId)
-                        this.cursorwidgets[diff.senderId].clear();
-                    } else {
-                        var node = $(".widget-templates .cursor-widget").clone();
-                        var element: HTMLElement = node[0];
-                        element.id = 'cursor' + diff.senderId;
-                        element.style.border = '1px solid ' + diff.color;
-                    }
-                    this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
-                        widget: element
-                    })
-                } catch (error) {
-                    console.log(error)
+                if (!document.getElementById('user' + diff.senderId)) {
+                    var element = document.createElement('span');
+                    element.id = "user" + diff.senderId
+                    element.innerHTML = diff.senderId
+                    element.style.color = diff.color
+                    document.getElementById('buttonsContainer').appendChild(element)
                 }
+
+                // If not already created, create a HTML element for the cursor, bound to senderId
+                if (this.cursorelements[diff.senderId] == undefined) {
+                    var node = $(".widget-templates .cursor-widget").clone();
+                    element = node[0];
+                    element.id = 'cursor' + diff.senderId;
+                    element.style.border = '1px solid ' + diff.color;
+                    this.cursorelements[diff.senderId] = element; 
+                }
+                
+                // Clear the existing widget
+                if (this.cursorwidgets[diff.senderId] != undefined) {
+                    this.cursorwidgets[diff.senderId].clear();
+                } 
+                
+                // Create a cursor with the HTML element
+                this.cursorwidgets[diff.senderId] = this.editor.setBookmark(pos, {
+                    widget: this.cursorelements[diff.senderId]
+                })                
             } else if (diff.ranges) {
                 var from = {
                     line: diff.ranges[0].anchor.line,
@@ -125,13 +129,9 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
                     }
                     var style = document.getElementById('selectionstyle');
                     style.innerHTML = ".selectionRange { background-color: " + diff.color + ";}";
-                    try {
-                        this.selections[diff.senderId] = this.editor.markText(from, to, {
-                            className: "selectionRange"
-                        })
-                    } catch (error) {
-                        console.log(error)
-                    }
+                    this.selections[diff.senderId] = this.editor.markText(from, to, {
+                        className: "selectionRange"
+                    })
                 } else {
                     if (this.selections[diff.senderId]) {
                         this.selections[diff.senderId].clear();
@@ -143,12 +143,8 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeOrder(diff) {
-        try {
-            if (this.current_chapter == diff.chapterIndex) {
-                this.editor.getDoc().replaceRange(diff.text, diff.from, diff.to)
-            }
-        } catch (error) {
-            console.log(error)
+        if (this.current_chapter == diff.chapterIndex) {
+            this.editor.getDoc().replaceRange(diff.text, diff.from, diff.to)
         }
     }
 
@@ -298,7 +294,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public changeChapter(event, chapter_number: number) {
-        console.log("Change cphapter");
+        console.log("Change chapter");
 
         this.documentService.sendDiff({
             removeCursor: true

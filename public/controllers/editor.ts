@@ -12,7 +12,7 @@ import {Document, Line, Chapter} from '../domain/document.ts';
 import {Diff} from '../domain/diff.ts';
 import {DocumentService} from '../data_access/document.ts';
 import {ChapterItem} from './chapteritem.ts'
-import {FileUploaderClass} from './fileUploader.ts'
+import {FileUpload} from './fileUploadPage.ts'
 import {PluginUploader} from './pluginuploader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnappetParser} from "../utils/snappetParser.ts";
@@ -27,7 +27,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
     selector: 'texd-editor',
     templateUrl: 'views/editor.html',
     providers: [DocumentService, HTTP_BINDINGS],
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, FileUploaderClass, CORE_DIRECTIVES, PluginUploader]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, CORE_DIRECTIVES, PluginUploader, FileUpload]
 })
 
 export class EditorController implements AfterViewInit {
@@ -57,6 +57,7 @@ export class EditorController implements AfterViewInit {
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
     @ViewChild(PluginUploader) pluginuploader: PluginUploader;
+    @ViewChild(FileUpload) fileUpload: FileUpload;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;
@@ -330,21 +331,12 @@ export class EditorController implements AfterViewInit {
         doc.close();
     }
 
-    public showUploadDivToggle(hide) {
-        this.showUploadDiv = hide;
-    }
-
-    public showUploadPlugin(){
-        this.pluginuploader.openModal();
-    }
-
     goToSettings() {
         this.router.navigate(['Settings', 'DocumentStyle', { id: this.document.id }]);
     }
 
     uploadClickedImage(file) {
         this.cmcomponent.insertImageWidget(file);
-        this.showUploadDivToggle(false);
     }
 
     setFontPickerAndSizePicker() {

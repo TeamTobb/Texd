@@ -1,19 +1,21 @@
-import {Component, NgZone, Input, Output, AfterViewInit} from 'angular2/core';
-import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
+import {Component, NgZone, Injector, provide, AfterViewInit, ViewChild, AfterContentInit, Input, Output, OnChanges, SimpleChange} from 'angular2/core';
+import {CORE_DIRECTIVES} from 'angular2/common';
+import {Http, Headers, HTTP_BINDINGS, Response} from 'angular2/http';
 import {DocumentService} from '../data_access/document.ts';
+import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
+import {Document} from '../domain/document.ts';
+import {UPLOAD_DIRECTIVES} from './ng2-uploader.ts';
 import {EventEmitter} from "angular2/src/facade/async";
 
-//import {UPLOAD_DIRECTIVES} from '../utils/ng2-uploader/ng2-uploader.ts';
+import {Modal} from "ng2-modal/Modal";
 
 @Component({
-    selector: 'fileuploader',
-    templateUrl: 'views/fileUploader.html',
-    styleUrls: ['stylesheets/style.css'],
+    selector: 'imageUploader',
+    templateUrl: 'views/imageModal.html',
     providers: [DocumentService],
-    directives: [UPLOAD_DIRECTIVES],
-    pipes: []
+    directives: [Modal, UPLOAD_DIRECTIVES, Alert]
 })
-export class FileUploaderClass implements AfterViewInit {
+export class FileUpload implements AfterViewInit {
     zone: NgZone;
     options: Object = {
         url: './upload/photo'
@@ -30,35 +32,42 @@ export class FileUploaderClass implements AfterViewInit {
     dragedFileIsUploaded = false;
     public dirFiles = [];
     public tests = [];
-    @Input() docId;
+    public currentDoc;
     @Output() clickedImage: EventEmitter<any> = new EventEmitter();
     public imageToUploadToEditor;
+    @Input() doc: Document;
+
 
     constructor(private documentService: DocumentService) {
         this.zone = new NgZone({ enableLongStackTrace: false });
-    }
 
+    }
 
     ngAfterViewInit() {
-        console.log(this.docId._id)
-        this.findAllPhotos()
+        setTimeout(() => {
+            console.log("FileUploadModal to'ern - OK?")
+            this.currentDoc = this.doc
+            this.findAllPhotos()
+        }, 100)
+
     }
 
+    onModalOpen() {
+        console.log("on modal open");
+    }
     private findAllPhotos() {
         console.log("1 OK")
-        this.documentService.getFilesInDir(this.docId._id, (files) => {
+        this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
             if (!files.errno) {
                 files.forEach(file => {
-                    this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + file);
-                    //console.log(this.dirFiles);
-
+                    this.dirFiles.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
                 });
             }
         });
     }
 
     photoClicked(file) {
-        console.log("clicked: " +file)
+        console.log("clicked: " + file)
         this.clickedImage.emit(file)
     }
 
@@ -71,9 +80,8 @@ export class FileUploaderClass implements AfterViewInit {
                 this.selectedFileIsUploaded = true;
                 console.log(data);
                 setTimeout(() => {
-                    this.dirFiles.push("uploads/document/" + this.docId._id + "/photos/" + data.originalName);
+                    this.dirFiles.push("uploads/document/" + this.currentDoc._id + "/photos/" + data.originalName);
                 }, 1000)
-
             }
             this.multipleResp.push(data);
         }

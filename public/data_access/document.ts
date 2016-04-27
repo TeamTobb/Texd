@@ -22,7 +22,6 @@ export class DocumentService {
     private _jsonParser: jsonToHtml = null;
     private snappetParser: SnappetParser;
     private jwthelper;
-    public currentChapter: number;
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
