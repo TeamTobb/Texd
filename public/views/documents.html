@@ -3,9 +3,9 @@
     New document
 </button>
 
-    <docview  (click)="createNewDocument()" [title]="newDocument.title" [preview]="newDocument"></docview>
+    <docview  (click)="createNewDocument()" [title]="newDocument.title" [preview]="newDocument" ></docview>
 
     <div *ngFor="#doc of documents; #i = index">
-        <docview (click)="goToDocument(doc._id)" [title]="doc.title" [preview]="doc"></docview>
+        <docview normalDoc="true" (click)="goToDocument(doc._id)" [title]="doc.title" [preview]="doc" (deleteThisDocument)="deleteDocument($event)"></docview>
     </div>
 </div>
