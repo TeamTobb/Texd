@@ -1,5 +1,4 @@
-//TODO change this file to handle uploads/photo and /upload/json
-
+//TODO is this in use?  
 export function upload(req, res) {
     var sampleFile;
     

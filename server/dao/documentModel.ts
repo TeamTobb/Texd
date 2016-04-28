@@ -1,8 +1,6 @@
 import mongoose = require("mongoose");
 import document = require('../../public/domain/document');
 
-
-
 var lineSchema = new mongoose.Schema({
     _raw: String,
     _metadata: []

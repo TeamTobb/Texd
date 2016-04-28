@@ -1,9 +1,9 @@
 import {Component} from 'angular2/core';
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
-import {EditorController} from './editor';
-import {LoginController} from './login';
-import {RegisterController} from './register';
-import {DashboardComponent} from './dashboard';
+import {EditorController} from './editor/editor';
+import {LoginController} from './auth/login';
+import {RegisterController} from './auth/register';
+import {DashboardComponent} from './dashboard/dashboard';
 import {SettingsComponent} from './settings/settings';
 import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import {CORE_DIRECTIVES} from 'angular2/common';

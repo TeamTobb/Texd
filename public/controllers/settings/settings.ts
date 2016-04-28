@@ -1,14 +1,14 @@
-import {PluginPage} from "./pluginpage";
+import {PluginPage} from "./plugin";
 import {Component, OnInit, AfterViewInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {SettingsPage} from './settingspage';
-import {DocumentStyle} from './documentStyle';
-import {DocumentService} from '../../data_access/document.ts';
-import {KeymapPage} from './keymappage';
+import {DocumentStyle} from './documentstyle';
+import {DocumentService} from '../../service/document.ts';
+import {KeymapPage} from './keymap';
 
 @Component({
     selector: 'settings',
-    templateUrl: 'views/settings.html',
+    templateUrl: 'views/settings/settings.html',
     directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([

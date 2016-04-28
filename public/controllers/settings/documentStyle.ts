@@ -2,19 +2,14 @@ import {Component, OnInit} from 'angular2/core';
 import {Router, RouteParams} from 'angular2/router';
 import {Input, Output} from 'angular2/core';
 import {EventEmitter} from "angular2/src/facade/async";
-
 import {FORM_PROVIDERS, FormBuilder, Validators} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 import {Alert} from 'ng2-bootstrap/ng2-bootstrap'
-
-
-import {DocumentService} from '../../data_access/document.ts';
-
-
+import {DocumentService} from '../../service/document.ts';
 
 @Component({
     selector: 'documentStyle',
-    templateUrl: 'views/settingspages/documentStyle.html',
+    templateUrl: 'views/settings/documentstyle.html',
     directives: [Alert]
 })
 

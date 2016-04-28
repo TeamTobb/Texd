@@ -3,7 +3,6 @@ import express = require('express')
 import Document = require("../domain/document");
 import Chapter = require('../domain/chapter')
 import Line = require('../domain/line')
-import Diff = require("../domain/diff");
 import documentModel = require("../dao/documentModel");
 import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
@@ -193,7 +192,7 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == '+snappet') {
-                    // TODO: add logic for handling snappets that are inserted on lines with text on them
+                    // TODO: add logic for handling snippets that are inserted on lines with text on them
                     var linefrom: number = diff.from.line;
                     for (var text in diff.text) {
                         if (Number(text) == 0) {

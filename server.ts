@@ -26,12 +26,10 @@ var http = require('http');
 var WebSocket = require('ws');
 var publicIp = require('public-ip');
 
-import Diff = require('./server/domain/diff');
-
 import uploadRoutes = require('./server/resources/upload');
 import routes = require('./server/resources/index');
 var pluginsRoutes = require('./server/resources/plugins');
-var snappetRoutes = require('./server/resources/snappets');
+var snippetRoutes = require('./server/resources/snippets');
 var loginroutes = require('./server/resources/login');
 var documentRoutes = require('./server/resources/document');
 var indexroutes = require('./server/resources/index')
@@ -154,7 +152,7 @@ app.post('/plugins', (req, res) => {
         }
     });
 })
-app.get('/snappets', snappetRoutes.read);
+app.get('/snippets', snippetRoutes.read);
 app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {
     documentService.getDocument(req, res)
