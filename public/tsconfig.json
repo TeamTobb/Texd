@@ -29,7 +29,7 @@
         "controllers/mainview.ts",
         "controllers/modals/imageuploader.ts",
         "controllers/modals/pluginuploader.ts",
-        "controllers/settings/documentstyle.ts",
+        "controllers/settings/documentStyle.ts",
         "controllers/settings/keymap.ts",
         "controllers/settings/plugin.ts",
         "controllers/settings/settings.ts",

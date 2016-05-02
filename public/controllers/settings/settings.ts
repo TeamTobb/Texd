@@ -2,7 +2,7 @@ import {PluginPage} from "./plugin";
 import {Component, OnInit, AfterViewInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {SettingsPage} from './settingspage';
-import {DocumentStyle} from './documentstyle';
+import {DocumentStyle} from './documentStyle';
 import {DocumentService} from '../../service/document.ts';
 import {KeymapPage} from './keymap';
 
