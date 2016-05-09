@@ -14,7 +14,7 @@ import {Modal} from "ng2-modal/Modal";
     templateUrl: 'views/modals/imageuploader.html',
     directives: [Modal, UPLOAD_DIRECTIVES, Alert]
 })
-export class FileUpload implements AfterViewInit {
+export class ImageUploader implements AfterViewInit {
     zone: NgZone;
     options: Object = {
         url: './upload/photo'
@@ -29,34 +29,34 @@ export class FileUpload implements AfterViewInit {
     dragedFileIsUploading = false;
     selectedFileIsUploaded = false;
     dragedFileIsUploaded = false;
-    public dirFiles = [];
+    public filesInDirective = [];
     public tests = [];
     public currentDoc;
     @Output() clickedImage: EventEmitter<any> = new EventEmitter();
     public imageToUploadToEditor;
     @Input() doc: Document;
 
-
     constructor(private documentService: DocumentService) {
         this.zone = new NgZone({ enableLongStackTrace: false });
-
     }
 
     ngAfterViewInit() {
         setTimeout(() => {
             this.currentDoc = this.doc
-            this.findAllPhotos()
+            this.findAllImages()
         }, 100)
-
     }
 
     onModalOpen() {
+        console.log("openingModal");
+        
     }
-    private findAllPhotos() {
+    
+    private findAllImages() {
         this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
             if (!files.errno) {
                 files.forEach(file => {
-                    this.dirFiles.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
+                    this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
                 });
             }
         });
@@ -66,7 +66,6 @@ export class FileUpload implements AfterViewInit {
         this.clickedImage.emit(file)
     }
 
-
     handleMultipleUpload(data): void {
         this.selectedFileIsUploading = true;
         let index = this.multipleResp.findIndex(x => x.id === data.id);
@@ -74,7 +73,7 @@ export class FileUpload implements AfterViewInit {
             if (!data.error) {
                 this.selectedFileIsUploaded = true;
                 setTimeout(() => {
-                    this.dirFiles.push("uploads/document/" + this.currentDoc._id + "/photos/" + data.originalName);
+                    this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + data.originalName);
                 }, 1000)
             }
             this.multipleResp.push(data);

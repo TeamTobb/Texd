@@ -12,7 +12,7 @@ import {Document, Line, Chapter} from '../../domain/document.ts';
 import {Diff} from '../../domain/diff.ts';
 import {DocumentService} from '../../service/document.ts';
 import {ChapterItem} from './chapteritem.ts'
-import {FileUpload} from '../modals/imageuploader.ts'
+import {ImageUploader} from '../modals/imageuploader.ts'
 import {PluginUploader} from '../modals/pluginuploader.ts'
 import {CmComponent} from './cmcomponent.ts'
 import {SnippetParser} from "../../utils/snippetParser.ts";
@@ -26,7 +26,7 @@ import {UPLOAD_DIRECTIVES} from 'ng2-uploader/ng2-uploader';
 @Component({
     selector: 'texd-editor',
     templateUrl: 'views/editor/editor.html',
-    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, CORE_DIRECTIVES, PluginUploader, FileUpload]
+    directives: [ChapterItem, CmComponent, DROPDOWN_DIRECTIVES, CORE_DIRECTIVES, CORE_DIRECTIVES, PluginUploader, ImageUploader]
 })
 
 export class EditorController implements AfterViewInit {
@@ -56,7 +56,7 @@ export class EditorController implements AfterViewInit {
 
     @ViewChild(CmComponent) cmcomponent: CmComponent;
     @ViewChild(PluginUploader) pluginuploader: PluginUploader;
-    @ViewChild(FileUpload) fileUpload: FileUpload;
+    @ViewChild(ImageUploader) imageUploader: ImageUploader;
 
     constructor(private http: Http, public currElement: ElementRef, private documentService: DocumentService, public renderer: Renderer, private _routeParams: RouteParams, private router: Router) {
         this.element = currElement;

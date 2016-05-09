@@ -122,12 +122,12 @@ var storage = multer.diskStorage({
     }
 });
 
-var upload = multer({ storage: storage }).single('photo');
+var saveUploadedFile = multer({ storage: storage }).single('photo');
 
 
 //TODO Change to app.use() Create one upload, with different paths for photo, JSON...
 app.post('/upload/photo', function (req, res) {
-    upload(req, res, function (err) {
+    saveUploadedFile(req, res, function (err) {
         if (err) {
             return res.end("Error uploading file.");
         }

@@ -7,7 +7,7 @@
     <modal-content>
         <div class="images-uploader-container">
             <div class="photosInUploadDiv">
-                <div *ngFor="#file of dirFiles; #i = index">
+                <div *ngFor="#file of filesInDirective; #i = index">
                     <button type="submit" title="{{file}}" (click)="photoClicked(file)" value="{{file}}" class="singlePhotoInDivUpload">
                         <img src="{{file}}" alt="{{file}}" class="imgInButtonUpload" >
                     </button>

@@ -48,8 +48,5 @@
     "typescript": "latest",
     "ws": "^1.0.1",
     "zone.js": "latest"
-  },
-  "devDependencies": {
-    "jasmine-core": "2.4.1"
   }
 }
