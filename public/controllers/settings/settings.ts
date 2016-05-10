@@ -1,7 +1,7 @@
 import {PluginPage} from "./plugin";
 import {Component, OnInit, AfterViewInit} from 'angular2/core';
 import {Router, ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
-import {SettingsPage} from './settingspage';
+import {UserPage} from './user';
 import {DocumentStyle} from './documentStyle';
 import {DocumentService} from '../../service/document.ts';
 import {KeymapPage} from './keymap';
@@ -12,8 +12,8 @@ import {KeymapPage} from './keymap';
     directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([
-    { path: '', name: 'Main', component: SettingsPage },
-    { path: '/page/:id', name: 'SettingsPage', component: SettingsPage },
+    { path: '', name: 'Main', component: PluginPage },
+    { path: '/page/user', name: 'UserPage', component: UserPage },
     { path: '/style/document/:id', name: 'DocumentStyle', component: DocumentStyle },
     { path: '/page/plugins', name: 'PluginPage', component: PluginPage},
     { path: '/page/keymap', name: 'KeymapPage', component: KeymapPage}
@@ -21,7 +21,7 @@ import {KeymapPage} from './keymap';
 export class SettingsComponent implements AfterViewInit {
     private settingTypes: string[] = ["Style", "User", "Keymap", "Plugins"];
     private active = 0;
-
+ˆ
     constructor(private _router: Router) {}
 
     ngAfterViewInit() {
@@ -36,7 +36,7 @@ export class SettingsComponent implements AfterViewInit {
                 break;
             case 1:
                 this.active = 1;
-                this._router.navigate(['SettingsPage', { id: settingType }]);
+                this._router.navigate(['UserPage', {}]);
                 break;
             case 2:
                 this.active = 2;

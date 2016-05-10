@@ -121,7 +121,7 @@ export class DocumentService {
                 if (c == "0") {
                     totalHTML += "<h1 id='firstpage'>" + tempDoc.chapters[c].header + "</h1>";
                 } else if(c == "1"){
-                    totalHTML += "<div class=\"toc\"></div>";                    
+                    totalHTML += "<div class=\"toc\"></div>";
                     totalHTML += "<h1 id=\"" + tempDoc.chapters[c].header.replace(/\s+/g, '-').toLowerCase() + "\">" + tempDoc.chapters[c].header + "</h1>";
                 }
                 else {
@@ -132,7 +132,6 @@ export class DocumentService {
                 var parsedHTML: string = this._jsonParser.getParsedHTML(parsedJSON);
                 totalHTML += parsedHTML;
             }
-            
             var el = document.createElement('html');
             el.innerHTML = totalHTML;
             var contentHTML = "";
@@ -155,7 +154,9 @@ export class DocumentService {
                 }
             }
             contentHTML += "</ol>"
-            el.getElementsByClassName('toc')[0].innerHTML = contentHTML; 
+            if (tempDoc.chapters.length > 1) {
+                el.getElementsByClassName('toc')[0].innerHTML = contentHTML;
+            }
             callback(el.innerHTML);
         })
     }

@@ -33,7 +33,7 @@
         "controllers/settings/keymap.ts",
         "controllers/settings/plugin.ts",
         "controllers/settings/settings.ts",
-        "controllers/settings/settingspage.ts",
+        "controllers/settings/user.ts",
         "utils/jsonToHtml.ts",
         "utils/keymap.ts",
         "utils/parseMap.ts",
