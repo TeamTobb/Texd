@@ -61,4 +61,7 @@ Example usage:
 #img @height “200px” @width “250px” @src “uploads/testImages/test.png” This is a test image #
 ```
 
-Here you can see that the attributes “height”, “width” and “src” are present, and that “ref” is not. Value is also used and does now contain “This is a test image” since this text is found between “#img” and “#” and is not specified as a attribute. This is how it will look in the finished document:
+Here you can see that the attributes “height”, “width” and “src” are present, and that “ref” is not. Value is also used and does now contain “This is a test image” since this text is found between “#img” and “#” and is not specified as a attribute.
+
+This is how it will look in the finished document:
+![Preview from image plugin](https://github.com/TeamTobb/Texd/blob/master/docs/imagepluginpreview.png "Preview from image plugin”)
