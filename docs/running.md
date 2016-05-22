@@ -32,4 +32,4 @@ Note: All commands entered need to be performed from within *this directory*.
     node server
     ```
 
-7. Open your favorite browser and navigating to `http://localhost:3000/` to access the app.
+7. Open Google Chrome or Mozilla Firefox and navigate to `http://localhost:3000/` to access the app.
