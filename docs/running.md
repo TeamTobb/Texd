@@ -9,23 +9,25 @@ Note: All commands entered need to be performed from within *this directory*.
     ```shell
     <MONGO_INSTALL_DIRECTORY>/bin/mongod --dbpath <PATH_TO_DB_DIRECTORY>
     ```
+    
 3. Install TypeScript globally: 
     ```shell
     sudo npm install -g typescript
     ```
-3. From this directory, install the app's node dependencies, tsd, and typings with the following commands:
+    
+4. From this directory, install the app's node dependencies, tsd, and typings with the following commands:
     ```shell
     npm install
     npm install -g tsd
     tsd install
     ```
 
-4. Before compiling the app you may have to change permissions (default is 744 after tsd install) to the typings directory.
+5. Before compiling the app you may have to change permissions (default is 744 after tsd install) to the typings directory.
     ```shell
     chmod -R 774 typings
     ```
 
-5. Compile the app with the following command:
+6. Compile the app with the following command:
     ```shell
     tsc
     ```
@@ -35,4 +37,4 @@ Note: All commands entered need to be performed from within *this directory*.
     node server
     ```
 
-7. Open Google Chrome or Mozilla Firefox and navigate to `http://localhost:3000/` to access the app.
+8. Open Google Chrome or Mozilla Firefox and navigate to `http://localhost:3000/` to access the app.
