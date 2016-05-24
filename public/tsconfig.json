@@ -40,7 +40,6 @@
         "utils/parser.ts",
         "utils/widget.ts",
         "utils/widgetParser.ts",
-        "domain/diff.ts",
         "domain/document.ts"
     ]
 }
