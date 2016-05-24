@@ -109,6 +109,7 @@ export class DocumentService {
                 lines = document._chapters[diff.chapterIndex]._lines;
 
                 if (diff.origin == '+input') {
+                    // New line
                     if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
                         var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
                         var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
@@ -117,6 +118,8 @@ export class DocumentService {
                         lines[diff.from.line]._raw = firstRaw
 
                         lines.splice(diff.from.line + 1, 0, line)
+
+                        // Widget or writing over selected text
                     } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
                         var fromLine = diff.from.line;
                         var fromCh = diff.from.ch;
@@ -130,12 +133,27 @@ export class DocumentService {
                             var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
                             lines[fromLine]._raw = newraw;
                         } else if (fromLine != toLine) {
-                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
+                            lines[fromLine]._raw = firstLine.slice(0, fromCh) + diff.text[0];
                             var lastRow = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRow + lastRow;
-                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                            var last_complete = false;
+                            for (var i = toLine; i > fromLine; i--) {
+                                if (diff.text[i - fromLine]) {
+                                    lines[i]._raw = diff.text[i - fromLine];
+                                    if (!last_complete) {
+                                        lines[i]._raw += lastRow;
+                                        last_complete = true;
+                                    }
+                                } else {
+                                    lines.splice(i, 1);
+                                }
+                            }
+                            if (!last_complete) {
+                                lines[fromLine]._raw += lastRow;
+                            }
                         }
-                    } else {  //ny bokstav
+
+                        // Writing a single letter
+                    } else {
                         var raw: any = lines[diff.from.line]["_raw"];
                         lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
                     }
