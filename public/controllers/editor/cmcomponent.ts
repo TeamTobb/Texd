@@ -412,7 +412,7 @@ export class CmComponent implements AfterViewInit, OnChanges, OnDestroy {
         var cursor = this.editor.getCursor();
         var to = cursor;
         to.line = cursor.line;
-        this.editor.getDoc().replaceRange('\n#img @src "' + file + '" @height "100%" @width "100%" #\n', cursor, to, "paste");
+        this.editor.getDoc().replaceRange('\n#img @src "' + file + '" @height "200px" @width "250px" #\n', cursor, to, "paste");
     }
 
     private setupCMAutocomplete() {
