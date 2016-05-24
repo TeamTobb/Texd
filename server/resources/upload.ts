@@ -1,30 +1,4 @@
-
-
-
-/*//TODO is this in use?  
-export function upload(req, res) {
-    var sampleFile;
-    
-	if (!req.files) {
-		res.send('No files were uploaded.');
-		return;
-	}
- 
-	sampleFile = req.files.sampleFile;
-	sampleFile.mv('/', function(err) {
-		if (err) {
-			res.status(500).send(err);
-            
-		}
-		else {
-			res.send('File uploaded!');
-		}
-	});
-}
-*/
 var fs = require('fs');
-
-//import express = require("express");
 var multer = require('multer')
 
 var storage = multer.diskStorage({
@@ -67,7 +41,6 @@ var storage = multer.diskStorage({
 });
 
 var saveUploadedFile = multer({ storage: storage }).single('photo');
-
 
 export function upload(req, res) {
 	console.log("uploadfunc");

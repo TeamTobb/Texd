@@ -43,22 +43,19 @@ export class ImageUploader implements AfterViewInit {
     ngAfterViewInit() {
         setTimeout(() => {
             this.currentDoc = this.doc
-            this.findAllImages()
+            this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
+                if (!files.errno) {
+                    this.filesInDirective = [];
+                    files.forEach(file => {
+                        this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
+                    });
+                }
+            });
         }, 100)
     }
 
-    onModalOpen() {        
-        this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
-            if (!files.errno) {
-                this.filesInDirective = [];
-                files.forEach(file => {
-                    this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
-                });
-            }
-        });
-        
-    }
-    
+
+
 
     photoClicked(file) {
         this.clickedImage.emit(file)
@@ -69,9 +66,10 @@ export class ImageUploader implements AfterViewInit {
         let index = this.multipleResp.findIndex(x => x.id === data.id);
         if (index === -1) {
             if (!data.error) {
-                this.selectedFileIsUploaded = true;
+                //this.selectedFileIsUploaded = true;
                 setTimeout(() => {
-                    this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + data.originalName);
+                    var correctOrginalName = data.originalName.replace(/\s/g, "");
+                    this.filesInDirective.unshift("uploads/document/" + this.currentDoc._id + "/photos/" + correctOrginalName);
                 }, 1000)
             }
             this.multipleResp.push(data);
@@ -81,13 +79,11 @@ export class ImageUploader implements AfterViewInit {
                 this.multipleResp[index] = data;
             });
         }
-
         let total = 0, uploaded = 0;
         this.multipleResp.forEach(resp => {
             total += resp.progress.total;
             uploaded += resp.progress.loaded;
         });
-
         this.multipleProgress = Math.floor(uploaded / (total / 100));
 
     }
@@ -98,7 +94,12 @@ export class ImageUploader implements AfterViewInit {
         if (index === -1) {
             this.dropResp.push(data);
             if (!data.error) {
-                this.dragedFileIsUploaded = true;
+                //this.dragedFileIsUploaded = true;
+                this.selectedFileIsUploaded = true;
+                setTimeout(() => {
+                    var correctOrginalName = data.originalName.replace(/\s/g, "");
+                    this.filesInDirective.unshift("uploads/document/" + this.currentDoc._id + "/photos/" + correctOrginalName);
+                }, 1000)
             }
         }
         else {
@@ -106,14 +107,24 @@ export class ImageUploader implements AfterViewInit {
                 this.dropResp[index] = data;
             });
         }
-
         let total = 0, uploaded = 0;
         this.dropResp.forEach(resp => {
             total += resp.progress.total;
             uploaded += resp.progress.loaded;
         });
-
         this.dropProgress = Math.floor(uploaded / (total / 100));
+
+    }
+
+    onModalOpen() {
+        this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
+            if (!files.errno) {
+                this.filesInDirective = [];
+                files.forEach(file => {
+                    this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
+                });
+            }
+        });
 
     }
 }
