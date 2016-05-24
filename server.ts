@@ -1,5 +1,4 @@
 /// <reference path="./typings/tsd.d.ts"/>​
-
 import express = require('express')
 var fs = require('fs');
 var https = require('https');
@@ -38,15 +37,15 @@ var wsPort: number = process.env.PORT || 3001;
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
 
-checkArgs();
-
 var WebSocketServer = WebSocket.Server;
 var server = new WebSocketServer({ port: wsPort });
 
 import DocumentService = require('./server/services/documentService');
-
 var documentService = new DocumentService.DocumentService();
 
+
+
+checkArgs();
 
 server.on('connection', ws => {
     ws.on('message', message => {
@@ -88,54 +87,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 
-//Setting up the uploader "Multer"
-var multer = require('multer')
-
-var storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        var documentID: string = ""
-        for (var index = 0; index < req.rawHeaders.length; index++) {
-            var element = req.rawHeaders[index];
-            if (element == "Referer") {
-                documentID = req.rawHeaders[index + 1].slice(req.rawHeaders[index + 1].length - 24, req.rawHeaders[index + 1].length);
-            }
-        }
-        var documentDir = './public/uploads/document/' + documentID.trim()// '/photos'
-        var photoDirForDocId = documentDir + '/photos'
-        if (!fs.existsSync(documentDir)) {
-            fs.mkdirSync(documentDir);
-            fs.mkdirSync(photoDirForDocId);
-        }
-        callback(null, photoDirForDocId);
-    },
-    filename: function (req, file, callback) {
-        var originalName: string = ""
-        for (var index = 0; index < req.rawHeaders.length; index++) {
-            var element = req.rawHeaders[index];
-            if (element == "originalName") {
-                originalName = req.rawHeaders[index + 1];
-                // replace all whitespace with nothing
-                originalName = originalName.replace(/\s/g, "");
-            }
-        }
-        callback(null, originalName);
-    }
-});
-
-var saveUploadedFile = multer({ storage: storage }).single('photo');
-
-
-//TODO Change to app.use() Create one upload, with different paths for photo, JSON...
-app.post('/upload/photo', function (req, res) {
-    saveUploadedFile(req, res, function (err) {
-        if (err) {
-            return res.end("Error uploading file.");
-        }
-        res.end("File is uploaded");
-    });
-});
-
-app.post('/uploadFile', uploadRoutes.upload);
 
 //Routes
 app.use('/', loginroutes);
@@ -160,7 +111,7 @@ app.get('/document/:id', (req, res) => {
 app.get('/document/createNew', (req, res) => {
     documentService.createNew(req, res)
 })
-
+app.post('/upload/photo', uploadRoutes.upload);
 
 // app.get('/documents', passport.authenticate('bearer'), documentRoutes.getDocuments);
 app.get('/documents', (req, res) => {
@@ -185,7 +136,6 @@ app.listen(httpPort, function () {
 
 
 // var server = https.createServer(https_options, app).listen(httpPort, function(){
-
 // });
 
 export var App = app;
