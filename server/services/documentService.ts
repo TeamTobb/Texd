@@ -71,6 +71,7 @@ export class DocumentService {
         if (this.documents !== undefined) {
             var documentid: string = req.params.id;
             delete this.documents[documentid];    
+            delete this.documentIsUpdated[documentid]; 
             documentRoutes.deleteDocument(documentid, (error) => {
                 if (!error){
                     res.status(202).jsonp({success: true})
@@ -90,6 +91,9 @@ export class DocumentService {
     }
 
     updateDocument(diff) {
+        if (!(diff.documentId in this.documents)) {
+            return;
+        }
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
