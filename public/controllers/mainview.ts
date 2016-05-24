@@ -1,10 +1,10 @@
 import {Component} from 'angular2/core';
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
-import {EditorController} from './editor';
-import {LoginController} from './login';
-import {RegisterController} from './register';
-import {DashboardComponent} from './dashboard';
-import {SettingsComponent} from './settings';
+import {EditorController} from './editor/editor';
+import {LoginController} from './auth/login';
+import {RegisterController} from './auth/register';
+import {DashboardComponent} from './dashboard/dashboard';
+import {SettingsComponent} from './settings/settings';
 import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import {CORE_DIRECTIVES} from 'angular2/common';
 
@@ -23,29 +23,28 @@ import {CORE_DIRECTIVES} from 'angular2/common';
 export class MainView{
     public title = 'Main view';
     public loggedIn = false;
-    public notLoggedIn = !this.loggedIn; 
-    
+    public notLoggedIn = !this.loggedIn;
+
     constructor(private _router: Router) {
         if (localStorage.getItem('id_token') != undefined) {
             this.loggedIn = true;
-            this.notLoggedIn = !this.loggedIn;   
+            this.notLoggedIn = !this.loggedIn;
         }
     }
-    
+
     logOut(){
-        localStorage.removeItem('id_token');  
-        this.loggedIn = false; 
+        localStorage.removeItem('id_token');
+        localStorage.removeItem('id_color'); 
+        this.loggedIn = false;
         this.notLoggedIn = !this.loggedIn;
     }
 
     public goToDashboard() {
-        console.log("Go to dashboard function");
         this.title = "Dashboard";
         this._router.navigate(['Dashboard', 'Documents', {}]);
     }
 
     public goToSettings() {
-        console.log("Go to settings function");
         this.title = "Settings";
         this._router.navigate(['Settings', 'Main', {}]);
     }

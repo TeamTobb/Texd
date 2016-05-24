@@ -1,0 +1,9 @@
+<div class="docView">
+    <section *ngIf="normalDoc">
+        <button class="docDelete" (click)="deleteThisDoc($event)"> X </button><br><br>
+    </section>
+    <b> {{title}} </b>
+    <div id="previewframe{{preview._id}}">
+    </div>
+    <br>
+</div>

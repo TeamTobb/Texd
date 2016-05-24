@@ -2,5 +2,6 @@
 	"tagname" : "jstest",
 	"html" : "<div id='scripttest'>Numbers: </div><script>for(var i=0; i<'$value'; i++){document.getElementById('scripttest').innerHTML+=i;}</script>",
 	"attr" : [],
-	"optattr" : []
+	"optattr" : [],
+	"description": "Javascript test to write all numbers from 0 to the number you insert as value"
 }

@@ -9,8 +9,4 @@ var Account = new Schema({
 
 Account.plugin(passportLocalMongoose);
 
-// export = Account; 
-
 module.exports = mongoose.model('Account', Account);
-
-// export var account = mongoose.model("document", Account); 

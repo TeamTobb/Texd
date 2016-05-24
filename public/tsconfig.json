@@ -8,7 +8,7 @@
         "experimentalDecorators": true
     },
     "filesGlob": [
-        "controllers/*.ts",
+        "controllers/**/*.ts",
         "utils/*.ts",
         "domain/*.ts",
         "data_access/*.ts"
@@ -18,30 +18,28 @@
         "rewriteTsconfig": true
     },
     "files": [
-        "controllers/chapteritem.ts",
-        "controllers/cmcomponent.ts",
-        "controllers/dashboard.ts",
-        "controllers/docview.ts",
-        "controllers/editor.ts",
-        "controllers/fileUploader.ts",
+        "controllers/auth/login.ts",
+        "controllers/auth/register.ts",
+        "controllers/dashboard/dashboard.ts",
+        "controllers/dashboard/docview.ts",
+        "controllers/editor/chapteritem.ts",
+        "controllers/editor/cmcomponent.ts",
+        "controllers/editor/editor.ts",
         "controllers/index.ts",
-        "controllers/login.ts",
         "controllers/mainview.ts",
-        "controllers/ng2-uploader.ts",
-        "controllers/pluginuploader.ts",
-        "controllers/register.ts",
-        "controllers/settings.ts",
-        "controllers/settingspage.ts",
-        "controllers/widget.ts",
+        "controllers/modals/imageuploader.ts",
+        "controllers/modals/pluginuploader.ts",
+        "controllers/settings/documentStyle.ts",
+        "controllers/settings/keymap.ts",
+        "controllers/settings/plugin.ts",
+        "controllers/settings/settings.ts",
+        "controllers/settings/user.ts",
         "utils/jsonToHtml.ts",
         "utils/keymap.ts",
         "utils/parseMap.ts",
-        "utils/parser.spec.ts",
         "utils/parser.ts",
-        "utils/snappetParser.ts",
+        "utils/widget.ts",
         "utils/widgetParser.ts",
-        "domain/diff.ts",
-        "domain/document.ts",
-        "data_access/document.ts"
+        "domain/document.ts"
     ]
 }

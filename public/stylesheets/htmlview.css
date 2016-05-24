@@ -38,4 +38,56 @@ body {
     margin-bottom: 1in;
     margin-right: 1in;
     margin-left: 1in;
+    min-height: 600px;
+}
+
+.table-plugin {
+    margin: auto;
+    border: 1px solid gray;
+}
+
+td {
+    border: 1px solid gray;
+}
+
+/* PRINTING - PDF */
+
+H1 {
+    page-break-before: always;
+}
+#firstpage {
+    page-break-before: avoid;
+}
+.image-widget {
+    page-break-inside: avoid;
+}
+
+.toc {
+    page-break-before: always;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    body {
+        /* dirty fix to remove the gray bar at top */
+        background-color: white;
+    }
+    #content, #content * {
+        visibility: visible;
+    }
+    #content {
+        width: 100%;
+    }
+    #innercontent {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    @page  {
+        size: auto;   /* auto is the initial value */
+        /* this affects the margin in the printer settings */
+        margin-top: 25mm;
+        margin-bottom: 25mm;
+    }
 }

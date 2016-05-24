@@ -5,13 +5,6 @@ export class ParseMap {
         plugins.forEach((plugin) => {
             this.generatePlugin(plugin);
         });
-
-        // var attributeList = [];
-        // attributeList["src"] = "my_funny_picture2.jpg";
-        // attributeList["height"] = "40px";
-        // console.log(attributeList);
-        // console.log(this.parseMap["#img"].generateHtmlWithAttr(attributeList, "this is a test value"));
-        // console.log(this.parseMap["#b"].generateHtmlWithAttr(attributeList, "this is a test value"));
     }
 
     generateLegalAttributes(attr, optattr) {
@@ -48,10 +41,8 @@ export class ParseMap {
                             if (temp_tag == "value") {
                                 html += value;
                             } else if (legalAttributes[temp_tag]) {
-                                // console.log("@" + temp_tag);
-                                // console.log(attributeList);
+                                
                                 if (attributeList["@" + temp_tag]) {
-                                    // console.log("works??");
                                     html += attributeList["@" + temp_tag];
                                 } else {
                                     // attribute is not present in the raw paragraph
@@ -75,6 +66,13 @@ export class ParseMap {
                     }
                 }
                 return html;
+            },
+            item: {
+                tagname: plugin.tagname,
+                html: plugin.html,
+                attr: plugin.attr,
+                optattr: plugin.optattr,
+                description: plugin.description
             }
         })
         this.parseMap["#" + plugin.tagname] = p;
@@ -84,4 +82,13 @@ export class ParseMap {
 export interface Plugin {
     getRef: (parentRef) => any;
     generateHtmlWithAttr: (attributeList, value) => any;
+    item: PluginItem;
+}
+
+export interface PluginItem {
+    tagname: string;
+    html: string;
+    attr: string[];
+    optattr: string[];
+    description: string;
 }

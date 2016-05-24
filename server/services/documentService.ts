@@ -3,7 +3,6 @@ import express = require('express')
 import Document = require("../domain/document");
 import Chapter = require('../domain/chapter')
 import Line = require('../domain/line')
-import Diff = require("../domain/diff");
 import documentModel = require("../dao/documentModel");
 import repository = documentModel.repository;
 import chapterModel = documentModel.chapterModel;
@@ -18,27 +17,36 @@ export class DocumentService {
             for (var document of documents) {
                 this.documents[document["id"]] = document;
             }
-            console.log(JSON.stringify(this.documents, null, 2));
             this.documentIsUpdated[document["id"]] = false
         })
 
         setInterval(() => {
-            // console.log("DB tick")
             for (var key in this.documentIsUpdated) {
                 if (this.documentIsUpdated[key]) {
-                    console.log(key + "is getting updated...: ");
                     documentRoutes.saveDocument(this.documents[key], (error, updatedDocumentId) => {
                         var documentId: string = key;
                         if (error) {
                             console.log(error)
                         } else {
-                            console.log("just updated doc: " + updatedDocumentId + " to Databse")
                             this.documentIsUpdated[updatedDocumentId] = false;
                         }
                     })
                 }
             }
         }, 5000);
+    }
+
+    createNew(newDocument, callback) {
+        var lines = [new Line(" ", []), new Line("", []), new Line("", [])];
+        var chapters = [new Chapter("Chapter1", lines)];
+        var style1 = {}
+        style1["fontSize"] = "12px";
+        style1["fontFamily"] = "\"Times New Roman\", Times, serif";
+        var document = new Document(9, "new", "Name 1", ["nil", "nil2"], chapters, style1);
+        documentRoutes.createNewDocument(document, (doc) => {
+            this.documents[doc._id] = doc;
+            callback(doc)
+        })
     }
 
     getChapter(req: express.Request, res: express.Response) {
@@ -50,29 +58,47 @@ export class DocumentService {
         }
     }
 
-
     getDocument(req: express.Request, res: express.Response) {
-        if (this.documents !== undefined) {
+        if (this.documents !== undefined && this.documents[req.params.id]) {
             var documentid: string = req.params.id;
             res.jsonp(this.documents[documentid]);
-            console.log("Fant doc: " + req.params.id);
+        } else {
+            res.status(404).jsonp({}); 
         }
     }
+    
+    deleteDocument(req: express.Request, res: express.Response, callback) {
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.id;
+            delete this.documents[documentid];    
+            delete this.documentIsUpdated[documentid]; 
+            documentRoutes.deleteDocument(documentid, (error) => {
+                if (!error){
+                    res.status(202).jsonp({success: true})
+                    callback(202);
+                } else { 
+                    res.status(204).jsonp({success: false})
+                    callback(204);
+                }                     
+            });            
+        }
+    }    
+    
     getDocuments(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             res.jsonp(this.documents);
-            console.log("Fant alle docs: ");
         }
-    }   
+    }
 
-    updateDocument(diff2) {
-        var diff = JSON.parse(diff2);
+    updateDocument(diff) {
+        if (!(diff.documentId in this.documents)) {
+            return;
+        }
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
         if (diff.newchapter) {
-            console.log("NEW CHAPTER...");
-            var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
+            var newChapter = new chapterModel({ _header: "New chapter", _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
         }
         if (diff.newtitle) {
@@ -83,18 +109,15 @@ export class DocumentService {
             document._style = diff.documentStyle;
         }
         else if (diff.deleteChapter) {
-            console.log("deleting chapter");
             document._chapters.splice(diff.chapterIndex, 1);
         }
 
         else if (diff.newchapterName) {
-            console.log("Changing chapter name")
             if (document._chapters[diff.chapterIndex] != undefined) {
                 document._chapters[diff.chapterIndex]._header = diff.newchapterName
             }
         }
         else if (diff.changeChapter) {
-            console.log("changing position on chapters");
             if (document._chapters[diff.fromChapter] != undefined && document._chapters[diff.toChapter] != undefined) {
                 var fromChapter = document._chapters[diff.fromChapter];
                 document._chapters.splice(diff.fromChapter, 1);
@@ -109,6 +132,7 @@ export class DocumentService {
                 lines = document._chapters[diff.chapterIndex]._lines;
 
                 if (diff.origin == '+input') {
+                    // New line
                     if (diff.text.length == 2 && diff.text[0] == "" && diff.text[1] == "" && diff.from.line == diff.to.line && diff.from.ch == diff.to.ch) {
                         var raw = lines[diff.from.line]._raw.slice(diff.to.ch);
                         var firstRaw = lines[diff.from.line]._raw.slice(0, diff.to.ch);
@@ -117,9 +141,9 @@ export class DocumentService {
                         lines[diff.from.line]._raw = firstRaw
 
                         lines.splice(diff.from.line + 1, 0, line)
-                    } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
-                        console.log("Tekst erstattet med bokstaver")
 
+                        // Widget or writing over selected text
+                    } else if (diff.removed[0] !== "" && diff.text[0] !== "") {
                         var fromLine = diff.from.line;
                         var fromCh = diff.from.ch;
                         var toLine = diff.to.line;
@@ -132,12 +156,27 @@ export class DocumentService {
                             var newraw: string = firstLine.slice(0, fromCh) + diff.text[0] + firstLine.slice(toCh);
                             lines[fromLine]._raw = newraw;
                         } else if (fromLine != toLine) {
-                            var firstRow = firstLine.slice(0, fromCh) + diff.text[0];
+                            lines[fromLine]._raw = firstLine.slice(0, fromCh) + diff.text[0];
                             var lastRow = lastLine.slice(toCh);
-                            lines[fromLine]._raw = firstRow + lastRow;
-                            lines.splice(fromLine + 1, diff.removed.length - 1);
+                            var last_complete = false;
+                            for (var i = toLine; i > fromLine; i--) {
+                                if (diff.text[i - fromLine]) {
+                                    lines[i]._raw = diff.text[i - fromLine];
+                                    if (!last_complete) {
+                                        lines[i]._raw += lastRow;
+                                        last_complete = true;
+                                    }
+                                } else {
+                                    lines.splice(i, 1);
+                                }
+                            }
+                            if (!last_complete) {
+                                lines[fromLine]._raw += lastRow;
+                            }
                         }
-                    } else {  //ny bokstav
+
+                        // Writing a single letter
+                    } else {
                         var raw: any = lines[diff.from.line]["_raw"];
                         lines[diff.from.line]["_raw"] = raw.slice(0, diff.from.ch) + (diff.text[0] || "") + raw.slice(diff.from.ch);
                     }
@@ -165,7 +204,7 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == 'paste') {
-                    // TODO: Make sure this works 100% 
+                    // TODO: Make sure this works 100%
                     var fromLine = diff.from.line;
                     var fromCh = diff.from.ch;
                     var toLine = diff.to.line;
@@ -194,13 +233,17 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == '+snappet') {
-                    // TODO: add logic for handling snappets that are inserted on lines with text on them
-                    var linefrom: number = diff.from.line;
-                    for (var text in diff.text) {
-                        if (Number(text) == 0) {
-                            lines[linefrom]._raw = diff.text[text];
+                    var fromLine = diff.from.line;
+                    var fromCh = diff.from.ch;
+                    var toLine = diff.to.line;
+                    var toCh = diff.to.ch;
+                    var beginning = lines[fromLine]._raw.slice(0, fromCh);
+                    var end = lines[toLine]._raw.slice(toCh);
+                    for (var n in diff.text) {
+                        if (Number(n) == 0) {
+                            lines[fromLine]._raw = beginning + diff.text[n];
                         } else {
-                            lines.splice(linefrom + Number(text), 0, { _raw: diff.text[text], _metadata: [] })
+                            lines.splice(fromLine + Number(n), 0, { _raw: diff.text[n] + end, _metadata: [] })
                         }
                     }
                 }

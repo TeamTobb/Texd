@@ -6,17 +6,13 @@
     <script>
         document.write('<base href="' + document.location.origin + '" />');
     </script>
-    <script src="angular2/bundles/angular2-polyfills.js"></script>
+    <script src="zone.js/dist/zone.js"></script>
+    <script src="reflect-metadata/Reflect.js"></script>
     <script src="typescript/lib/typescript.js"></script>
     <script src="systemjs/dist/system.js"></script>
     <script src="rxjs/bundles/Rx.js"></script>
-    <script src="angular2/bundles/angular2.js"></script>
-    <script src="angular2/bundles/http.dev.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
-    <!-- use internal instead of external router.dev.js -->
-    <script src="https://code.angularjs.org/2.0.0-beta.3/router.dev.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 
     <!-- JQuery UI -->
@@ -62,13 +58,8 @@
     <script src="lib/codemirror/codemirror-javascript/addon/hint/javascript/javascript-templates.js"></script>
 
     <!-- bootstrap -->
-    <script src="ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
-
-    <!-- testing with jspdf -->
-    <script src="lib/jspdf.debug.js"></script>
     <!--<script src="node_modules/systemjs/dist/system.src.js"></script>-->
 
 
@@ -77,20 +68,33 @@
             transpiler: 'typescript',
             typescriptOptions: { emitDecoratorMetadata: true },
             packages: {
-                'controllers': {defaultExtension: 'ts'},
+                'controllers': {
+                    defaultExtension: 'ts'
+                },
+                "angular2": {
+                    defaultExtension: "js"
+                },
                  "angular2-jwt": {
                     defaultExtension: "js"
-                }, 
-                'angular2-modal': {
+                },
+                'ng2-bootstrap': {
                     defaultExtension: 'js'
+                },
+                'ng2-modal': {
+                    defaultExtension: 'js'
+                },
+                'ng2-uploader': {
+                    defaultExtension: 'ts'
                 }
             },
             map: {
+                "angular2": "/angular2",
                 "moment": "moment/moment.js",
-                "angular2-jwt": "angular2-jwt", 
-                "angular2-modal": "/angular2-modal/dist/commonjs"
+                "angular2-jwt": "angular2-jwt",
+                "ng2-bootstrap": "/ng2-bootstrap/bundles",
+                "ng2-modal": "/ng2-modal", 
+                "ng2-uploader": "lib/uploader/src"                
             }
-            
       });
       System.import('controllers/index')
             .then(null, console.error.bind(console));

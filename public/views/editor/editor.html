@@ -1,0 +1,62 @@
+<!-- editor and topbar frame -->
+<div class="editorContainerBox">
+    <div class="beforeEditorContainer">
+        <div id="title">
+            <h2 contenteditable="true" (blur)="changeDocumentTitle($event)">{{document.title}}</h2>
+            <div id="userSpanBox"></div>
+        </div>
+        <div id="buttonsContainer">
+            <span id="buttonsContainerLeft">
+                <button id="sidebarbutton">></button>
+                R <input type="checkbox" id="richTextButton">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="insertheader" style="font-style: bold">Header</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="insertbold" style="font-weight: bold">b</button>
+                <button id="insertitalic" style="font-style: italic">i</button>
+                <button id="insertunderline" style="text-decoration: underline;">u</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <imageUploader [doc]=document (clickedImage)="uploadClickedImage($event)">
+                </imageUploader>
+
+                <pluginuploader>
+                </pluginuploader>
+
+                <button id="styleSettings" (click)="goToSettings()" style="">Style</button>
+
+                <select id="selectFont">
+                    <option  value="{{font}}"  *ngFor="#font of fontPicker; #i = index">{{font}}</option>
+                </select>
+
+                <select id="selectSize">
+                    <option value="{{size}}px" *ngFor="#size of sizePicker; #i = index">{{size}}px</option>
+                </select>
+
+            </span>
+            <span id="buttonsContainerRight" style="float: right; padding-right: 30px">
+                <button id="hidePreview">Hide</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="viewDocument">Download</button>
+                <button id="updatePreview">Update</button>
+            </span>
+        </div>
+    </div>
+    <div class="editorContainer">
+        <cmcomponent id="cmcomponent" [document]=document [current_chapter]=current_chapter
+            (emitChangeChapter)="changeChapter($event)" (emitDoneLoading)="doneLoadingCmComponent($event)"></cmcomponent>
+    </div>
+</div>
+
+<!-- widgets -->
+<div class="widget-templates">
+    <span class="general-span-widget"></span>
+    <iframe class="cleanIframe"></iframe>
+    <span contenteditable="true" class="image-edit"></span>
+    <span contenteditable="false" class="cursor-widget"></span>
+    <div class="image-widget" style="background-color: #EEE">
+        <img class="image-frame" src="test.jpg" height="100px" width="100px">
+        <br>
+        <span class="image-text">This is some text</span>
+    </div>
+</div>

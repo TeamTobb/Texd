@@ -1,0 +1,88 @@
+
+<button (click)="imageModal.open()">Upload image</button>
+<modal modalClass="modal-lg" #imageModal (onOpen)="onModalOpen()">
+    <modal-header>
+        <h2>Images</h2>
+    </modal-header>
+    <modal-content>
+        <div class="images-uploader-container">
+            <div class="photosInUploadDiv">
+                <div *ngFor="#file of filesInDirective; #i = index">
+                    <button type="submit" title="{{file}}" (click)="photoClicked(file)" value="{{file}}" class="singlePhotoInDivUpload">
+                        <img src="{{file}}" alt="{{file}}" class="imgInButtonUpload" >
+                    </button>
+                </div>
+            </div>
+            <div class="columns">
+                <h1 class="headerForUpload"> Upload Image </h1>
+
+                <div id="dragBox" class="column is-4" [ng-file-drop]="options" (onUpload)="handleDropUpload($event)">
+                    <div class="message is-success">
+
+                        <div class="message-header">Drag file inside this box</div>
+
+                        <section *ngIf="dragedFileIsUploading">
+                            <div class="progress">
+                                <div class="progress-bar" [style.width]="dropProgress + '%'"></div>
+                                <span class="percent">{{ dropProgress }}%</span> {{ basicResp | json }}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="column is-4">
+                    <div class="message is-success">
+                        <div class="message-header">Press the button and select files </div>
+                        <br>
+                        <br>
+
+                        <div class="message-body">
+                            <label class="tag btn is-success">
+                                <input type="file" multiple [ng-file-select]="options" (onUpload)="handleMultipleUpload($event)">
+                            </label>
+
+                            <section *ngIf="selectedFileIsUploading">
+
+                                <div class="progress">
+                                    <div class="progress-bar" [style.width]="multipleProgress + '%'"></div>
+                                    <span class="percent">{{ multipleProgress }}%</span>
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+                </div><br>
+                <div class="message resp">
+                    <div class="message-header"></div>
+                    <div class="message-body">
+                        <p>
+                            {{ basicResp | json }}
+                        </p>
+                        <h2 *ngIf="selectedFileIsUploaded">
+                            File uploaded
+                        </h2>
+                        <h2 *ngIf="dragedFileIsUploaded">
+                        File uploaded
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="message resp">
+                <div class="message-header"></div>
+                <div class="message-body">
+                    <p>
+                        {{ basicResp | json }}
+                    </p>
+                    <h2 *ngIf="selectedFileIsUploaded">
+                        File uploaded
+                    </h2>
+                    <h2 *ngIf="dragedFileIsUploaded">
+                    File uploaded
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </modal-content>
+    
+</modal>

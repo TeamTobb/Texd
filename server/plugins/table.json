@@ -1,0 +1,7 @@
+{
+  "tagname": "t",
+  "html": "<div class='image-widget'><div id='$id'></div><br><span class='image-text'>$id</span></div><script>var create_row = function(rowstack, text) { var split = text.split('|'); var curr_row = ''; for(var s in split) { curr_row += '<td>' + split[s] + '</td>'; } rowstack.push(curr_row); }; var elem = document.getElementById('$id'); var str = '$value'; var rows = []; var curr_elements = ''; for(var i in str) { if(str[i] == '[') { continue; } else if(str[i] == ']') {create_row(rows, curr_elements); curr_elements = ''; } else { curr_elements += str[i]; } } var total = '<table class=table-plugin>'; for (var row in rows) { total += '<tr>'; total += rows[row]; total += '</tr>'; } total += '</table>'; elem.innerHTML = total;</script>",
+  "attr": ["id"],
+  "optattr": [],
+  "description": "Table, example usage: ' #t @id \"table1\" [1|2|3][4|5|6] # ' "
+}

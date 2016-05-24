@@ -2,5 +2,6 @@
     "tagname": "i",
     "html": "<i>$value</i>",
     "attr": [],
-    "optattr": []
+    "optattr": [],
+    "description": "Italic text"
 }

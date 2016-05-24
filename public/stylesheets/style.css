@@ -81,7 +81,7 @@ body {
 
 #editor_div {
     position: relative;
-    height: 100%; 
+    height: 100%;
     width: 100%;
     flex: 1 1 auto;
 }
@@ -89,21 +89,32 @@ body {
 .modal-content{
     width: 100%;
     height: 100%;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
 }
 
 .plugin-uploader-container{
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
     width: 90%;
     height: 60%;
 }
 
+.modal-body{
+    width:100%;
+    height: 100%;
+}
+
+.images-uploader-container{
+    width: 100%;
+    height: 60%;
+}
+
 .modal-lg {
-    height: 550px;
+    height: 80%;
+    width: 100%;
     position: relative;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
     margin-top: 50px;
 }
@@ -111,7 +122,7 @@ body {
 .modal-sm {
     /*height: 500px;*/
     position: relative;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
     margin-top: 50px;
 }
@@ -204,7 +215,7 @@ body {
     height: 100%;
     overflow-y: none;
     overflow-x: none;
-    left: -3px;
+    /*left: -3px;*/
     top: 0;
     bottom: 0;
     width: 6px;
@@ -300,30 +311,18 @@ body {
     width: 98%;
     /*margin-left: 40px;*/
     /*margin-right: 40px;*/
+    background-color: gray;
     /*margin: auto;*/
     display: block;
     padding-left: 10px;
     overflow: scroll;
     word-wrap: break-word;
 }
-.uploadDiv{
-    z-index: 999;
-    background-color: lightsteelblue;
-    width: 80%;
-    height: 90%;
-    position: absolute;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-}
 
 .uploadPluginDiv{
     z-index: 999;
     background-color: lightsteelblue;
-    width: 80%; 
+    width: 80%;
     height: 80%;
     position: absolute;
     margin-top: auto;
@@ -336,7 +335,7 @@ body {
 
 .photosInUploadDiv{
     width: 100%;
-    height: 30%;
+    height: 60%;
     top:0;
     overflow-y: scroll;
     overflow-x: scroll;
@@ -344,8 +343,8 @@ body {
 
 .singlePhotoInDivUpload{
     margin: 1%;
-    width:200px;
-    height:200px;
+    width:150px;
+    height:150px;
     float:left;
 }
 
@@ -360,7 +359,6 @@ body {
     margin: 10%;
     height: 80%;
     width: 80%;
-
 }
 
 .headerForUpload{
@@ -447,7 +445,7 @@ body {
     height: 100%;
 }
 
-.selectDocumentInSettings{   
+.selectDocumentInSettings{
  list-style-type: none;
  list-style-position: none;
  list-style-image: none;
@@ -471,6 +469,12 @@ body {
     text-decoration: none;
 }
 
+.dashboard{
+    width: 100%;
+    height: 90%;
+    overflow-x: scroll;
+}
+
 .docView{
     background-color: white;
     border: 2px solid black;
@@ -483,4 +487,99 @@ body {
     overflow: scroll;
     float:left;
     margin: 3%;
+}
+
+.docDelete{
+    float: right;
+    top: 0px;
+    right: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+
+}
+
+#pluginpageheader {
+    padding-left: 20px;
+    height: 75px;
+    position: relative;
+    flex: 0 1 auto;
+}
+
+.settingsPagerightPlugin {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    flex-flow: column;
+    /*word-wrap: break-word;*/
+}
+
+#scrollableviewplugin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    flex: 1 1 auto;
+}
+
+#pluginTableWrapper {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+#pluginpagetable {
+    width: 100%;
+}
+
+.pluginpagetabletr1 {
+    height: 30px;
+    border-bottom: 1px gray solid;
+    /*display: flex;
+    flex-flow: row;*/
+}
+
+.pluginpagetabletr2 {
+    /*display: flex;
+    flex-flow: row;*/
+    width: 100%;
+}
+
+.pluginpagetabletd1 {
+    padding-left: 20px;
+    width: 150px;
+    /*flex: 0 1 auto;*/
+}
+
+.pluginpagetabletd2 {
+    padding-left: 20px;
+    /*flex: 1 1 auto;*/
+    /*width: 100%;*/
+}
+
+#selectFont {
+    width: 150px;
+}
+
+#innerContent ol {
+    counter-reset: item
+}
+#innerContent li {
+    display: block
+}
+#innerContent li:before {
+    content: counters(item, ".")" ";
+    counter-increment: item
+}
+
+#userSpanBox {
+    position: absolute;
+    right: 30px;
+    top: 0;
+}
+
+.userSpanElement {
+    margin-right: 3px;
+    margin-left: 3px;
 }

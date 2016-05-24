@@ -8,5 +8,6 @@
         "height",
         "width",
         "ref"
-    ]
+    ],
+    "description": "Image"
 }
