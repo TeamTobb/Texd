@@ -9,7 +9,10 @@ Note: All commands entered need to be performed from within *this directory*.
     ```shell
     <MONGO_INSTALL_DIRECTORY>/bin/mongod --dbpath <PATH_TO_DB_DIRECTORY>
     ```
-
+3. Install TypeScript globally: 
+    ```shell
+    sudo npm install -g typescript
+    ```
 3. From this directory, install the app's node dependencies, tsd, and typings with the following commands:
     ```shell
     npm install
