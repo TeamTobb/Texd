@@ -43,7 +43,7 @@ export class DocumentService {
         style1["fontSize"] = "12px";
         style1["fontFamily"] = "\"Times New Roman\", Times, serif";
         var document = new Document(9, "new", "Name 1", ["nil", "nil2"], chapters, style1);
-        documentRoutes.createNewDocument(document, (doc) => {            
+        documentRoutes.createNewDocument(document, (doc) => {
             this.documents[doc._id] = doc;
             callback(doc)
         })
@@ -70,7 +70,7 @@ export class DocumentService {
         }
     }
 
-    updateDocument(diff) {       
+    updateDocument(diff) {
         this.documentIsUpdated[diff.documentId] = true;
         var document = this.documents[diff.documentId + ""];
 
@@ -163,7 +163,7 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == 'paste') {
-                    // TODO: Make sure this works 100% 
+                    // TODO: Make sure this works 100%
                     var fromLine = diff.from.line;
                     var fromCh = diff.from.ch;
                     var toLine = diff.to.line;
@@ -192,13 +192,17 @@ export class DocumentService {
                         }
                     }
                 } else if (diff.origin == '+snappet') {
-                    // TODO: add logic for handling snippets that are inserted on lines with text on them
-                    var linefrom: number = diff.from.line;
-                    for (var text in diff.text) {
-                        if (Number(text) == 0) {
-                            lines[linefrom]._raw = diff.text[text];
+                    var fromLine = diff.from.line;
+                    var fromCh = diff.from.ch;
+                    var toLine = diff.to.line;
+                    var toCh = diff.to.ch;
+                    var beginning = lines[fromLine]._raw.slice(0, fromCh);
+                    var end = lines[toLine]._raw.slice(toCh);
+                    for (var n in diff.text) {
+                        if (Number(n) == 0) {
+                            lines[fromLine]._raw = beginning + diff.text[n];
                         } else {
-                            lines.splice(linefrom + Number(text), 0, { _raw: diff.text[text], _metadata: [] })
+                            lines.splice(fromLine + Number(n), 0, { _raw: diff.text[n] + end, _metadata: [] })
                         }
                     }
                 }
