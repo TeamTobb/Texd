@@ -4,7 +4,6 @@ import {Component, ElementRef, Renderer, Input, ViewChild, AfterViewInit, OnChan
 import {Http, HTTP_BINDINGS, Response} from 'angular2/http';
 import {Injectable} from 'angular2/core';
 import {RouteParams} from 'angular2/router';
-import 'rxjs/Rx';
 import {ButtonCheckbox} from 'ng2-bootstrap/ng2-bootstrap';
 import {Parser} from '../../utils/parser.ts';
 import {jsonToHtml} from '../../utils/jsonToHtml.ts';

@@ -5,13 +5,12 @@ import {Document} from '../../domain/document';
 import {DocumentService} from '../../service/document.ts';
 import {DocView} from './docview';
 
-import { CORE_DIRECTIVES, FORM_DIRECTIVES } from 'angular2/common';
 import { ACCORDION_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 
 @Component({
     selector: 'dashboard',
     templateUrl: 'views/dashboard/dashboard.html',
-    directives: [DocView, ACCORDION_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES]
+    directives: [DocView]
 })
 export class DashboardComponent {
     private documents: Document[];
