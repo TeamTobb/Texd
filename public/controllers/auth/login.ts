@@ -24,7 +24,7 @@ export class LoginController {
         this.user = { username: "", password: "" }
     }
 
-    onSubmit() {
+    onLogin() {
         var headers = new Headers()
         headers.append('Content-Type', 'application/json');
 

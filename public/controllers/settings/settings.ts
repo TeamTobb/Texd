@@ -21,7 +21,7 @@ import {KeymapPage} from './keymap';
 export class SettingsComponent implements AfterViewInit {
     private settingTypes: string[] = ["Style", "User", "Keymap", "Plugins"];
     private active = 0;
-ˆ
+
     constructor(private _router: Router) {}
 
     ngAfterViewInit() {

@@ -22,7 +22,7 @@ export class RegisterController {
         this.user = { username: "", password: "" }
     }
 
-    onSubmit() {
+    onRegister() {
         var headers = new Headers()
         headers.append('Content-Type', 'application/json');
         this.http.post('./register', JSON.stringify({ username: this.user.username, password: this.user.password }), { headers: headers }).map((res: Response) => res.json()).subscribe(res => {
