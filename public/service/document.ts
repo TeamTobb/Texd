@@ -219,11 +219,14 @@ export class DocumentService {
             callback(tempDoc);
         })
     }
-
+    
     public getDocument(documentId: string, callback: (document: Document) => any) {
-        this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
-            this.document = new Document([], [], [], [], [], res);
+        this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(
+            (data) => {
+            this.document = new Document([], [], [], [], [], data);
             callback(this.document);
+        }, (error) => {
+            window.location.replace(window.location.origin);
         })
     }
     

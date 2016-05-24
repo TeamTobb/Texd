@@ -59,9 +59,11 @@ export class DocumentService {
     }
 
     getDocument(req: express.Request, res: express.Response) {
-        if (this.documents !== undefined) {
+        if (this.documents !== undefined && this.documents[req.params.id]) {
             var documentid: string = req.params.id;
             res.jsonp(this.documents[documentid]);
+        } else {
+            res.status(404).jsonp({}); 
         }
     }
     
