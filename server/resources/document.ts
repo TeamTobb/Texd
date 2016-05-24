@@ -75,7 +75,6 @@ export function getAllDocuments(callback) {
     })
 }
 
-
 export function createNewDocument(document, callback) {
     repository.create(document, (error, document) => {
         if (error) {
@@ -93,7 +92,17 @@ export function saveDocument(document, callback) {
             callback(error, document._id)
         } else {
             callback(null, document._id);
+        }
+    })
+}
 
+export function deleteDocument(documentid, callback) {
+    repository.remove({_id : documentid}, (err)=>{
+        if (err) {
+            console.log(err);
+            callback(true)           
+        } else {            
+            callback(false)
         }
     })
 }
