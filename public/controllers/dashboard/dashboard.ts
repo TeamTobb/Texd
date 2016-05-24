@@ -1,4 +1,4 @@
-import {Component, OnInit, View} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
 import {Router} from 'angular2/router';
 import {HTTP_BINDINGS} from 'angular2/http';
 import {Document} from '../../domain/document';

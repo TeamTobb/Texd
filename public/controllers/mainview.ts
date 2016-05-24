@@ -34,6 +34,7 @@ export class MainView{
 
     logOut(){
         localStorage.removeItem('id_token');
+        localStorage.removeItem('id_color'); 
         this.loggedIn = false;
         this.notLoggedIn = !this.loggedIn;
     }

@@ -75,7 +75,7 @@ export class DocumentService {
         var document = this.documents[diff.documentId + ""];
 
         if (diff.newchapter) {
-            var newChapter = new chapterModel({ _header: "New Chapter " + (diff.chapterIndex + 1), _lines: [{ _raw: "...", _metadata: [] }] });
+            var newChapter = new chapterModel({ _header: "New chapter", _lines: [{ _raw: "...", _metadata: [] }] });
             document._chapters.splice(diff.chapterIndex + 1, 0, newChapter);
         }
         if (diff.newtitle) {

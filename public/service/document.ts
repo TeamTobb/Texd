@@ -6,9 +6,7 @@ import {Parser} from '../utils/parser.ts';
 import {jsonToHtml} from '../utils/jsonToHtml.ts';
 import {Document, Chapter, Line} from "../domain/document.ts"
 import {Observable} from 'rxjs/Observable';
-import {Diff} from "../domain/diff.ts";
 import {ParseMap} from "../utils/parseMap.ts";
-import {SnippetParser} from "../utils/snippetParser.ts";
 import {EditorController} from '../controllers/editor/editor.ts'
 import {Observer} from 'rxjs/Observer';
 
@@ -20,7 +18,6 @@ export class DocumentService {
     public _senderId: string;
     private _textParser: Parser = null;
     private _jsonParser: jsonToHtml = null;
-    private snippetParser: SnippetParser;
     private jwthelper;
     public cm: any;
     public diffObserver: Observable<any>;

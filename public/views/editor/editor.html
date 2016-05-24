@@ -43,7 +43,7 @@
         </div>
     </div>
     <div class="editorContainer">
-        <cmcomponent id="cmcomponent" [document]=document [current_chapter]=current_chapter [lines]=document.chapters[current_chapter].lines
+        <cmcomponent id="cmcomponent" [document]=document [current_chapter]=current_chapter
             (emitChangeChapter)="changeChapter($event)" (emitDoneLoading)="doneLoadingCmComponent($event)"></cmcomponent>
     </div>
 </div>

@@ -4,11 +4,11 @@ import {MainView} from './mainview';
 import {ROUTER_PROVIDERS} from 'angular2/router';
 import {AuthHttp, AuthConfig} from "angular2-jwt/angular2-jwt"; //I am stating it twice
 import {HTTP_PROVIDERS, Http} from 'angular2/http';
-import {DocumentService} from '../../service/document.ts';
+import {DocumentService} from '../service/document.ts';
 
 bootstrap(MainView, [
     DocumentService,
-    ROUTER_PROVIDERS, 
+    ROUTER_PROVIDERS,
     HTTP_PROVIDERS,
     provide(AuthHttp, {
         useFactory: (http) => {
@@ -16,4 +16,4 @@ bootstrap(MainView, [
         },
         deps: [Http]
     })
-    ]);
+]);

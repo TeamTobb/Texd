@@ -9,13 +9,11 @@ import {ButtonCheckbox} from 'ng2-bootstrap/ng2-bootstrap';
 import {Parser} from '../../utils/parser.ts';
 import {jsonToHtml} from '../../utils/jsonToHtml.ts';
 import {Document, Line, Chapter} from '../../domain/document.ts';
-import {Diff} from '../../domain/diff.ts';
 import {DocumentService} from '../../service/document.ts';
 import {ChapterItem} from './chapteritem.ts'
 import {ImageUploader} from '../modals/imageuploader.ts'
 import {PluginUploader} from '../modals/pluginuploader.ts'
 import {CmComponent} from './cmcomponent.ts'
-import {SnippetParser} from "../../utils/snippetParser.ts";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from 'angular2/router';
 import {Observer} from 'rxjs/Observer';
 import {CORE_DIRECTIVES} from 'angular2/common';
@@ -100,7 +98,7 @@ export class EditorController implements AfterViewInit {
             }
 
             if (diff.deleteChapter) {
-                this.document.chapters.splice(diff.chapterIndex, 1);
+                this.cmcomponent.deleteChapter(diff);
             }
 
             if (diff.changeChapter) {
