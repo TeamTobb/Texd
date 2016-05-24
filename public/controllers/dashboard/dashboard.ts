@@ -30,17 +30,15 @@ export class DashboardComponent {
         this._documentService.newDocObserver.subscribe((newDoc) => {
             this.documents.unshift(newDoc)
         })
-                
+
         this._documentService.deleteDocObserver.subscribe((docId) => {            
             for (var i = 0; i < this.documents.length; i++) {
-                var element = this.documents[i];
-                if (element.id==docId){
-                    this.documents.splice(i,1);
+                var element = this.documents[i];                               
+                if (element._id == docId) {                    
+                    this.documents.splice(i, 1);
                 }
-            }
+            }            
         })
-        
-        
     }
 
     public goToDocument(documentId: string) {
@@ -48,20 +46,19 @@ export class DashboardComponent {
     }
 
     createNewDocument() {
-        this._documentService.createNewDocument((res) => {
-            console.log("New Doc created");            
+        this._documentService.createNewDocument((res) => { 
         });
     }
 
     deleteDocument(document) {
         this._documentService.deleteDocument(document, () => {
         });
-        for (var key in this.documents) {
+        /*for (var key in this.documents) {
             var element = this.documents[key];
             if (element.id == document){
                 console.log(key);                               
                 this.documents.splice( +key, 1)
             }
-        }
+        }*/
     }
 }          
