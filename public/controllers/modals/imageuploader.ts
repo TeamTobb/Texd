@@ -47,20 +47,18 @@ export class ImageUploader implements AfterViewInit {
         }, 100)
     }
 
-    onModalOpen() {
-        console.log("openingModal");
-        
-    }
-    
-    private findAllImages() {
+    onModalOpen() {        
         this.documentService.getFilesInDir(this.currentDoc._id, (files) => {
             if (!files.errno) {
+                this.filesInDirective = [];
                 files.forEach(file => {
                     this.filesInDirective.push("uploads/document/" + this.currentDoc._id + "/photos/" + file);
                 });
             }
         });
+        
     }
+    
 
     photoClicked(file) {
         this.clickedImage.emit(file)
