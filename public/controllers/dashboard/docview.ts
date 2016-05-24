@@ -35,9 +35,8 @@ export class DocView implements AfterViewInit {
   
   deleteThisDoc($event){
     $event.stopPropagation();
-    this.deleteThisDocument.emit(this.preview._id);
+    this.deleteThisDocument.emit(this.preview._id);     
   }
-
 }
 
 

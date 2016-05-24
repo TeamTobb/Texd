@@ -22,19 +22,20 @@ export class DocumentService {
     public cm: any;
     public diffObserver: Observable<any>;
     private _todosObserver: Observer<any>;
-
     public newDocObserver: Observable<any>;
     private _newDocObserver: Observer<any>;
+    public deleteDocObserver: Observable<any>;
+    private _deleteDocObserver: Observer<any>;
     private refreshDocuments = false
     public diff: any = {};
-    public newDoc: any = {};
     public ip: string;
     public port: string;
 
 
     constructor(private http: Http, private authHttp: AuthHttp) {
         this.diffObserver = new Observable(observer => this._todosObserver = observer).startWith(this.diff).share();
-        this.newDocObserver = new Observable(observer => this._newDocObserver = observer);
+        this.newDocObserver = new Observable(observer => this._newDocObserver = observer).startWith().share();
+        this.deleteDocObserver = new Observable(observer => this._deleteDocObserver = observer).startWith().share();
         this.jwthelper = new JwtHelper()
         var token = localStorage.getItem('id_token')
 
@@ -56,19 +57,19 @@ export class DocumentService {
                 var parsed = JSON.parse(message.data)
 
                 if (parsed.newDocument) {
-                    this.newDoc = parsed.document;
-                    this._newDocObserver.next(this.newDoc);
-                }
-                if (parsed.newplugin) {
+                    this._newDocObserver.next(parsed.document);
+                } else if (parsed.deleteDocument){
+                    this._deleteDocObserver.next(parsed.documentid);                             
+                } else if (parsed.newplugin) {
                     this.getPlugins(() => { });
                 } else if (parsed.senderId != this._senderId) {
                     if (parsed.documentId == this.document.id) {
                         this.diff = parsed;
                         this._todosObserver.next(this.diff);
-                    }
+                    }                    
                     if (parsed.documentStyle) {
                         this.document.style = parsed.documentStyle;
-                    }
+                    } 
                 }
             }
         })
@@ -223,6 +224,13 @@ export class DocumentService {
         this.http.get('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
             this.document = new Document([], [], [], [], [], res);
             callback(this.document);
+        })
+    }
+    
+    public deleteDocument(documentId: string, callback: () => any) {
+        console.log("Delte doc in Document Serverice ");        
+        this.http.delete('./document/' + documentId).map((res: Response) => res.json()).subscribe(res => {
+            callback();
         })
     }
 

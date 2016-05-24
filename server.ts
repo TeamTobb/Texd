@@ -51,7 +51,7 @@ server.on('connection', ws => {
     ws.on('message', message => {
         var parsedMessage = JSON.parse(message);
 
-       if (parsedMessage.newDocument) {
+        if (parsedMessage.newDocument) {
             documentService.createNew(parsedMessage.document, (doc) => {
                 broadcast(JSON.stringify({ newDocument: true, document: doc }))
             })
@@ -87,7 +87,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 
-
 //Routes
 app.use('/', loginroutes);
 app.get('/plugins', pluginsRoutes.read);
@@ -107,7 +106,18 @@ app.get('/snippets', snippetRoutes.read);
 app.get('/getFilesInDir/:id', documentRoutes.getFilesInDir);
 app.get('/document/:id', (req, res) => {
     documentService.getDocument(req, res)
-})
+});
+
+app.delete('/document/:id', (req, res) => {
+
+    documentService.deleteDocument(req, res, (statusCode) => {
+        if (statusCode == 202) {
+            var documentid: string = req.params.id;
+            broadcast(JSON.stringify({deleteDocument: true, documentid: documentid}));
+        }
+    });
+});
+
 app.get('/document/createNew', (req, res) => {
     documentService.createNew(req, res)
 })

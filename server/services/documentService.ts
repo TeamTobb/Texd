@@ -64,6 +64,23 @@ export class DocumentService {
             res.jsonp(this.documents[documentid]);
         }
     }
+    
+    deleteDocument(req: express.Request, res: express.Response, callback) {
+        if (this.documents !== undefined) {
+            var documentid: string = req.params.id;
+            delete this.documents[documentid];    
+            documentRoutes.deleteDocument(documentid, (error) => {
+                if (!error){
+                    res.status(202).jsonp({success: true})
+                    callback(202);
+                } else { 
+                    res.status(204).jsonp({success: false})
+                    callback(204);
+                }                     
+            });            
+        }
+    }    
+    
     getDocuments(req: express.Request, res: express.Response) {
         if (this.documents !== undefined) {
             res.jsonp(this.documents);
