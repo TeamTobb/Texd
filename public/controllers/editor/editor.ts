@@ -120,6 +120,12 @@ export class EditorController implements AfterViewInit {
                 this.cmcomponent.addCursor(diff);
             }
         })
+        
+         this.documentService.deleteDocObserver.subscribe((docId) => {               
+            if (docId==this.document.id){
+                window.location.replace(window.location.origin);
+            }         
+        })
     }
 
     cursorActivity(diff) {
