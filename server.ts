@@ -34,6 +34,7 @@ var documentRoutes = require('./server/resources/document');
 var indexroutes = require('./server/resources/index')
 
 var wsPort: number = process.env.PORT || 3001;
+var wsIp: string = process.env.IP || 'localhost';
 var databaseUrl: string = 'localhost';
 var httpPort = 3000;
 
@@ -133,9 +134,13 @@ app.get('/documents/:documentid/:chapterIndex', (req, res) => {
 })
 
 app.get('/wsip', (req, res) => {
-    publicIp.v4((err, ip) => {
-        res.jsonp({ ip: ip, httpPort: httpPort, wsPort: wsPort })
-    });
+    if(!process.env.prod) {
+      publicIp.v4((err, ip) => {
+        res.jsonp({ ip: ip, httpPort: httpPort, wsPort: wsPort });
+      });
+    } else {
+      res.jsonp({ ip: wsIp, httpPort: httpPort, wsPort: wsPort });
+    }
 })
 
 app.get('/*', indexroutes.index);
