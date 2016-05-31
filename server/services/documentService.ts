@@ -217,7 +217,7 @@ export class DocumentService {
                             lines[fromLine]._raw = beginning + diff.text[0] + end;
                         } else {
                             lines[fromLine]._raw = beginning + diff.text[0];
-                            for (var i = 1; i < diff.text.length - 1; i++) {
+                            for (let i: any = 1; i < diff.text.length - 1; i++) {
                                 lines.splice(fromLine + i, 0, { _raw: diff.text[i], _metadata: [] })
                             }
                             lines.splice(toLine + diff.text.length - 1, 0, { _raw: diff.text[diff.text.length - 1] + end, _metadata: [] })
@@ -225,7 +225,7 @@ export class DocumentService {
                     } else if (fromLine != toLine) {
                         lines.splice(fromLine + 1, (toLine - fromLine));
                         lines[fromLine]._raw = beginning + diff.text[0];
-                        for (var i = 1; i < diff.text.length - 1; i++) {
+                        for (let i: any; i < diff.text.length - 1; i++) {
                             lines.splice(i, 0, { _raw: diff.text[i], _metadata: [] })
                         }
                         if (diff.text.length != 1) {
