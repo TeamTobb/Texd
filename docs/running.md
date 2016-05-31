@@ -38,3 +38,5 @@ Note: All commands entered need to be performed from within *this directory*.
     ```
 
 8. Open Google Chrome or Mozilla Firefox and navigate to `http://localhost:3000/` to access the app.
+
+### Alternatively - you can use [docker](https://github.com/zalox/docker-images/tree/master/Texd)
