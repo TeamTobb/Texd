@@ -1,11 +1,11 @@
 <button (click)="pluginModal.open()">Upload plugin</button>
 <modal #pluginModal (onOpen)="onModalOpen()">
     <modal-header>
-        <h2>Last opp plugin</h2>
+        <h2>Upload plugin</h2>
     </modal-header>
     <modal-content>
         <div class="plugin-uploader-container">
-            <label for="pluginname">Navn</label>
+            <label for="pluginname">Name</label>
             <input type="text" class="form-control" id="pluginname" [(ngModel)]="pluginname" />
 
             <textarea id="uploadTextArea"></textarea>
